@@ -1,0 +1,14 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+h2 {
+  border-bottom: 2px solid #20b2aa;
+}
+
+a {
+  color: #20b2aa;
+}
