@@ -4,34 +4,44 @@ import { Input } from "../../components/input/Input";
 import { Button } from "../../components/button/Button";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase/firebaseConfig";
-import validator from "validator";
+
+import s from "./registrationPage.module.css";
 
 export const RegistrationPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string>("");
+  const [emailError, setEmailError] = useState<string>("");
+  const [passwordError, setPasswordError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setEmailError("");
+    setPasswordError("");
 
-    if (!email || !password) {
-      setError("Please fill out all fields");
+    if (!email) {
+      setEmailError("Email is required");
       setLoading(false);
       return;
     }
 
-    if (!validator.isEmail(email)) {
-      setError("Please enter a valid email address");
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org|io|ru)$/;
+    if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address");
       setLoading(false);
       return;
     }
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
+    if (!password) {
+      setPasswordError("Password is required");
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6 || password.length > 20) {
+      setPasswordError("Password must be between 6 and 20 characters long");
       setLoading(false);
       return;
     }
@@ -41,29 +51,32 @@ export const RegistrationPage = () => {
       console.log("Пользователь успешно зарегистрирован!");
       navigate("/login");
     } catch (err) {
-      setError("Error" + (err as Error).message);
+      setEmailError("A user with this email already exists");
+      console.log(err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
+    <div className={s.root}>
       <h2>Registration</h2>
       <form onSubmit={handleSubmit}>
         <Input
           label="Email"
           type="email"
+          error={emailError}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
         />
         <Input
+          error={passwordError}
           label="Password"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Enter your password"
         />
-        {error && <p className="error-message">{error}</p>}
+
         <Button type="submit" disabled={loading}>
           {loading ? "Registration..." : "Register"}
         </Button>
