@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Input } from "../../components/input/Input";
-import { Button } from "../../components/button/Button";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase/firebaseConfig";
-
+import { registerUser } from "@/services/firebase/registerUser";
+import { Input } from "@/components/UI/input";
+import { Button } from "@/components/UI/button";
 import s from "./registrationPage.module.css";
 
 export const RegistrationPage = () => {
@@ -47,12 +45,20 @@ export const RegistrationPage = () => {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      await registerUser(email, password);
       console.log("Пользователь успешно зарегистрирован!");
-      navigate("/login");
-    } catch (err) {
-      setEmailError("A user with this email already exists");
-      console.log(err);
+      navigate("/chat");
+    } catch (err: any) {
+      console.error(err);
+      if (err.code === "auth/email-already-in-use") {
+        setEmailError("A user with this email already exists");
+      } else if (err.code === "auth/invalid-email") {
+        setEmailError("Please enter a valid email address");
+      } else if (err.code === "auth/weak-password") {
+        setPasswordError("Password must be at least 6 characters long");
+      } else if (err.code === "auth/network-request-failed") {
+        setEmailError("Network error. Please try again later");
+      }
     } finally {
       setLoading(false);
     }
@@ -78,11 +84,11 @@ export const RegistrationPage = () => {
         />
 
         <Button type="submit" disabled={loading}>
-          {loading ? "Registration..." : "Register"}
+          {loading ? "Registration..." : "Sign up"}
         </Button>
       </form>
       <p>
-        Already have an account? <a href="/login">Enter</a>
+        Already have an account? <a href="/login">Sign up</a>
       </p>
     </div>
   );
