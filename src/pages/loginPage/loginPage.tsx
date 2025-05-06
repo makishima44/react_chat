@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { Button } from "../../components/button/Button";
-import { Input } from "../../components/input/Input";
+import { Button } from "../../components/UI/button/Button";
+import { Input } from "../../components/UI/input/Input";
 import { useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase/firebaseConfig";
-
 import s from "./loginPage.module.css";
+import loginUser from "@/services/firebase/loginUser";
 
 type loginPageProps = {};
 
@@ -49,7 +47,7 @@ export const LoginPage = ({}: loginPageProps) => {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await loginUser(email, password);
       console.log("Пользователь успешно вошел!");
       navigate("/chat");
     } catch (err: any) {
@@ -57,6 +55,7 @@ export const LoginPage = ({}: loginPageProps) => {
         setEmailError("User not found");
       } else if (err.code === "auth/wrong-password") {
         setPasswordError("Wrong password");
+        console.log(err.code);
       } else if (err.code === "auth/invalid-email") {
         setEmailError("Please enter a valid email address");
       } else if (err.code === "auth/user-disabled") {
