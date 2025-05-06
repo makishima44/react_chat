@@ -1,10 +1,10 @@
-import { JSX } from "react";
+import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { auth } from "../../firebase/firebaseConfig";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 type Props = {
-  children: JSX.Element;
+  children: ReactNode;
 };
 
 export const PrivateRoute = ({ children }: Props) => {
