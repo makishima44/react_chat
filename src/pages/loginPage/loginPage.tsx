@@ -48,20 +48,13 @@ export const LoginPage = ({}: loginPageProps) => {
 
     try {
       await loginUser(email, password);
-      console.log("Пользователь успешно вошел!");
       navigate("/chat");
     } catch (err: any) {
-      if (err.code === "auth/user-not-found") {
-        setEmailError("User not found");
-      } else if (err.code === "auth/wrong-password") {
+      console.log(err.code);
+      if (err.code === "auth/invalid-credential") {
         setPasswordError("Wrong password");
-        console.log(err.code);
       } else if (err.code === "auth/invalid-email") {
         setEmailError("Please enter a valid email address");
-      } else if (err.code === "auth/user-disabled") {
-        setEmailError("User is disabled");
-      } else if (err.code === "auth/network-request-failed") {
-        setEmailError("Network error. Please try again later");
       }
     } finally {
       setLoading(false);

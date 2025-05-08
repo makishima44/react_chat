@@ -1,0 +1,9 @@
+.nav {
+  display: flex;
+  gap: 20px;
+
+  a {
+    color: black;
+    text-decoration: none;
+  }
+}
