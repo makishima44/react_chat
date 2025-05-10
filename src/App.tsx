@@ -2,9 +2,9 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import { PrivateRoute } from "./components/router/PrivateRoute";
 import { PublicRoute } from "./components/router/PublicRoute";
-import { RegistrationPage } from "./pages/registrationPage";
-import { LoginPage } from "./pages/loginPage";
-import { ChatPage } from "./pages/chatPage";
+import { RegistrationPage } from "./pages/registrationPage/RegistrationPage";
+import { LoginPage } from "./pages/loginPage/LoginPage";
+import { ChatPage } from "./pages/chatPage/ChatPage";
 
 const App = () => {
   return (
