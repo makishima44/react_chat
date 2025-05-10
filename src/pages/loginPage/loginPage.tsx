@@ -8,9 +8,7 @@ import s from "./loginPage.module.css";
 import { Input } from "@/components/UI/input";
 import { Button } from "@/components/UI/button";
 
-type loginPageProps = {};
-
-export const LoginPage = ({}: loginPageProps) => {
+export const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState<string>("");
