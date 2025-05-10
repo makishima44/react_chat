@@ -1,11 +1,12 @@
 import { useState } from "react";
 
-import { Input } from "../../components/UI/input/Input";
 import { useNavigate } from "react-router-dom";
 import loginUser from "@/services/firebase/loginUser";
 
 import s from "./loginPage.module.css";
-import { Button } from "@/components/UI/button/Button";
+
+import { Input } from "@/components/UI/input";
+import { Button } from "@/components/UI/button";
 
 type loginPageProps = {};
 
