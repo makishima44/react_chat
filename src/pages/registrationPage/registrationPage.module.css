@@ -1,14 +1,21 @@
-.root {
+.page {
+  width: 100%;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-
-  a {
-    color: #20b2aa;
-  }
 }
 
-h2 {
-  border-bottom: 2px solid #20b2aa;
+.form {
+  display: grid;
+  gap: 12px;
+}
+
+.formError {
+  color: var(--warning);
+  font-size: 13px;
+}
+
+.hint {
+  color: var(--text-dim);
+  font-size: 13px;
 }
