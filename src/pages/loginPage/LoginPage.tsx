@@ -1,48 +1,36 @@
-import { useState } from "react";
-
-import { useNavigate } from "react-router-dom";
+import { FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FirebaseError } from "firebase/app";
 import loginUser from "@/services/firebase/loginUser";
+import { getEmailError, getPasswordError } from "@/utils/validation";
 
 import s from "./loginPage.module.css";
 
 import { Input } from "@/components/UI/input";
 import { Button } from "@/components/UI/button";
+import { TerminalFrame } from "@/components/layout/TerminalFrame";
 
 export const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
+  const [formError, setFormError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setEmailError("");
     setPasswordError("");
+    setFormError("");
 
-    if (!email) {
-      setEmailError("Email is required");
-      setLoading(false);
-      return;
-    }
-
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org|io|ru)$/;
-    if (!emailRegex.test(email)) {
-      setEmailError("Please enter a valid email address");
-      setLoading(false);
-      return;
-    }
-
-    if (!password) {
-      setPasswordError("Password is required");
-      setLoading(false);
-      return;
-    }
-
-    if (password.length < 6 || password.length > 20) {
-      setPasswordError("Password must be between 6 and 20 characters long");
+    const nextEmailError = getEmailError(email);
+    const nextPasswordError = getPasswordError(password);
+    setEmailError(nextEmailError);
+    setPasswordError(nextPasswordError);
+    if (nextEmailError || nextPasswordError) {
       setLoading(false);
       return;
     }
@@ -50,12 +38,18 @@ export const LoginPage = () => {
     try {
       await loginUser(email, password);
       navigate("/chat");
-    } catch (err: any) {
-      console.log(err.code);
-      if (err.code === "auth/invalid-credential") {
-        setPasswordError("Wrong password");
-      } else if (err.code === "auth/invalid-email") {
+    } catch (err) {
+      const firebaseError = err as FirebaseError;
+      if (firebaseError.code === "auth/invalid-credential") {
+        setPasswordError("Invalid email or password");
+      } else if (firebaseError.code === "auth/invalid-email") {
         setEmailError("Please enter a valid email address");
+      } else if (firebaseError.code === "auth/too-many-requests") {
+        setFormError("Too many attempts. Please wait a minute and try again.");
+      } else if (firebaseError.code === "auth/network-request-failed") {
+        setFormError("Network error. Please try again.");
+      } else {
+        setFormError("Login failed. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -63,31 +57,50 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className={s.root}>
-      <h2>Sign in</h2>
-      <form onSubmit={handleSubmit}>
-        <Input
-          label="Login"
-          type="email"
-          error={emailError}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email"
-        />
-        <Input
-          error={passwordError}
-          label="Password"
-          type="password"
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter your password"
-        />
+    <div className={s.page}>
+      <TerminalFrame
+        title="Access Node"
+        subtitle="Identify yourself to enter the secure channel."
+        footer={
+          <span className={s.hint}>
+            No clearance yet? <Link to="/register">Request access</Link>
+          </span>
+        }
+      >
+        <form onSubmit={handleSubmit} className={s.form}>
+          <Input
+            id="login-email"
+            label="Operator Email"
+            type="email"
+            name="email"
+            autoComplete="email"
+            required
+            maxLength={254}
+            error={emailError}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="operator@node.net"
+          />
+          <Input
+            id="login-password"
+            error={passwordError}
+            label="Passcode"
+            type="password"
+            name="password"
+            autoComplete="current-password"
+            required
+            minLength={6}
+            maxLength={64}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter passcode"
+          />
 
-        <Button type="submit" disabled={loading}>
-          {loading ? "Loading..." : "Sign in"}
-        </Button>
-      </form>
-      <p>
-        Don't have an account? <a href="/register">Sign up</a>
-      </p>
+          {formError && <div className={s.formError}>{formError}</div>}
+
+          <Button type="submit" disabled={loading}>
+            {loading ? "Connecting..." : "Enter Channel"}
+          </Button>
+        </form>
+      </TerminalFrame>
     </div>
   );
 };

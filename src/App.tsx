@@ -5,10 +5,11 @@ import { PublicRoute } from "./components/router/PublicRoute";
 import { RegistrationPage } from "./pages/registrationPage/RegistrationPage";
 import { LoginPage } from "./pages/loginPage/LoginPage";
 import { ChatPage } from "./pages/chatPage/ChatPage";
+import s from "./App.module.css";
 
 const App = () => {
   return (
-    <div>
+    <div className={s.app}>
       <Routes>
         <Route
           path="/register"

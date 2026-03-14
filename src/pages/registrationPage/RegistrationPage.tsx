@@ -1,63 +1,53 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FirebaseError } from "firebase/app";
 import { registerUser } from "@/services/firebase/registerUser";
 import { Input } from "@/components/UI/input";
 import { Button } from "@/components/UI/button";
 import s from "./registrationPage.module.css";
+import { TerminalFrame } from "@/components/layout/TerminalFrame";
+import { getEmailError, getPasswordError } from "@/utils/validation";
 
 export const RegistrationPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
+  const [formError, setFormError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setEmailError("");
     setPasswordError("");
+    setFormError("");
 
-    if (!email) {
-      setEmailError("Email is required");
-      setLoading(false);
-      return;
-    }
-
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org|io|ru)$/;
-    if (!emailRegex.test(email)) {
-      setEmailError("Please enter a valid email address");
-      setLoading(false);
-      return;
-    }
-
-    if (!password) {
-      setPasswordError("Password is required");
-      setLoading(false);
-      return;
-    }
-
-    if (password.length < 6 || password.length > 20) {
-      setPasswordError("Password must be between 6 and 20 characters long");
+    const nextEmailError = getEmailError(email);
+    const nextPasswordError = getPasswordError(password);
+    setEmailError(nextEmailError);
+    setPasswordError(nextPasswordError);
+    if (nextEmailError || nextPasswordError) {
       setLoading(false);
       return;
     }
 
     try {
       await registerUser(email, password);
-      console.log("Пользователь успешно зарегистрирован!");
       navigate("/chat");
-    } catch (err: any) {
-      console.error(err);
-      if (err.code === "auth/email-already-in-use") {
+    } catch (err) {
+      const firebaseError = err as FirebaseError;
+      if (firebaseError.code === "auth/email-already-in-use") {
         setEmailError("A user with this email already exists");
-      } else if (err.code === "auth/invalid-email") {
+      } else if (firebaseError.code === "auth/invalid-email") {
         setEmailError("Please enter a valid email address");
-      } else if (err.code === "auth/weak-password") {
+      } else if (firebaseError.code === "auth/weak-password") {
         setPasswordError("Password must be at least 6 characters long");
-      } else if (err.code === "auth/network-request-failed") {
-        setEmailError("Network error. Please try again later");
+      } else if (firebaseError.code === "auth/network-request-failed") {
+        setFormError("Network error. Please try again.");
+      } else {
+        setFormError("Registration failed. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -65,31 +55,50 @@ export const RegistrationPage = () => {
   };
 
   return (
-    <div className={s.root}>
-      <h2>Registration</h2>
-      <form onSubmit={handleSubmit}>
-        <Input
-          label="Email"
-          type="email"
-          error={emailError}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email"
-        />
-        <Input
-          error={passwordError}
-          label="Password"
-          type="password"
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter your password"
-        />
+    <div className={s.page}>
+      <TerminalFrame
+        title="Request Access"
+        subtitle="Register your operator ID to join the network."
+        footer={
+          <span className={s.hint}>
+            Already cleared? <Link to="/login">Return to login</Link>
+          </span>
+        }
+      >
+        <form onSubmit={handleSubmit} className={s.form}>
+          <Input
+            id="register-email"
+            label="Operator Email"
+            type="email"
+            name="email"
+            autoComplete="email"
+            required
+            maxLength={254}
+            error={emailError}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="operator@node.net"
+          />
+          <Input
+            id="register-password"
+            error={passwordError}
+            label="Passcode"
+            type="password"
+            name="password"
+            autoComplete="new-password"
+            required
+            minLength={6}
+            maxLength={64}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Choose passcode"
+          />
 
-        <Button type="submit" disabled={loading}>
-          {loading ? "Registration..." : "Sign up"}
-        </Button>
-      </form>
-      <p>
-        Already have an account? <a href="/login">Sign up</a>
-      </p>
+          {formError && <div className={s.formError}>{formError}</div>}
+
+          <Button type="submit" disabled={loading}>
+            {loading ? "Registering..." : "Authorize Access"}
+          </Button>
+        </form>
+      </TerminalFrame>
     </div>
   );
 };

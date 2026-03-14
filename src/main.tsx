@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import { store } from "./api/store.ts";
+import "./styles/globals.css";
 
 import App from "./App.tsx";
 
