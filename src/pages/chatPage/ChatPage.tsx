@@ -164,7 +164,7 @@ export const ChatPage = () => {
   const handleChallengeSubmit = (event: FormEvent) => {
     event.preventDefault();
     const normalized = challengeAnswer.trim().toLowerCase();
-    if (normalized === "обретаем свободу") {
+    if (normalized === "мы обретаем свободу") {
       sessionStorage.removeItem("challengeRequired");
       setChallengeOpen(false);
       setChallengeError("");
