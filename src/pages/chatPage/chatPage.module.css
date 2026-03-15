@@ -161,7 +161,7 @@
 
 .messages {
   flex: 1;
-  min-height: 500px;
+  min-height: 440px;
   max-height: 52vh;
   padding: 12px 14px;
   overflow-y: auto;
