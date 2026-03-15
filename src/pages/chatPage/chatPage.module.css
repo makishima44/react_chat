@@ -7,7 +7,7 @@
 
 .chatFrame {
   width: min(980px, 96vw);
-  min-height: min(86vh, 860px);
+  min-height: min(66vh, 660px);
 }
 
 .headerControls {
