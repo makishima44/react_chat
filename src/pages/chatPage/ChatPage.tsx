@@ -30,13 +30,16 @@ export const ChatPage = () => {
   const [nicknameError, setNicknameError] = useState("");
   const [savingNickname, setSavingNickname] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [challengeOpen, setChallengeOpen] = useState(false);
+  const [challengeAnswer, setChallengeAnswer] = useState("");
+  const [challengeError, setChallengeError] = useState("");
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const challengeInputRef = useRef<HTMLInputElement | null>(null);
   const authUser = auth.currentUser;
   const currentUserId = authUser?.uid ?? "anonymous";
   const currentUserEmail = authUser?.email ?? "";
-  const currentUserName =
-    authUser?.displayName?.trim() || currentUserEmail || "anonymous@node";
+  const currentUserName = authUser?.displayName?.trim() || currentUserEmail || "anonymous@node";
 
   useEffect(() => {
     const q = query(collection(db, "messages"), orderBy("createdAt"));
@@ -51,10 +54,19 @@ export const ChatPage = () => {
       },
       () => {
         setSendError("Failed to sync messages. Check your connection.");
-      }
+      },
     );
 
     return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const needsChallenge = sessionStorage.getItem("challengeRequired") === "1";
+    setChallengeOpen(needsChallenge);
+    if (needsChallenge) {
+      setChallengeAnswer("");
+      setChallengeError("");
+    }
   }, []);
 
   const handleSend = async (e?: FormEvent) => {
@@ -143,47 +155,51 @@ export const ChatPage = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [settingsOpen]);
 
+  useEffect(() => {
+    if (challengeOpen) {
+      challengeInputRef.current?.focus();
+    }
+  }, [challengeOpen]);
+
+  const handleChallengeSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    const normalized = challengeAnswer.trim().toLowerCase();
+    if (normalized === "обретаем свободу") {
+      sessionStorage.removeItem("challengeRequired");
+      setChallengeOpen(false);
+      setChallengeError("");
+      return;
+    }
+    setChallengeError("Неверно. Ты еблан!");
+  };
+
   return (
     <div className={s.page}>
       <TerminalFrame
-        title="Secure Channel"
-        subtitle="Live relay active. Use encrypted prompt below."
+        title='Secure Channel'
+        subtitle='Live relay active. Use encrypted prompt below.'
         headerSlot={
           <div className={s.headerControls}>
-            <Button
-              type="button"
-              variant="ghost"
-              className={s.iconButton}
-              onClick={openSettings}
-              aria-label="Open settings"
-            >
-              <svg
-                className={s.icon}
-                viewBox="0 0 24 24"
-                role="img"
-                aria-hidden="true"
-              >
+            <Button type='button' variant='ghost' className={s.iconButton} onClick={openSettings} aria-label='Open settings'>
+              <svg className={s.icon} viewBox='0 0 24 24' role='img' aria-hidden='true'>
                 <path
-                  d="M12 8.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5ZM4.93 12.5c-.02-.16-.03-.33-.03-.5 0-.17.01-.34.03-.5l2.05-.32a5.96 5.96 0 0 1 .83-1.99l-1.22-1.67c.2-.25.42-.47.66-.69l1.67 1.22c.62-.38 1.29-.66 1.99-.83l.32-2.05c.16-.02.33-.03.5-.03.17 0 .34.01.5.03l.32 2.05c.7.17 1.37.45 1.99.83l1.67-1.22c.24.22.46.44.66.69l-1.22 1.67c.38.62.66 1.29.83 1.99l2.05.32c.02.16.03.33.03.5 0 .17-.01.34-.03.5l-2.05.32a5.96 5.96 0 0 1-.83 1.99l1.22 1.67c-.2.25-.42.47-.66.69l-1.67-1.22a5.96 5.96 0 0 1-1.99.83l-.32 2.05c-.16.02-.33.03-.5.03-.17 0-.34-.01-.5-.03l-.32-2.05a5.96 5.96 0 0 1-1.99-.83l-1.67 1.22c-.24-.22-.46-.44-.66-.69l1.22-1.67a5.96 5.96 0 0 1-.83-1.99l-2.05-.32Z"
-                  fill="currentColor"
+                  d='M12 8.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5ZM4.93 12.5c-.02-.16-.03-.33-.03-.5 0-.17.01-.34.03-.5l2.05-.32a5.96 5.96 0 0 1 .83-1.99l-1.22-1.67c.2-.25.42-.47.66-.69l1.67 1.22c.62-.38 1.29-.66 1.99-.83l.32-2.05c.16-.02.33-.03.5-.03.17 0 .34.01.5.03l.32 2.05c.7.17 1.37.45 1.99.83l1.67-1.22c.24.22.46.44.66.69l-1.22 1.67c.38.62.66 1.29.83 1.99l2.05.32c.02.16.03.33.03.5 0 .17-.01.34-.03.5l-2.05.32a5.96 5.96 0 0 1-.83 1.99l1.22 1.67c-.2.25-.42.47-.66.69l-1.67-1.22a5.96 5.96 0 0 1-1.99.83l-.32 2.05c-.16.02-.33.03-.5.03-.17 0-.34-.01-.5-.03l-.32-2.05a5.96 5.96 0 0 1-1.99-.83l-1.67 1.22c-.24-.22-.46-.44-.66-.69l1.22-1.67a5.96 5.96 0 0 1-.83-1.99l-2.05-.32Z'
+                  fill='currentColor'
                 />
               </svg>
             </Button>
-            <Button variant="ghost" onClick={handleLogout}>
+            <Button variant='ghost' onClick={handleLogout}>
               Logout
             </Button>
           </div>
         }
         className={s.chatFrame}
       >
-        <div className={s.messages} role="log" aria-live="polite">
+        <div className={s.messages} role='log' aria-live='polite'>
           {messages.length === 0 && <div className={s.empty}>No transmissions yet.</div>}
           {messages.map((msg) => {
             const displayName = msg.userName || msg.user || "anonymous@node";
-            const isOwn = msg.userId
-              ? msg.userId === currentUserId
-              : msg.user === currentUserName ||
-                (currentUserEmail && msg.user === currentUserEmail);
+            const isOwn = msg.userId ? msg.userId === currentUserId : msg.user === currentUserName || (currentUserEmail && msg.user === currentUserEmail);
 
             return (
               <div key={msg.id} className={clsx(s.message, isOwn && s.messageOwn)}>
@@ -199,15 +215,8 @@ export const ChatPage = () => {
 
         <form className={s.inputArea} onSubmit={handleSend}>
           <span className={s.inputPrompt}>$</span>
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Transmit message"
-            disabled={sending}
-            aria-label="Message"
-          />
-          <Button type="submit" disabled={sending || !input.trim()}>
+          <input type='text' value={input} onChange={(e) => setInput(e.target.value)} placeholder='Transmit message' disabled={sending} aria-label='Message' />
+          <Button type='submit' disabled={sending || !input.trim()}>
             {sending ? "Sending..." : "Transmit"}
           </Button>
         </form>
@@ -217,35 +226,24 @@ export const ChatPage = () => {
 
       {settingsOpen && (
         <div className={s.modalOverlay} onClick={closeSettings}>
-          <div
-            className={s.modal}
-            onClick={(event) => event.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="settings-title"
-          >
+          <div className={s.modal} onClick={(event) => event.stopPropagation()} role='dialog' aria-modal='true' aria-labelledby='settings-title'>
             <div className={s.modalHeader}>
-              <h2 className={s.modalTitle} id="settings-title">
+              <h2 className={s.modalTitle} id='settings-title'>
                 Settings
               </h2>
-              <button
-                type="button"
-                className={s.modalClose}
-                onClick={closeSettings}
-                aria-label="Close settings"
-              >
+              <button type='button' className={s.modalClose} onClick={closeSettings} aria-label='Close settings'>
                 ×
               </button>
             </div>
 
             <form className={s.nicknameForm} onSubmit={handleNicknameSave}>
               <div className={s.nicknameField}>
-                <label className={s.nicknameLabel} htmlFor="nickname">
+                <label className={s.nicknameLabel} htmlFor='nickname'>
                   Nickname
                 </label>
                 <input
-                  id="nickname"
-                  type="text"
+                  id='nickname'
+                  type='text'
                   value={nickname}
                   onChange={(e) => {
                     setNickname(e.target.value);
@@ -256,17 +254,53 @@ export const ChatPage = () => {
                   placeholder={currentUserName}
                   maxLength={24}
                   disabled={!authUser || savingNickname}
-                  aria-label="Nickname"
+                  aria-label='Nickname'
                 />
                 {nicknameError && <div className={s.nicknameError}>{nicknameError}</div>}
               </div>
 
               <div className={s.modalActions}>
-                <Button type="button" variant="ghost" onClick={closeSettings}>
+                <Button type='button' variant='ghost' onClick={closeSettings}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={!authUser || savingNickname}>
+                <Button type='submit' disabled={!authUser || savingNickname}>
                   {savingNickname ? "Saving..." : "Save"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {challengeOpen && (
+        <div className={s.modalOverlay}>
+          <div className={s.modal} role='dialog' aria-modal='true' aria-labelledby='challenge-title'>
+            <div className={s.modalHeader}>
+              <h2 className={s.modalTitle} id='challenge-title'>
+                Контроль доступа
+              </h2>
+            </div>
+
+            <form className={s.challengeForm} onSubmit={handleChallengeSubmit}>
+              <p className={s.challengePrompt}>Закончите фразу: "Лишь утратив все до конца.."</p>
+              <input
+                ref={challengeInputRef}
+                type='text'
+                value={challengeAnswer}
+                onChange={(event) => {
+                  setChallengeAnswer(event.target.value);
+                  if (challengeError) {
+                    setChallengeError("");
+                  }
+                }}
+                placeholder='Введите продолжение'
+                autoComplete='off'
+                aria-label='Ответ'
+              />
+              {challengeError && <div className={s.challengeError}>{challengeError}</div>}
+              <div className={s.modalActions}>
+                <Button type='submit' disabled={!challengeAnswer.trim()}>
+                  Подтвердить
                 </Button>
               </div>
             </form>

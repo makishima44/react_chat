@@ -120,6 +120,39 @@
   font-size: 12px;
 }
 
+.challengeForm {
+  display: grid;
+  gap: 16px;
+}
+
+.challengePrompt {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.challengeForm input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(120, 255, 120, 0.25);
+  background: rgba(2, 10, 5, 0.7);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.challengeForm input:focus {
+  outline: none;
+  border-color: rgba(120, 255, 120, 0.5);
+  box-shadow: 0 0 8px rgba(71, 255, 138, 0.2);
+}
+
+.challengeError {
+  color: var(--danger);
+  font-size: 12px;
+}
+
 .modalActions {
   display: flex;
   justify-content: flex-end;
@@ -128,7 +161,7 @@
 
 .messages {
   flex: 1;
-  min-height: 320px;
+  min-height: 500px;
   max-height: 52vh;
   padding: 12px 14px;
   overflow-y: auto;
