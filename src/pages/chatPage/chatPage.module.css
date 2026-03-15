@@ -10,6 +10,122 @@
   min-height: min(86vh, 860px);
 }
 
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.iconButton {
+  width: 40px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 8, 4, 0.78);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 30;
+}
+
+.modal {
+  width: min(440px, 92vw);
+  background: linear-gradient(180deg, rgba(7, 26, 14, 0.98), rgba(4, 16, 9, 0.96));
+  border: 1px solid rgba(120, 255, 120, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 0 24px rgba(71, 255, 138, 0.18);
+  padding: 18px 20px 20px;
+  display: grid;
+  gap: 16px;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.modalClose {
+  background: transparent;
+  border: 1px solid rgba(120, 255, 120, 0.35);
+  color: var(--text-dim);
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.modalClose:hover {
+  box-shadow: 0 0 10px rgba(71, 255, 138, 0.2);
+}
+
+.nicknameForm {
+  display: grid;
+  gap: 16px;
+}
+
+.nicknameField {
+  display: grid;
+  gap: 8px;
+}
+
+.nicknameLabel {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.nicknameForm input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(120, 255, 120, 0.25);
+  background: rgba(2, 10, 5, 0.7);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.nicknameForm input:focus {
+  outline: none;
+  border-color: rgba(120, 255, 120, 0.5);
+  box-shadow: 0 0 8px rgba(71, 255, 138, 0.2);
+}
+
+.nicknameError {
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .messages {
   flex: 1;
   min-height: 320px;
@@ -41,7 +157,7 @@
 
 .user {
   color: var(--text-dim);
-  text-transform: lowercase;
+  text-transform: none;
 }
 
 .separator {
@@ -92,6 +208,11 @@
 @media (max-width: 720px) {
   .chatFrame {
     min-height: 80vh;
+  }
+
+  .headerControls {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .messages {

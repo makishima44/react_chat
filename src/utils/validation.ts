@@ -22,3 +22,17 @@ export const getPasswordError = (password: string) => {
   }
   return "";
 };
+
+export const getNicknameError = (nickname: string) => {
+  const trimmed = nickname.trim();
+  if (!trimmed) {
+    return "Nickname is required";
+  }
+  if (trimmed.length < 2) {
+    return "Nickname must be at least 2 characters long";
+  }
+  if (trimmed.length > 24) {
+    return "Nickname must be 24 characters or fewer";
+  }
+  return "";
+};
