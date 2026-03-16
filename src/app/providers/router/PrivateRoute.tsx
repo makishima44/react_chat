@@ -1,18 +1,18 @@
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/services/firebase/firebaseConfig";
+import { auth } from "@/shared/api/firebase/firebaseConfig";
 
 type Props = {
   children: ReactNode;
 };
 
-export const PublicRoute = ({ children }: Props) => {
+export const PrivateRoute = ({ children }: Props) => {
   const [user, loading] = useAuthState(auth);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  return user ? <Navigate to="/chat" replace /> : children;
+  return user ? children : <Navigate to="/login" replace />;
 };

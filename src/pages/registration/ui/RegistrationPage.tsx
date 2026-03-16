@@ -1,12 +1,12 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
-import { registerUser } from "@/services/firebase/registerUser";
-import { Input } from "@/components/UI/input";
-import { Button } from "@/components/UI/button";
+import { registerUser } from "@/shared/api/firebase/registerUser";
+import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/ui/button";
 import s from "./registrationPage.module.css";
-import { TerminalFrame } from "@/components/layout/TerminalFrame";
-import { getEmailError, getPasswordError } from "@/utils/validation";
+import { TerminalFrame } from "@/shared/ui/terminal-frame/TerminalFrame";
+import { getEmailError, getPasswordError } from "@/shared/lib/validation";
 
 export const RegistrationPage = () => {
   const [email, setEmail] = useState("");

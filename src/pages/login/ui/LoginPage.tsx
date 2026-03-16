@@ -1,14 +1,14 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
-import loginUser from "@/services/firebase/loginUser";
-import { getEmailError, getPasswordError } from "@/utils/validation";
+import loginUser from "@/shared/api/firebase/loginUser";
+import { getEmailError, getPasswordError } from "@/shared/lib/validation";
 
 import s from "./loginPage.module.css";
 
-import { Input } from "@/components/UI/input";
-import { Button } from "@/components/UI/button";
-import { TerminalFrame } from "@/components/layout/TerminalFrame";
+import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/ui/button";
+import { TerminalFrame } from "@/shared/ui/terminal-frame/TerminalFrame";
 
 export const LoginPage = () => {
   const [email, setEmail] = useState("");
