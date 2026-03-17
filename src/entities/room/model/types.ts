@@ -6,4 +6,5 @@ export type Room = {
   createdAt: Timestamp | null;
   createdBy?: string;
   createdByName?: string;
+  password?: string;
 };

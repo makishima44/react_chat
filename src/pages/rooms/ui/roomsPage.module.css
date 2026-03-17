@@ -19,6 +19,18 @@
   letter-spacing: normal;
 }
 
+.iconButton {
+  width: 40px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+}
+
 .operatorName {
   font-size: 12px;
   color: var(--text-dim);
@@ -152,6 +164,11 @@
 .deleteModalBody {
   display: grid;
   gap: 8px;
+}
+
+.accessModalBody {
+  display: grid;
+  gap: 12px;
 }
 
 .dangerAction {

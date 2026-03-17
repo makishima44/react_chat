@@ -1,12 +1,11 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { addDoc, collection, doc, onSnapshot, orderBy, query, serverTimestamp, where } from "firebase/firestore";
-import { signOut, updateProfile } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { useNavigate, useParams } from "react-router-dom";
 
 import type { Message } from "@/entities/message/model/types";
 import { db, auth } from "@/shared/api/firebase/firebaseConfig";
-import { getNicknameError } from "@/shared/lib/validation";
 import { TerminalFrame } from "@/shared/ui/terminal-frame/TerminalFrame";
 import { Button } from "@/shared/ui/button";
 
@@ -14,17 +13,12 @@ import s from "./chatPage.module.css";
 import { ChatHeaderControls } from "./components/ChatHeaderControls";
 import { ChatInput } from "./components/ChatInput";
 import { ChatMessages } from "./components/ChatMessages";
-import { ChatSettingsModal } from "./components/ChatSettingsModal";
 
 export const ChatPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState("");
-  const [nickname, setNickname] = useState(auth.currentUser?.displayName ?? "");
-  const [nicknameError, setNicknameError] = useState("");
-  const [savingNickname, setSavingNickname] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [roomName, setRoomName] = useState("");
   const [roomStatus, setRoomStatus] = useState<"loading" | "ready" | "missing">("loading");
   const navigate = useNavigate();
@@ -71,44 +65,6 @@ export const ChatPage = () => {
     }
   };
 
-  const openSettings = () => {
-    setNickname(authUser?.displayName ?? "");
-    setNicknameError("");
-    setSettingsOpen(true);
-  };
-
-  const closeSettings = () => setSettingsOpen(false);
-
-  const handleNicknameChange = (value: string) => {
-    setNickname(value);
-    if (nicknameError) {
-      setNicknameError("");
-    }
-  };
-
-  const handleNicknameSave = async (event?: FormEvent) => {
-    event?.preventDefault();
-    if (!authUser || savingNickname) return;
-    const nextError = getNicknameError(nickname);
-    setNicknameError(nextError);
-    if (nextError) return;
-
-    const trimmed = nickname.trim();
-    if (trimmed === (authUser.displayName ?? "")) return;
-
-    setSavingNickname(true);
-    try {
-      await updateProfile(authUser, { displayName: trimmed });
-      setNickname(trimmed);
-      setNicknameError("");
-      setSettingsOpen(false);
-    } catch {
-      setNicknameError("Failed to update nickname. Please try again.");
-    } finally {
-      setSavingNickname(false);
-    }
-  };
-
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -121,17 +77,6 @@ export const ChatPage = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  useEffect(() => {
-    if (!settingsOpen) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        closeSettings();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [settingsOpen]);
 
   useEffect(() => {
     if (sessionStorage.getItem("challengeRequired") === "1") {
@@ -206,7 +151,6 @@ export const ChatPage = () => {
           subtitle="This room no longer exists. Return to the directory."
           headerSlot={
             <ChatHeaderControls
-              onOpenSettings={openSettings}
               onGoToRooms={() => navigate("/rooms")}
               onLogout={handleLogout}
             />
@@ -221,18 +165,6 @@ export const ChatPage = () => {
           </div>
         </TerminalFrame>
 
-        {settingsOpen && (
-          <ChatSettingsModal
-            authUser={authUser}
-            nickname={nickname}
-            nicknameError={nicknameError}
-            savingNickname={savingNickname}
-            currentUserName={currentUserName}
-            onClose={closeSettings}
-            onSubmit={handleNicknameSave}
-            onNicknameChange={handleNicknameChange}
-          />
-        )}
       </div>
     );
   }
@@ -242,7 +174,7 @@ export const ChatPage = () => {
       <TerminalFrame
         title="Secure Channel"
         subtitle={roomName ? `Room: ${roomName}` : "Live relay active. Use encrypted prompt below."}
-        headerSlot={<ChatHeaderControls onOpenSettings={openSettings} onGoToRooms={() => navigate("/rooms")} onLogout={handleLogout} />}
+        headerSlot={<ChatHeaderControls onGoToRooms={() => navigate("/rooms")} onLogout={handleLogout} />}
         className={s.chatFrame}
       >
         <ChatMessages
@@ -255,22 +187,8 @@ export const ChatPage = () => {
 
         <ChatInput input={input} sending={sending} disabled={roomStatus !== "ready"} onChange={setInput} onSubmit={handleSend} />
 
-        {sendError && <div className={s.sendError}>{sendError}</div>}
+      {sendError && <div className={s.sendError}>{sendError}</div>}
       </TerminalFrame>
-
-      {settingsOpen && (
-        <ChatSettingsModal
-          authUser={authUser}
-          nickname={nickname}
-          nicknameError={nicknameError}
-          savingNickname={savingNickname}
-          currentUserName={currentUserName}
-          onClose={closeSettings}
-          onSubmit={handleNicknameSave}
-          onNicknameChange={handleNicknameChange}
-        />
-      )}
-
     </div>
   );
 };
