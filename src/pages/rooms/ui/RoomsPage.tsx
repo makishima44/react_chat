@@ -1,4 +1,4 @@
-import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState } from "react";
 import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, orderBy, query, serverTimestamp, where, writeBatch } from "firebase/firestore";
 import { signOut, updateProfile } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
@@ -80,7 +80,7 @@ export const RoomsPage = () => {
 
   useEffect(() => {
     if (!settingsOpen) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
         setSettingsOpen(false);
       }
@@ -198,7 +198,7 @@ export const RoomsPage = () => {
     navigate(`/chat/${roomId}`);
   };
 
-  const handleRoomKeyDown = (event: KeyboardEvent<HTMLDivElement>, roomId: string, room: Room) => {
+  const handleRoomKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>, roomId: string, room: Room) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       handleOpenRoom(roomId, room);
