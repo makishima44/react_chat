@@ -1,8 +1,9 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
-import { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp } from "firebase/firestore";
+import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, orderBy, query, serverTimestamp, where, writeBatch } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { useNavigate } from "react-router-dom";
+import clsx from "clsx";
 
 import type { Room } from "@/entities/room/model/types";
 import { auth, db } from "@/shared/api/firebase/firebaseConfig";
@@ -12,6 +13,7 @@ import { Button } from "@/shared/ui/button";
 import { ChatChallengeModal } from "@/pages/chat/ui/components/ChatChallengeModal";
 
 import s from "./roomsPage.module.css";
+import modalS from "@/pages/chat/ui/chatPage.module.css";
 
 export const RoomsPage = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -22,6 +24,9 @@ export const RoomsPage = () => {
   const [challengeOpen, setChallengeOpen] = useState(false);
   const [challengeAnswer, setChallengeAnswer] = useState("");
   const [challengeError, setChallengeError] = useState("");
+  const [deletingRoomId, setDeletingRoomId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<Room | null>(null);
   const navigate = useNavigate();
   const challengeInputRef = useRef<HTMLInputElement | null>(null);
   const authUser = auth.currentUser;
@@ -115,7 +120,75 @@ export const RoomsPage = () => {
 
   const handleOpenRoom = (roomId: string) => {
     if (challengeOpen) return;
+    if (deleteError) setDeleteError("");
     navigate(`/chat/${roomId}`);
+  };
+
+  const handleRoomKeyDown = (event: KeyboardEvent<HTMLDivElement>, roomId: string) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleOpenRoom(roomId);
+    }
+  };
+
+  const handleOpenDeleteModal = (room: Room) => {
+    if (challengeOpen || deletingRoomId) return;
+
+    const isOwner = room.createdBy === currentUserId;
+    if (!isOwner) {
+      setDeleteError("Нет доступа для удаления комнаты.");
+      return;
+    }
+
+    setDeleteError("");
+    setDeleteTarget(room);
+  };
+
+  const handleCloseDeleteModal = () => {
+    if (deletingRoomId) return;
+    setDeleteTarget(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    const room = deleteTarget;
+    if (challengeOpen || deletingRoomId) return;
+
+    const isOwner = room.createdBy === currentUserId;
+    if (!isOwner) {
+      setDeleteError("Нет доступа для удаления комнаты.");
+      return;
+    }
+
+    setDeletingRoomId(room.id);
+    setDeleteError("");
+
+    try {
+      const messagesQuery = query(collection(db, "messages"), where("roomId", "==", room.id));
+      const messagesSnapshot = await getDocs(messagesQuery);
+      const messageDocs = messagesSnapshot.docs;
+      const batchSize = 450;
+
+      for (let i = 0; i < messageDocs.length; i += batchSize) {
+        const batch = writeBatch(db);
+        messageDocs.slice(i, i + batchSize).forEach((messageDoc) => {
+          batch.delete(messageDoc.ref);
+        });
+        await batch.commit();
+      }
+
+      await deleteDoc(doc(db, "rooms", room.id));
+      setDeleteTarget(null);
+    } catch (err) {
+      const firebaseError = err as FirebaseError;
+      if (firebaseError.code === "permission-denied") {
+        setDeleteError("Нет доступа для удаления комнаты.");
+      } else {
+        setDeleteError("Не удалось удалить комнату. Попробуйте снова.");
+      }
+    } finally {
+      setDeletingRoomId(null);
+    }
   };
 
   const handleLogout = async () => {
@@ -130,12 +203,12 @@ export const RoomsPage = () => {
   return (
     <div className={s.page}>
       <TerminalFrame
-        title="Channel Directory"
-        subtitle="Select an existing room or spin up a new secure channel."
+        title='Channel Directory'
+        subtitle='Select an existing room or spin up a new secure channel.'
         headerSlot={
           <div className={s.headerControls}>
             <span className={s.operatorName}>{currentUserName}</span>
-            <Button variant="ghost" onClick={handleLogout}>
+            <Button variant='ghost' onClick={handleLogout}>
               Logout
             </Button>
           </div>
@@ -145,8 +218,8 @@ export const RoomsPage = () => {
         <div className={s.content}>
           <form className={s.createForm} onSubmit={handleCreateRoom}>
             <Input
-              label="Название комнаты"
-              placeholder="Например: Delta-7"
+              label='Название комнаты'
+              placeholder='Например: Delta-7'
               value={newRoomName}
               onChange={(event) => {
                 setNewRoomName(event.target.value);
@@ -156,7 +229,7 @@ export const RoomsPage = () => {
               required
             />
             {createError && <div className={s.formError}>{createError}</div>}
-            <Button type="submit" disabled={creating}>
+            <Button type='submit' disabled={creating}>
               {creating ? "Создаю..." : "Создать комнату"}
             </Button>
           </form>
@@ -168,23 +241,40 @@ export const RoomsPage = () => {
             </div>
 
             {roomsError && <div className={s.formError}>{roomsError}</div>}
+            {deleteError && <div className={s.formError}>{deleteError}</div>}
 
             {rooms.length === 0 ? (
               <div className={s.emptyState}>Комнат пока нет. Создайте первую.</div>
             ) : (
               <div className={s.roomGrid}>
                 {rooms.map((room) => (
-                  <button
+                  <div
                     key={room.id}
-                    type="button"
-                    className={s.roomCard}
+                    className={clsx(s.roomCard, deletingRoomId === room.id && s.roomCardDisabled)}
+                    role='button'
+                    tabIndex={0}
+                    aria-disabled={deletingRoomId === room.id}
                     onClick={() => handleOpenRoom(room.id)}
+                    onKeyDown={(event) => handleRoomKeyDown(event, room.id)}
                   >
-                    <div className={s.roomName}>{room.name || "Безымянный канал"}</div>
-                    <div className={s.roomMeta}>
-                      {room.createdByName ? `Создал: ${room.createdByName}` : "Создатель неизвестен"}
+                    <div className={s.roomHeader}>
+                      <div className={s.roomName}>{room.name || "Безымянный канал"}</div>
+                      {room.createdBy === currentUserId && (
+                        <button
+                          type='button'
+                          className={s.deleteButton}
+                          disabled={deletingRoomId === room.id}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleOpenDeleteModal(room);
+                          }}
+                        >
+                          {deletingRoomId === room.id ? "Удаляю..." : "Удалить"}
+                        </button>
+                      )}
                     </div>
-                  </button>
+                    <div className={s.roomMeta}>{room.createdByName ? `Создал: ${room.createdByName}` : "Создатель неизвестен"}</div>
+                  </div>
                 ))}
               </div>
             )}
@@ -205,6 +295,35 @@ export const RoomsPage = () => {
           }}
           onSubmit={handleChallengeSubmit}
         />
+      )}
+
+      {deleteTarget && (
+        <div className={modalS.modalOverlay} onClick={handleCloseDeleteModal}>
+          <div className={modalS.modal} onClick={(event) => event.stopPropagation()} role='dialog' aria-modal='true' aria-labelledby='delete-room-title'>
+            <div className={modalS.modalHeader}>
+              <h2 className={modalS.modalTitle} id='delete-room-title'>
+                Delete
+              </h2>
+              <button type='button' className={modalS.modalClose} onClick={handleCloseDeleteModal} aria-label='Закрыть'>
+                ×
+              </button>
+            </div>
+
+            <div className={s.deleteModalBody}>
+              <p className={modalS.challengePrompt}>Вы уверены, что хотите удалить комнату "{deleteTarget.name || "Безымянный канал"}"?</p>
+              <p className={modalS.challengePrompt}>Все сообщения этой комнаты будут удалены без возможности восстановления.</p>
+            </div>
+
+            <div className={modalS.modalActions}>
+              <Button type='button' variant='ghost' onClick={handleCloseDeleteModal} disabled={!!deletingRoomId}>
+                Отмена
+              </Button>
+              <Button type='button' className={s.dangerAction} onClick={handleConfirmDelete} disabled={!!deletingRoomId}>
+                {deletingRoomId ? "Удаляю..." : "Удалить"}
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
