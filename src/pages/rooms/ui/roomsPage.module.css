@@ -1,0 +1,124 @@
+.page {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.roomsFrame {
+  width: min(980px, 96vw);
+  min-height: min(66vh, 660px);
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.operatorName {
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.content {
+  display: grid;
+  gap: 20px;
+}
+
+.createForm {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(2, 10, 5, 0.82);
+  border: 1px solid rgba(120, 255, 120, 0.25);
+  border-radius: 10px;
+  box-shadow: inset 0 0 18px rgba(71, 255, 138, 0.12);
+}
+
+.formError {
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.roomsSection {
+  display: grid;
+  gap: 12px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--accent-strong);
+}
+
+.sectionHint {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.roomGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.roomCard {
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 255, 120, 0.25);
+  background: linear-gradient(180deg, rgba(2, 12, 6, 0.92), rgba(2, 10, 5, 0.72));
+  color: var(--text);
+  cursor: pointer;
+  transition: border 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.roomCard:hover {
+  border-color: rgba(120, 255, 120, 0.45);
+  box-shadow: 0 0 16px rgba(71, 255, 138, 0.2);
+  transform: translateY(-2px);
+}
+
+.roomName {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.roomMeta {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.emptyState {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-style: italic;
+  padding: 12px 4px;
+}
+
+@media (max-width: 720px) {
+  .roomsFrame {
+    min-height: 80vh;
+  }
+
+  .headerControls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

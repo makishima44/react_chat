@@ -2,6 +2,8 @@ import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { registerUser } from "@/shared/api/firebase/registerUser";
+import { auth } from "@/shared/api/firebase/firebaseConfig";
+import { signOut } from "firebase/auth";
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 import s from "./registrationPage.module.css";
@@ -35,7 +37,8 @@ export const RegistrationPage = () => {
 
     try {
       await registerUser(email, password);
-      navigate("/chat");
+      await signOut(auth);
+      navigate("/login");
     } catch (err) {
       const firebaseError = err as FirebaseError;
       if (firebaseError.code === "auth/email-already-in-use") {

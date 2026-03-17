@@ -7,4 +7,5 @@ export type Message = {
   user: string;
   userId?: string;
   userName?: string;
+  roomId?: string;
 };

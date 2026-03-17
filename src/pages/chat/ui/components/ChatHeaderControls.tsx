@@ -4,9 +4,10 @@ import s from "../chatPage.module.css";
 type ChatHeaderControlsProps = {
   onOpenSettings: () => void;
   onLogout: () => void;
+  onGoToRooms: () => void;
 };
 
-export const ChatHeaderControls = ({ onOpenSettings, onLogout }: ChatHeaderControlsProps) => {
+export const ChatHeaderControls = ({ onOpenSettings, onLogout, onGoToRooms }: ChatHeaderControlsProps) => {
   return (
     <div className={s.headerControls}>
       <Button type="button" variant="ghost" className={s.iconButton} onClick={onOpenSettings} aria-label="Open settings">
@@ -16,6 +17,9 @@ export const ChatHeaderControls = ({ onOpenSettings, onLogout }: ChatHeaderContr
             fill="currentColor"
           />
         </svg>
+      </Button>
+      <Button variant="ghost" onClick={onGoToRooms}>
+        Rooms
       </Button>
       <Button variant="ghost" onClick={onLogout}>
         Logout

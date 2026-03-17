@@ -1,16 +1,16 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, doc, onSnapshot, orderBy, query, serverTimestamp, where } from "firebase/firestore";
 import { signOut, updateProfile } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import type { Message } from "@/entities/message/model/types";
 import { db, auth } from "@/shared/api/firebase/firebaseConfig";
 import { getNicknameError } from "@/shared/lib/validation";
 import { TerminalFrame } from "@/shared/ui/terminal-frame/TerminalFrame";
+import { Button } from "@/shared/ui/button";
 
 import s from "./chatPage.module.css";
-import { ChatChallengeModal } from "./components/ChatChallengeModal";
 import { ChatHeaderControls } from "./components/ChatHeaderControls";
 import { ChatInput } from "./components/ChatInput";
 import { ChatMessages } from "./components/ChatMessages";
@@ -25,49 +25,26 @@ export const ChatPage = () => {
   const [nicknameError, setNicknameError] = useState("");
   const [savingNickname, setSavingNickname] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [challengeOpen, setChallengeOpen] = useState(false);
-  const [challengeAnswer, setChallengeAnswer] = useState("");
-  const [challengeError, setChallengeError] = useState("");
+  const [roomName, setRoomName] = useState("");
+  const [roomStatus, setRoomStatus] = useState<"loading" | "ready" | "missing">("loading");
   const navigate = useNavigate();
+  const { roomId } = useParams();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const challengeInputRef = useRef<HTMLInputElement | null>(null);
   const authUser = auth.currentUser;
   const currentUserId = authUser?.uid ?? "anonymous";
   const currentUserEmail = authUser?.email ?? "";
   const currentUserName = authUser?.displayName?.trim() || currentUserEmail || "anonymous@node";
 
   useEffect(() => {
-    const q = query(collection(db, "messages"), orderBy("createdAt"));
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const msgs = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as Omit<Message, "id">),
-        }));
-        setMessages(msgs);
-      },
-      () => {
-        setSendError("Failed to sync messages. Check your connection.");
-      },
-    );
-
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const needsChallenge = sessionStorage.getItem("challengeRequired") === "1";
-    setChallengeOpen(needsChallenge);
-    if (needsChallenge) {
-      setChallengeAnswer("");
-      setChallengeError("");
+    if (!roomId) {
+      navigate("/rooms", { replace: true });
     }
-  }, []);
+  }, [roomId, navigate]);
 
   const handleSend = async (event?: FormEvent) => {
     event?.preventDefault();
     const trimmed = input.trim();
-    if (!trimmed || sending) return;
+    if (!trimmed || sending || !roomId) return;
 
     setSending(true);
     setSendError("");
@@ -79,6 +56,7 @@ export const ChatPage = () => {
         user: currentUserEmail || currentUserName,
         userId: currentUserId,
         userName: currentUserName,
+        roomId,
       });
       setInput("");
     } catch (err) {
@@ -156,29 +134,115 @@ export const ChatPage = () => {
   }, [settingsOpen]);
 
   useEffect(() => {
-    if (challengeOpen) {
-      challengeInputRef.current?.focus();
+    if (sessionStorage.getItem("challengeRequired") === "1") {
+      navigate("/rooms", { replace: true });
     }
-  }, [challengeOpen]);
+  }, [navigate]);
 
-  const handleChallengeSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    const normalized = challengeAnswer.trim().toLowerCase();
-    if (normalized === "мы обретаем свободу") {
-      sessionStorage.removeItem("challengeRequired");
-      setChallengeOpen(false);
-      setChallengeError("");
+  useEffect(() => {
+    if (!roomId) return;
+    setRoomStatus("loading");
+    setRoomName("");
+    const roomRef = doc(db, "rooms", roomId);
+    const unsubscribe = onSnapshot(
+      roomRef,
+      (snapshot) => {
+        if (!snapshot.exists()) {
+          setRoomStatus("missing");
+          setRoomName("");
+          return;
+        }
+        const data = snapshot.data() as { name?: string };
+        setRoomName(data?.name ?? "Secure Channel");
+        setRoomStatus("ready");
+      },
+      () => {
+        setRoomStatus("missing");
+      },
+    );
+
+    return () => unsubscribe();
+  }, [roomId]);
+
+  useEffect(() => {
+    if (!roomId || roomStatus === "missing") {
+      setMessages([]);
       return;
     }
-    setChallengeError("Неверно. Ты еблан!");
-  };
+    const q = query(collection(db, "messages"), where("roomId", "==", roomId), orderBy("createdAt"));
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const msgs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as Omit<Message, "id">),
+        }));
+        setMessages(msgs);
+      },
+      (err) => {
+        const firebaseError = err as FirebaseError;
+        if (firebaseError.code === "failed-precondition") {
+          setSendError("Firestore needs a composite index for roomId + createdAt.");
+        } else if (firebaseError.code === "permission-denied") {
+          setSendError("Access denied. You do not have permission to read this room.");
+        } else {
+          setSendError("Failed to sync messages. Check your connection.");
+        }
+      },
+    );
+
+    return () => unsubscribe();
+  }, [roomId, roomStatus]);
+
+  if (!roomId) {
+    return null;
+  }
+
+  if (roomStatus === "missing") {
+    return (
+      <div className={s.page}>
+        <TerminalFrame
+          title="Channel Lost"
+          subtitle="This room no longer exists. Return to the directory."
+          headerSlot={
+            <ChatHeaderControls
+              onOpenSettings={openSettings}
+              onGoToRooms={() => navigate("/rooms")}
+              onLogout={handleLogout}
+            />
+          }
+          className={s.chatFrame}
+        >
+          <div className={s.roomState}>
+            <p>The requested room could not be found.</p>
+            <Button type="button" onClick={() => navigate("/rooms")}>
+              Back to Rooms
+            </Button>
+          </div>
+        </TerminalFrame>
+
+        {settingsOpen && (
+          <ChatSettingsModal
+            authUser={authUser}
+            nickname={nickname}
+            nicknameError={nicknameError}
+            savingNickname={savingNickname}
+            currentUserName={currentUserName}
+            onClose={closeSettings}
+            onSubmit={handleNicknameSave}
+            onNicknameChange={handleNicknameChange}
+          />
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className={s.page}>
       <TerminalFrame
         title="Secure Channel"
-        subtitle="Live relay active. Use encrypted prompt below."
-        headerSlot={<ChatHeaderControls onOpenSettings={openSettings} onLogout={handleLogout} />}
+        subtitle={roomName ? `Room: ${roomName}` : "Live relay active. Use encrypted prompt below."}
+        headerSlot={<ChatHeaderControls onOpenSettings={openSettings} onGoToRooms={() => navigate("/rooms")} onLogout={handleLogout} />}
         className={s.chatFrame}
       >
         <ChatMessages
@@ -189,7 +253,7 @@ export const ChatPage = () => {
           messagesEndRef={messagesEndRef}
         />
 
-        <ChatInput input={input} sending={sending} onChange={setInput} onSubmit={handleSend} />
+        <ChatInput input={input} sending={sending} disabled={roomStatus !== "ready"} onChange={setInput} onSubmit={handleSend} />
 
         {sendError && <div className={s.sendError}>{sendError}</div>}
       </TerminalFrame>
@@ -207,20 +271,6 @@ export const ChatPage = () => {
         />
       )}
 
-      {challengeOpen && (
-        <ChatChallengeModal
-          challengeAnswer={challengeAnswer}
-          challengeError={challengeError}
-          inputRef={challengeInputRef}
-          onAnswerChange={(value) => {
-            setChallengeAnswer(value);
-            if (challengeError) {
-              setChallengeError("");
-            }
-          }}
-          onSubmit={handleChallengeSubmit}
-        />
-      )}
     </div>
   );
 };

@@ -238,6 +238,16 @@
   font-size: 13px;
 }
 
+.roomState {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  background: rgba(2, 10, 5, 0.82);
+  border: 1px solid rgba(120, 255, 120, 0.25);
+  border-radius: 8px;
+  color: var(--text-dim);
+}
+
 @media (max-width: 720px) {
   .chatFrame {
     min-height: 80vh;

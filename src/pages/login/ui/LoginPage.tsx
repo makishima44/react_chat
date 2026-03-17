@@ -38,7 +38,7 @@ export const LoginPage = () => {
     try {
       await loginUser(email, password);
       sessionStorage.setItem("challengeRequired", "1");
-      navigate("/chat");
+      navigate("/rooms");
     } catch (err) {
       const firebaseError = err as FirebaseError;
       if (firebaseError.code === "auth/invalid-credential") {
