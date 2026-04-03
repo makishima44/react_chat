@@ -24,6 +24,7 @@ export const ChatPage = () => {
   const [editDraft, setEditDraft] = useState("");
   const [processingMessageId, setProcessingMessageId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Message | null>(null);
+  const [replyTarget, setReplyTarget] = useState<Message | null>(null);
   const [roomName, setRoomName] = useState("");
   const [roomStatus, setRoomStatus] = useState<"loading" | "ready" | "missing">("loading");
   const [onlineUsers, setOnlineUsers] = useState<Array<{ id: string; userId?: string; userName?: string; isTyping?: boolean }>>([]);
@@ -87,8 +88,17 @@ export const ChatPage = () => {
         userId: currentUserId,
         userName: currentUserName,
         roomId,
+        replyTo: replyTarget
+          ? {
+              id: replyTarget.id,
+              text: replyTarget.text,
+              user: replyTarget.user,
+              userName: replyTarget.userName,
+            }
+          : null,
       });
       setInput("");
+      setReplyTarget(null);
     } catch (err) {
       const firebaseError = err as FirebaseError;
       if (firebaseError.code === "permission-denied") {
@@ -183,6 +193,16 @@ export const ChatPage = () => {
     if (processingMessageId || !isOwnMessage(message)) return;
     setDeleteTarget(message);
     setSendError("");
+  };
+
+  const handleReplyMessage = (message: Message) => {
+    if (processingMessageId) return;
+    setReplyTarget(message);
+    setSendError("");
+  };
+
+  const handleCancelReply = () => {
+    setReplyTarget(null);
   };
 
   const handleCloseDeleteModal = () => {
@@ -425,6 +445,7 @@ export const ChatPage = () => {
           onEditDraftChange={setEditDraft}
           onSaveEdit={handleSaveEdit}
           onDeleteMessage={handleDeleteMessage}
+          onReplyMessage={handleReplyMessage}
         />
 
         <div className={s.presenceBar}>
@@ -432,7 +453,15 @@ export const ChatPage = () => {
           {typingLabel && <span className={s.typingState}>{typingLabel}</span>}
         </div>
 
-        <ChatInput input={input} sending={sending} disabled={roomStatus !== "ready"} onChange={handleInputChange} onSubmit={handleSend} />
+        <ChatInput
+          input={input}
+          sending={sending}
+          disabled={roomStatus !== "ready"}
+          replyTarget={replyTarget}
+          onChange={handleInputChange}
+          onCancelReply={handleCancelReply}
+          onSubmit={handleSend}
+        />
 
         {sendError && <div className={s.sendError}>{sendError}</div>}
       </TerminalFrame>

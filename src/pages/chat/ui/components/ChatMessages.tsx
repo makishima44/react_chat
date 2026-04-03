@@ -17,6 +17,7 @@ type ChatMessagesProps = {
   onEditDraftChange: (value: string) => void;
   onSaveEdit: (event?: FormEvent) => void;
   onDeleteMessage: (message: Message) => void;
+  onReplyMessage: (message: Message) => void;
 };
 
 export const ChatMessages = ({
@@ -33,6 +34,7 @@ export const ChatMessages = ({
   onEditDraftChange,
   onSaveEdit,
   onDeleteMessage,
+  onReplyMessage,
 }: ChatMessagesProps) => {
   const isOwnMessage = (msg: Message) =>
     msg.userId ? msg.userId === currentUserId : msg.user === currentUserName || (currentUserEmail && msg.user === currentUserEmail);
@@ -75,18 +77,29 @@ export const ChatMessages = ({
               </form>
             ) : (
               <>
-                <span className={s.text}>{msg.text}</span>
-                {msg.editedAt && <span className={s.editedTag}>(edited)</span>}
-                {isOwn && (
-                  <div className={s.messageActions}>
-                    <button type="button" disabled={isProcessing} onClick={() => onStartEdit(msg)}>
-                      Edit
-                    </button>
-                    <button type="button" disabled={isProcessing} onClick={() => onDeleteMessage(msg)}>
-                      Delete
-                    </button>
+                {msg.replyTo && (
+                  <div className={s.replyPreview}>
+                    <span className={s.replyPreviewAuthor}>{msg.replyTo.userName || msg.replyTo.user || "anonymous@node"}</span>
+                    <span className={s.replyPreviewText}>{msg.replyTo.text}</span>
                   </div>
                 )}
+                <span className={s.text}>{msg.text}</span>
+                {msg.editedAt && <span className={s.editedTag}>(edited)</span>}
+                <div className={s.messageActions}>
+                  <button type="button" disabled={isProcessing} onClick={() => onReplyMessage(msg)}>
+                    Reply
+                  </button>
+                  {isOwn && (
+                    <>
+                      <button type="button" disabled={isProcessing} onClick={() => onStartEdit(msg)}>
+                        Edit
+                      </button>
+                      <button type="button" disabled={isProcessing} onClick={() => onDeleteMessage(msg)}>
+                        Delete
+                      </button>
+                    </>
+                  )}
+                </div>
               </>
             )}
           </div>
