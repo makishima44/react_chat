@@ -1,6 +1,7 @@
 import { FormEvent, RefObject } from "react";
 import clsx from "clsx";
 import type { Message } from "@/entities/message/model/types";
+import { isMessageMentioningUser, splitMessageByMentions } from "@/pages/chat/model/mentions";
 import s from "../chatPage.module.css";
 
 type ChatMessagesProps = {
@@ -8,6 +9,7 @@ type ChatMessagesProps = {
   currentUserId: string;
   currentUserEmail: string;
   currentUserName: string;
+  mentionAliases: string[];
   messagesEndRef: RefObject<HTMLDivElement | null>;
   editingMessageId: string | null;
   editDraft: string;
@@ -25,6 +27,7 @@ export const ChatMessages = ({
   currentUserId,
   currentUserEmail,
   currentUserName,
+  mentionAliases,
   messagesEndRef,
   editingMessageId,
   editDraft,
@@ -47,9 +50,14 @@ export const ChatMessages = ({
         const isOwn = isOwnMessage(msg);
         const isEditing = editingMessageId === msg.id;
         const isProcessing = processingMessageId === msg.id;
+        const mentionChunks = splitMessageByMentions(msg.text, mentionAliases);
+        const mentionsCurrentUser = isMessageMentioningUser(msg.text, mentionAliases) && !isOwn;
 
         return (
-          <div key={msg.id} className={clsx(s.message, isOwn && s.messageOwn, isEditing && s.messageEditing)}>
+          <div
+            key={msg.id}
+            className={clsx(s.message, isOwn && s.messageOwn, isEditing && s.messageEditing, mentionsCurrentUser && s.messageMentioned)}
+          >
             <div className={s.messageMeta}>
               <span className={s.prompt}>&gt;</span>
               <span className={s.user}>{displayName}</span>
@@ -83,7 +91,20 @@ export const ChatMessages = ({
                     <span className={s.replyPreviewText}>{msg.replyTo.text}</span>
                   </div>
                 )}
-                <span className={s.text}>{msg.text}</span>
+                <span className={s.text}>
+                  {mentionChunks.map((chunk, index) =>
+                    chunk.isMention ? (
+                      <span
+                        key={`${msg.id}-mention-${index}`}
+                        className={clsx(s.mention, chunk.isCurrentUserMention && s.mentionCurrentUser)}
+                      >
+                        {chunk.text}
+                      </span>
+                    ) : (
+                      <span key={`${msg.id}-text-${index}`}>{chunk.text}</span>
+                    ),
+                  )}
+                </span>
                 {msg.editedAt && <span className={s.editedTag}>(edited)</span>}
                 <div className={s.messageActions}>
                   <button type="button" disabled={isProcessing} onClick={() => onReplyMessage(msg)}>

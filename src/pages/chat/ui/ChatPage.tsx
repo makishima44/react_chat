@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { addDoc, collection, deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
@@ -14,6 +14,9 @@ import { ChatHeaderControls } from "./components/ChatHeaderControls";
 import { ChatInput } from "./components/ChatInput";
 import { ChatMessages } from "./components/ChatMessages";
 import { DeleteMessageModal } from "./components/DeleteMessageModal";
+import { getMentionAliases, isMessageMentioningUser } from "@/pages/chat/model/mentions";
+
+type NotificationPermissionState = NotificationPermission | "unsupported";
 
 export const ChatPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -28,19 +31,36 @@ export const ChatPage = () => {
   const [roomName, setRoomName] = useState("");
   const [roomStatus, setRoomStatus] = useState<"loading" | "ready" | "missing">("loading");
   const [onlineUsers, setOnlineUsers] = useState<Array<{ id: string; userId?: string; userName?: string; isTyping?: boolean }>>([]);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermissionState>("unsupported");
   const navigate = useNavigate();
   const { roomId } = useParams();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const typingTimeoutRef = useRef<number | null>(null);
   const isTypingRef = useRef(false);
+  const knownMessageIdsRef = useRef<Set<string>>(new Set());
+  const notifiedMessageIdsRef = useRef<Set<string>>(new Set());
   const authUser = auth.currentUser;
   const currentUserId = authUser?.uid ?? "anonymous";
   const currentUserEmail = authUser?.email ?? "";
   const currentUserName = authUser?.displayName?.trim() || currentUserEmail || "anonymous@node";
   const presenceDocId = roomId && authUser ? `${roomId}_${authUser.uid}` : null;
+  const mentionAliases = useMemo(() => getMentionAliases(currentUserName, currentUserEmail), [currentUserName, currentUserEmail]);
 
-  const isOwnMessage = (message: Message) =>
-    message.userId ? message.userId === currentUserId : message.user === currentUserName || (currentUserEmail && message.user === currentUserEmail);
+  const isOwnMessage = useCallback(
+    (message: Message) =>
+      message.userId ? message.userId === currentUserId : message.user === currentUserName || (currentUserEmail && message.user === currentUserEmail),
+    [currentUserEmail, currentUserId, currentUserName],
+  );
+
+  const handleEnableNotifications = async () => {
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      setNotificationPermission("unsupported");
+      return;
+    }
+
+    const permission = await Notification.requestPermission();
+    setNotificationPermission(permission);
+  };
 
   const setTypingState = async (nextTyping: boolean) => {
     if (!presenceDocId || !roomId || !authUser || isTypingRef.current === nextTyping) return;
@@ -292,6 +312,19 @@ export const ChatPage = () => {
   }, [roomId]);
 
   useEffect(() => {
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      setNotificationPermission("unsupported");
+      return;
+    }
+    setNotificationPermission(Notification.permission);
+  }, []);
+
+  useEffect(() => {
+    knownMessageIdsRef.current = new Set();
+    notifiedMessageIdsRef.current = new Set();
+  }, [roomId]);
+
+  useEffect(() => {
     if (!roomId || roomStatus === "missing") {
       setMessages([]);
       return;
@@ -304,6 +337,38 @@ export const ChatPage = () => {
           id: doc.id,
           ...(doc.data() as Omit<Message, "id">),
         }));
+
+        const previousMessageIds = knownMessageIdsRef.current;
+        const nextMessageIds = new Set(msgs.map((message) => message.id));
+        const isInitialSync = previousMessageIds.size === 0;
+        const newMessages = isInitialSync ? [] : msgs.filter((message) => !previousMessageIds.has(message.id));
+        knownMessageIdsRef.current = nextMessageIds;
+
+        if (notificationPermission === "granted" && document.visibilityState !== "visible") {
+          newMessages.forEach((message) => {
+            if (notifiedMessageIdsRef.current.has(message.id)) return;
+            if (isOwnMessage(message)) return;
+            if (!isMessageMentioningUser(message.text, mentionAliases)) return;
+
+            const author = message.userName || message.user || "anonymous@node";
+            const textPreview = message.text.length > 120 ? `${message.text.slice(0, 120)}...` : message.text;
+            const title = roomName ? `Mention in ${roomName}` : "New mention";
+
+            const mentionNotification = new Notification(title, {
+              body: `${author}: ${textPreview}`,
+              tag: `mention-${message.id}`,
+            });
+
+            mentionNotification.onclick = () => {
+              window.focus();
+              mentionNotification.close();
+            };
+
+            window.setTimeout(() => mentionNotification.close(), 7000);
+            notifiedMessageIdsRef.current.add(message.id);
+          });
+        }
+
         setMessages(msgs);
       },
       (err) => {
@@ -319,7 +384,7 @@ export const ChatPage = () => {
     );
 
     return () => unsubscribe();
-  }, [roomId, roomStatus]);
+  }, [isOwnMessage, mentionAliases, notificationPermission, roomId, roomName, roomStatus]);
 
   useEffect(() => {
     if (!roomId || !authUser || roomStatus !== "ready") {
@@ -436,6 +501,7 @@ export const ChatPage = () => {
           currentUserId={currentUserId}
           currentUserEmail={currentUserEmail}
           currentUserName={currentUserName}
+          mentionAliases={mentionAliases}
           messagesEndRef={messagesEndRef}
           editingMessageId={editingMessageId}
           editDraft={editDraft}
@@ -451,6 +517,13 @@ export const ChatPage = () => {
         <div className={s.presenceBar}>
           <span className={s.onlineState}>{onlineCount} online</span>
           {typingLabel && <span className={s.typingState}>{typingLabel}</span>}
+          {notificationPermission === "default" && (
+            <button type="button" className={s.notificationButton} onClick={handleEnableNotifications}>
+              Enable mention alerts
+            </button>
+          )}
+          {notificationPermission === "granted" && <span className={s.notificationEnabled}>Mention alerts enabled</span>}
+          {notificationPermission === "denied" && <span className={s.notificationDenied}>Browser notifications are blocked</span>}
         </div>
 
         <ChatInput

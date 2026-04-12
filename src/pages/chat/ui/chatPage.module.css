@@ -178,6 +178,7 @@
   padding: 4px 0;
   font-size: 14px;
   line-height: 1.5;
+  border-radius: 6px;
 }
 
 .messageOwn {
@@ -189,6 +190,12 @@
   border: 1px solid rgba(120, 255, 120, 0.26);
   border-radius: 8px;
   background: rgba(2, 10, 5, 0.52);
+}
+
+.messageMentioned {
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 214, 102, 0.45);
+  background: rgba(68, 47, 8, 0.24);
 }
 
 .messageMeta {
@@ -212,6 +219,18 @@
 
 .text {
   color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.mention {
+  color: #ffd666;
+  font-weight: 600;
+}
+
+.mentionCurrentUser {
+  color: #ffdf80;
+  text-shadow: 0 0 8px rgba(255, 223, 128, 0.35);
 }
 
 .replyPreview {
@@ -395,6 +414,29 @@
 .typingState {
   color: var(--text);
   font-style: italic;
+}
+
+.notificationButton {
+  border: 1px solid rgba(120, 255, 120, 0.35);
+  background: rgba(2, 10, 5, 0.7);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 2px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.notificationButton:hover {
+  color: var(--accent-strong);
+  border-color: rgba(120, 255, 120, 0.55);
+}
+
+.notificationEnabled {
+  color: var(--accent-strong);
+}
+
+.notificationDenied {
+  color: var(--danger);
 }
 
 .deleteMessageBody {
