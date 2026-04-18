@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import clsx from "clsx";
+import { useAppPreferences } from "@/shared/model/preferences";
 import s from "./terminalFrame.module.css";
 
 type TerminalFrameProps = {
@@ -19,14 +20,17 @@ export const TerminalFrame = ({
   className,
   children,
 }: TerminalFrameProps) => {
+  const { t } = useAppPreferences();
+
   return (
     <section className={clsx(s.frame, className)}>
       <div className={s.header}>
         <div className={s.headerLeft}>
           <span className={s.statusDot} aria-hidden="true" />
-          <span className={s.statusText}>SYS READY</span>
+          <span className={s.statusText}>{t("shellReady")}</span>
         </div>
-        {headerSlot && <div className={s.headerRight}>{headerSlot}</div>}
+
+        <div className={s.headerRight}>{headerSlot && <div className={s.headerSlot}>{headerSlot}</div>}</div>
       </div>
 
       <div className={s.titleBlock}>

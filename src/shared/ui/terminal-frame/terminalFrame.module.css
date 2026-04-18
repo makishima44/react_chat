@@ -1,6 +1,6 @@
 .frame {
   width: min(720px, 92vw);
-  background: linear-gradient(180deg, rgba(7, 26, 14, 0.92), rgba(4, 16, 9, 0.92));
+  background: linear-gradient(180deg, var(--panel-top) 0%, var(--panel-bottom) 100%);
   border: 1px solid var(--panel-border);
   box-shadow: var(--shadow);
   border-radius: var(--radius);
@@ -17,7 +17,7 @@
   position: absolute;
   inset: 0;
   border-radius: var(--radius);
-  border: 1px solid rgba(71, 255, 138, 0.2);
+  border: 1px solid rgba(var(--accent-rgb), 0.2);
   pointer-events: none;
 }
 
@@ -26,14 +26,15 @@
   position: absolute;
   inset: 8px;
   border-radius: calc(var(--radius) - 6px);
-  border: 1px dashed rgba(71, 255, 138, 0.2);
+  border: 1px dashed rgba(var(--accent-rgb), 0.2);
   pointer-events: none;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 12px;
   text-transform: uppercase;
   font-size: 12px;
   color: var(--text-dim);
@@ -44,6 +45,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  min-height: 32px;
 }
 
 .statusText {
@@ -55,10 +57,17 @@
   height: 8px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 8px rgba(71, 255, 138, 0.9);
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.9);
 }
 
 .headerRight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.headerSlot {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -76,7 +85,7 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent-strong);
-  text-shadow: 0 0 12px rgba(71, 255, 138, 0.6);
+  text-shadow: 0 0 12px rgba(var(--accent-rgb), 0.6);
 }
 
 .caret {
@@ -85,7 +94,7 @@
   height: 18px;
   margin-left: 8px;
   background: var(--accent);
-  box-shadow: 0 0 12px rgba(71, 255, 138, 0.9);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.9);
   animation: caretBlink 1s steps(2, jump-none) infinite;
 }
 
@@ -102,7 +111,7 @@
 }
 
 .footer {
-  border-top: 1px solid rgba(71, 255, 138, 0.2);
+  border-top: 1px solid rgba(var(--accent-rgb), 0.2);
   padding-top: 10px;
   font-size: 13px;
   color: var(--text-dim);
@@ -125,13 +134,30 @@
   }
 }
 
+@media (max-width: 900px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .headerRight {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
 @media (max-width: 560px) {
   .frame {
-    padding: 16px;
+    width: min(720px, 96vw);
+    padding: 14px;
   }
 
   .title {
     font-size: 28px;
   }
-}
 
+  .headerSlot {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
