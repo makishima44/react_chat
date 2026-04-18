@@ -2,6 +2,7 @@ import { FormEvent } from "react";
 import type { Message } from "@/entities/message/model/types";
 import { Button } from "@/shared/ui/button";
 import s from "../chatPage.module.css";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 type ChatInputProps = {
   input: string;
@@ -15,7 +16,8 @@ type ChatInputProps = {
 
 export const ChatInput = ({ input, sending, disabled, replyTarget, onChange, onCancelReply, onSubmit }: ChatInputProps) => {
   const locked = sending || disabled;
-  const replyAuthor = replyTarget?.userName || replyTarget?.user || "anonymous@node";
+  const { t } = useAppPreferences();
+  const replyAuthor = replyTarget?.userName || replyTarget?.user || t("commonAnonymous");
   const replyText = replyTarget?.text ?? "";
   const replyPreviewText = replyText.length > 120 ? `${replyText.slice(0, 120)}...` : replyText;
 
@@ -23,10 +25,10 @@ export const ChatInput = ({ input, sending, disabled, replyTarget, onChange, onC
     <form className={s.inputArea} onSubmit={onSubmit}>
       {replyTarget && (
         <div className={s.replyComposer}>
-          <div className={s.replyComposerMeta}>Replying to {replyAuthor}</div>
+          <div className={s.replyComposerMeta}>{t("chatReplyingTo", { name: replyAuthor })}</div>
           <div className={s.replyComposerText}>{replyPreviewText}</div>
           <button type="button" className={s.replyComposerCancel} onClick={onCancelReply} disabled={locked}>
-            Cancel
+            {t("chatReplyCancel")}
           </button>
         </div>
       )}
@@ -35,12 +37,12 @@ export const ChatInput = ({ input, sending, disabled, replyTarget, onChange, onC
         type="text"
         value={input}
         onChange={(event) => onChange(event.target.value)}
-        placeholder="Transmit message"
+        placeholder={t("chatInputPlaceholder")}
         disabled={locked}
-        aria-label="Message"
+        aria-label={t("chatInputAria")}
       />
       <Button type="submit" disabled={locked || !input.trim()}>
-        {sending ? "Sending..." : "Transmit"}
+        {sending ? t("chatSending") : t("chatSend")}
       </Button>
     </form>
   );

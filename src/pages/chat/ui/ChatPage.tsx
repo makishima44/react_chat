@@ -15,6 +15,7 @@ import { ChatInput } from "./components/ChatInput";
 import { ChatMessages } from "./components/ChatMessages";
 import { DeleteMessageModal } from "./components/DeleteMessageModal";
 import { getMentionAliases, isMessageMentioningUser } from "@/pages/chat/model/mentions";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 type NotificationPermissionState = NotificationPermission | "unsupported";
 
@@ -40,9 +41,10 @@ export const ChatPage = () => {
   const knownMessageIdsRef = useRef<Set<string>>(new Set());
   const notifiedMessageIdsRef = useRef<Set<string>>(new Set());
   const authUser = auth.currentUser;
+  const { t } = useAppPreferences();
   const currentUserId = authUser?.uid ?? "anonymous";
   const currentUserEmail = authUser?.email ?? "";
-  const currentUserName = authUser?.displayName?.trim() || currentUserEmail || "anonymous@node";
+  const currentUserName = authUser?.displayName?.trim() || currentUserEmail || t("commonAnonymous");
   const presenceDocId = roomId && authUser ? `${roomId}_${authUser.uid}` : null;
   const mentionAliases = useMemo(() => getMentionAliases(currentUserName, currentUserEmail), [currentUserName, currentUserEmail]);
 
@@ -122,9 +124,9 @@ export const ChatPage = () => {
     } catch (err) {
       const firebaseError = err as FirebaseError;
       if (firebaseError.code === "permission-denied") {
-        setSendError("Access denied. You no longer have permission to post.");
+        setSendError(t("chatPostDenied"));
       } else {
-        setSendError("Transmission failed. Please try again.");
+        setSendError(t("chatPostFailed"));
       }
     } finally {
       setSending(false);
@@ -180,7 +182,7 @@ export const ChatPage = () => {
 
     const trimmed = editDraft.trim();
     if (!trimmed) {
-      setSendError("Message cannot be empty.");
+      setSendError(t("chatMessageEmpty"));
       return;
     }
     if (trimmed === target.text) {
@@ -200,9 +202,9 @@ export const ChatPage = () => {
     } catch (err) {
       const firebaseError = err as FirebaseError;
       if (firebaseError.code === "permission-denied") {
-        setSendError("Access denied. You cannot edit this message.");
+        setSendError(t("chatEditDenied"));
       } else {
-        setSendError("Failed to edit message. Please try again.");
+        setSendError(t("chatEditFailed"));
       }
     } finally {
       setProcessingMessageId(null);
@@ -245,9 +247,9 @@ export const ChatPage = () => {
     } catch (err) {
       const firebaseError = err as FirebaseError;
       if (firebaseError.code === "permission-denied") {
-        setSendError("Access denied. You cannot delete this message.");
+        setSendError(t("chatDeleteDenied"));
       } else {
-        setSendError("Failed to delete message. Please try again.");
+        setSendError(t("chatDeleteFailed"));
       }
     } finally {
       setProcessingMessageId(null);
@@ -272,7 +274,7 @@ export const ChatPage = () => {
       await signOut(auth);
       navigate("/login");
     } catch {
-      setSendError("Logout failed. Please try again.");
+      setSendError(t("logoutError"));
     }
   };
 
@@ -300,7 +302,7 @@ export const ChatPage = () => {
           return;
         }
         const data = snapshot.data() as { name?: string };
-        setRoomName(data?.name ?? "Secure Channel");
+        setRoomName(data?.name ?? t("chatTitle"));
         setRoomStatus("ready");
       },
       () => {
@@ -309,7 +311,7 @@ export const ChatPage = () => {
     );
 
     return () => unsubscribe();
-  }, [roomId]);
+  }, [roomId, t]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !("Notification" in window)) {
@@ -333,9 +335,9 @@ export const ChatPage = () => {
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const msgs = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as Omit<Message, "id">),
+        const msgs = snapshot.docs.map((docSnapshot) => ({
+          id: docSnapshot.id,
+          ...(docSnapshot.data() as Omit<Message, "id">),
         }));
 
         const previousMessageIds = knownMessageIdsRef.current;
@@ -350,9 +352,9 @@ export const ChatPage = () => {
             if (isOwnMessage(message)) return;
             if (!isMessageMentioningUser(message.text, mentionAliases)) return;
 
-            const author = message.userName || message.user || "anonymous@node";
+            const author = message.userName || message.user || t("commonAnonymous");
             const textPreview = message.text.length > 120 ? `${message.text.slice(0, 120)}...` : message.text;
-            const title = roomName ? `Mention in ${roomName}` : "New mention";
+            const title = roomName ? t("mentionNotificationTitle", { room: roomName }) : t("mentionNotificationTitleFallback");
 
             const mentionNotification = new Notification(title, {
               body: `${author}: ${textPreview}`,
@@ -374,17 +376,17 @@ export const ChatPage = () => {
       (err) => {
         const firebaseError = err as FirebaseError;
         if (firebaseError.code === "failed-precondition") {
-          setSendError("Firestore needs a composite index for roomId + createdAt.");
+          setSendError(t("chatIndexMissing"));
         } else if (firebaseError.code === "permission-denied") {
-          setSendError("Access denied. You do not have permission to read this room.");
+          setSendError(t("chatReadDenied"));
         } else {
-          setSendError("Failed to sync messages. Check your connection.");
+          setSendError(t("chatSyncFailed"));
         }
       },
     );
 
     return () => unsubscribe();
-  }, [isOwnMessage, mentionAliases, notificationPermission, roomId, roomName, roomStatus]);
+  }, [isOwnMessage, mentionAliases, notificationPermission, roomId, roomName, roomStatus, t]);
 
   useEffect(() => {
     if (!roomId || !authUser || roomStatus !== "ready") {
@@ -455,7 +457,7 @@ export const ChatPage = () => {
   const onlineCount = onlineUsers.length;
   const typingLabel =
     typingUsers.length > 0
-      ? `${typingUsers.map((user) => user.userName || "anonymous@node").join(", ")} typing...`
+      ? t("chatTyping", { names: typingUsers.map((user) => user.userName || t("commonAnonymous")).join(", ") })
       : "";
 
   if (!roomId) {
@@ -466,8 +468,8 @@ export const ChatPage = () => {
     return (
       <div className={s.page}>
         <TerminalFrame
-          title="Channel Lost"
-          subtitle="This room no longer exists. Return to the directory."
+          title={t("chatMissingTitle")}
+          subtitle={t("chatMissingSubtitle")}
           headerSlot={
             <ChatHeaderControls
               onGoToRooms={() => navigate("/rooms")}
@@ -477,13 +479,12 @@ export const ChatPage = () => {
           className={s.chatFrame}
         >
           <div className={s.roomState}>
-            <p>The requested room could not be found.</p>
+            <p>{t("chatMissingBody")}</p>
             <Button type="button" onClick={() => navigate("/rooms")}>
-              Back to Rooms
+              {t("chatBackToRooms")}
             </Button>
           </div>
         </TerminalFrame>
-
       </div>
     );
   }
@@ -491,8 +492,8 @@ export const ChatPage = () => {
   return (
     <div className={s.page}>
       <TerminalFrame
-        title="Secure Channel"
-        subtitle={roomName ? `Room: ${roomName}` : "Live relay active. Use encrypted prompt below."}
+        title={t("chatTitle")}
+        subtitle={roomName ? t("chatSubtitleWithRoom", { name: roomName }) : t("chatSubtitleFallback")}
         headerSlot={<ChatHeaderControls onGoToRooms={() => navigate("/rooms")} onLogout={handleLogout} />}
         className={s.chatFrame}
       >
@@ -515,15 +516,15 @@ export const ChatPage = () => {
         />
 
         <div className={s.presenceBar}>
-          <span className={s.onlineState}>{onlineCount} online</span>
+          <span className={s.onlineState}>{t("chatOnline", { count: onlineCount })}</span>
           {typingLabel && <span className={s.typingState}>{typingLabel}</span>}
           {notificationPermission === "default" && (
             <button type="button" className={s.notificationButton} onClick={handleEnableNotifications}>
-              Enable mention alerts
+              {t("chatEnableMentionAlerts")}
             </button>
           )}
-          {notificationPermission === "granted" && <span className={s.notificationEnabled}>Mention alerts enabled</span>}
-          {notificationPermission === "denied" && <span className={s.notificationDenied}>Browser notifications are blocked</span>}
+          {notificationPermission === "granted" && <span className={s.notificationEnabled}>{t("chatMentionAlertsEnabled")}</span>}
+          {notificationPermission === "denied" && <span className={s.notificationDenied}>{t("chatMentionAlertsBlocked")}</span>}
         </div>
 
         <ChatInput

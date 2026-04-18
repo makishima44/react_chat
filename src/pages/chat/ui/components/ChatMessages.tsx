@@ -3,6 +3,7 @@ import clsx from "clsx";
 import type { Message } from "@/entities/message/model/types";
 import { isMessageMentioningUser, splitMessageByMentions } from "@/pages/chat/model/mentions";
 import s from "../chatPage.module.css";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 type ChatMessagesProps = {
   messages: Message[];
@@ -39,14 +40,16 @@ export const ChatMessages = ({
   onDeleteMessage,
   onReplyMessage,
 }: ChatMessagesProps) => {
+  const { t } = useAppPreferences();
+
   const isOwnMessage = (msg: Message) =>
     msg.userId ? msg.userId === currentUserId : msg.user === currentUserName || (currentUserEmail && msg.user === currentUserEmail);
 
   return (
     <div className={s.messages} role="log" aria-live="polite">
-      {messages.length === 0 && <div className={s.empty}>No transmissions yet.</div>}
+      {messages.length === 0 && <div className={s.empty}>{t("chatNoMessages")}</div>}
       {messages.map((msg) => {
-        const displayName = msg.userName || msg.user || "anonymous@node";
+        const displayName = msg.userName || msg.user || t("commonAnonymous");
         const isOwn = isOwnMessage(msg);
         const isEditing = editingMessageId === msg.id;
         const isProcessing = processingMessageId === msg.id;
@@ -72,14 +75,14 @@ export const ChatMessages = ({
                   onChange={(event) => onEditDraftChange(event.target.value)}
                   maxLength={2000}
                   autoFocus
-                  aria-label="Edit message"
+                  aria-label={t("chatEditAria")}
                 />
                 <div className={s.messageActions}>
                   <button type="submit" disabled={isProcessing || !editDraft.trim()}>
-                    Save
+                    {t("chatEditSave")}
                   </button>
                   <button type="button" disabled={isProcessing} onClick={onCancelEdit}>
-                    Cancel
+                    {t("commonCancel")}
                   </button>
                 </div>
               </form>
@@ -87,7 +90,7 @@ export const ChatMessages = ({
               <>
                 {msg.replyTo && (
                   <div className={s.replyPreview}>
-                    <span className={s.replyPreviewAuthor}>{msg.replyTo.userName || msg.replyTo.user || "anonymous@node"}</span>
+                    <span className={s.replyPreviewAuthor}>{msg.replyTo.userName || msg.replyTo.user || t("commonAnonymous")}</span>
                     <span className={s.replyPreviewText}>{msg.replyTo.text}</span>
                   </div>
                 )}
@@ -105,18 +108,18 @@ export const ChatMessages = ({
                     ),
                   )}
                 </span>
-                {msg.editedAt && <span className={s.editedTag}>(edited)</span>}
+                {msg.editedAt && <span className={s.editedTag}>{t("chatEdited")}</span>}
                 <div className={s.messageActions}>
                   <button type="button" disabled={isProcessing} onClick={() => onReplyMessage(msg)}>
-                    Reply
+                    {t("chatReply")}
                   </button>
                   {isOwn && (
                     <>
                       <button type="button" disabled={isProcessing} onClick={() => onStartEdit(msg)}>
-                        Edit
+                        {t("chatEdit")}
                       </button>
                       <button type="button" disabled={isProcessing} onClick={() => onDeleteMessage(msg)}>
-                        Delete
+                        {t("commonDelete")}
                       </button>
                     </>
                   )}
