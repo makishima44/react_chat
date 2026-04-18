@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import clsx from "clsx";
+import { useAppPreferences } from "@/shared/model/preferences";
 import s from "./matrixSplash.module.css";
 
 type MatrixSplashProps = {
@@ -11,6 +12,7 @@ const CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export const MatrixSplash = ({ state, onSkip }: MatrixSplashProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const { t } = useAppPreferences();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -79,11 +81,11 @@ export const MatrixSplash = ({ state, onSkip }: MatrixSplashProps) => {
   }, []);
 
   return (
-    <div className={clsx(s.splash, state === "fading" && s.fading)} onClick={onSkip} role='presentation'>
+    <div className={clsx(s.splash, state === "fading" && s.fading)} onClick={onSkip} role="presentation">
       <canvas ref={canvasRef} className={s.canvas} />
       <div className={s.content}>
-        <p className={clsx(s.kicker, "flicker")}>SYSTEM BOOTING</p>
-        <p className={s.subtitle}>Click to skip</p>
+        <p className={clsx(s.kicker, "flicker")}>{t("splashBooting")}</p>
+        <p className={s.subtitle}>{t("splashSkip")}</p>
       </div>
     </div>
   );

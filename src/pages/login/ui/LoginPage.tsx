@@ -9,6 +9,7 @@ import s from "./loginPage.module.css";
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 import { TerminalFrame } from "@/shared/ui/terminal-frame/TerminalFrame";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 export const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -18,6 +19,7 @@ export const LoginPage = () => {
   const [formError, setFormError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+  const { t } = useAppPreferences();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -26,8 +28,8 @@ export const LoginPage = () => {
     setPasswordError("");
     setFormError("");
 
-    const nextEmailError = getEmailError(email);
-    const nextPasswordError = getPasswordError(password);
+    const nextEmailError = getEmailError(email, t);
+    const nextPasswordError = getPasswordError(password, t);
     setEmailError(nextEmailError);
     setPasswordError(nextPasswordError);
     if (nextEmailError || nextPasswordError) {
@@ -42,15 +44,15 @@ export const LoginPage = () => {
     } catch (err) {
       const firebaseError = err as FirebaseError;
       if (firebaseError.code === "auth/invalid-credential") {
-        setPasswordError("Invalid email or password");
+        setPasswordError(t("firebaseInvalidCredential"));
       } else if (firebaseError.code === "auth/invalid-email") {
-        setEmailError("Please enter a valid email address");
+        setEmailError(t("firebaseInvalidEmail"));
       } else if (firebaseError.code === "auth/too-many-requests") {
-        setFormError("Too many attempts. Please wait a minute and try again.");
+        setFormError(t("firebaseTooManyRequests"));
       } else if (firebaseError.code === "auth/network-request-failed") {
-        setFormError("Network error. Please try again.");
+        setFormError(t("firebaseNetworkError"));
       } else {
-        setFormError("Login failed. Please try again.");
+        setFormError(t("loginGenericError"));
       }
     } finally {
       setLoading(false);
@@ -60,18 +62,18 @@ export const LoginPage = () => {
   return (
     <div className={s.page}>
       <TerminalFrame
-        title="Access Node"
-        subtitle="Identify yourself to enter the secure channel."
+        title={t("loginTitle")}
+        subtitle={t("loginSubtitle")}
         footer={
           <span className={s.hint}>
-            No clearance yet? <Link to="/register">Request access</Link>
+            {t("loginNoAccess")} <Link to="/register">{t("loginRequestAccess")}</Link>
           </span>
         }
       >
         <form onSubmit={handleSubmit} className={s.form}>
           <Input
             id="login-email"
-            label="Operator Email"
+            label={t("loginEmailLabel")}
             type="email"
             name="email"
             autoComplete="email"
@@ -84,7 +86,7 @@ export const LoginPage = () => {
           <Input
             id="login-password"
             error={passwordError}
-            label="Passcode"
+            label={t("loginPasswordLabel")}
             type="password"
             name="password"
             autoComplete="current-password"
@@ -92,13 +94,13 @@ export const LoginPage = () => {
             minLength={6}
             maxLength={64}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter passcode"
+            placeholder={t("loginPasswordPlaceholder")}
           />
 
           {formError && <div className={s.formError}>{formError}</div>}
 
           <Button type="submit" disabled={loading}>
-            {loading ? "Connecting..." : "Enter Channel"}
+            {loading ? t("loginSubmitting") : t("loginSubmit")}
           </Button>
         </form>
       </TerminalFrame>
