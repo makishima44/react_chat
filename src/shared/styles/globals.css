@@ -2,21 +2,75 @@
 
 :root {
   color-scheme: dark;
-  --bg: #050b06;
-  --bg-deep: #020703;
-  --panel: #071a0e;
-  --panel-border: rgba(120, 255, 120, 0.35);
-  --panel-glow: rgba(64, 255, 140, 0.2);
-  --text: #c9ffd5;
-  --text-dim: #7bd8a0;
-  --accent: #47ff8a;
-  --accent-strong: #90ffb4;
-  --danger: #ff6b6b;
-  --warning: #ffd166;
   --font-mono: "Share Tech Mono", "Courier New", Courier, monospace;
   --font-display: "VT323", "Share Tech Mono", "Courier New", Courier, monospace;
   --radius: 10px;
-  --shadow: 0 0 18px rgba(71, 255, 138, 0.25);
+
+  --accent-rgb: 71, 255, 138;
+  --accent-soft-rgb: 120, 255, 120;
+  --bg-rgb: 5, 11, 6;
+  --bg-deep-rgb: 2, 7, 3;
+  --surface-rgb: 2, 10, 5;
+  --panel-top-rgb: 7, 26, 14;
+  --panel-bottom-rgb: 4, 16, 9;
+  --shadow-rgb: 71, 255, 138;
+
+  --text-rgb: 201, 255, 213;
+  --text-dim-rgb: 123, 216, 160;
+  --danger-rgb: 255, 107, 107;
+  --warning-rgb: 255, 209, 102;
+
+  --bg: rgb(var(--bg-rgb));
+  --bg-deep: rgb(var(--bg-deep-rgb));
+  --panel: rgb(var(--panel-top-rgb));
+  --panel-border: rgba(var(--accent-soft-rgb), 0.35);
+  --panel-top: rgba(var(--panel-top-rgb), 0.92);
+  --panel-bottom: rgba(var(--panel-bottom-rgb), 0.92);
+  --surface: rgba(var(--surface-rgb), 0.82);
+  --text: rgb(var(--text-rgb));
+  --text-dim: rgb(var(--text-dim-rgb));
+  --accent: rgb(var(--accent-rgb));
+  --accent-strong: rgba(var(--accent-soft-rgb), 0.95);
+  --danger: rgb(var(--danger-rgb));
+  --warning: rgb(var(--warning-rgb));
+  --shadow: 0 0 18px rgba(var(--shadow-rgb), 0.25);
+}
+
+:root[data-theme="green"] {
+  --accent-rgb: 71, 255, 138;
+  --accent-soft-rgb: 120, 255, 120;
+  --bg-rgb: 5, 11, 6;
+  --bg-deep-rgb: 2, 7, 3;
+  --surface-rgb: 2, 10, 5;
+  --panel-top-rgb: 7, 26, 14;
+  --panel-bottom-rgb: 4, 16, 9;
+  --shadow-rgb: 71, 255, 138;
+}
+
+:root[data-theme="red"] {
+  --accent-rgb: 255, 92, 92;
+  --accent-soft-rgb: 255, 176, 156;
+  --bg-rgb: 18, 6, 7;
+  --bg-deep-rgb: 8, 2, 3;
+  --surface-rgb: 24, 8, 10;
+  --panel-top-rgb: 41, 12, 14;
+  --panel-bottom-rgb: 22, 8, 9;
+  --shadow-rgb: 255, 110, 96;
+  --text-rgb: 255, 235, 228;
+  --text-dim-rgb: 241, 182, 170;
+}
+
+:root[data-theme="purple"] {
+  --accent-rgb: 201, 142, 255;
+  --accent-soft-rgb: 228, 188, 255;
+  --bg-rgb: 10, 7, 20;
+  --bg-deep-rgb: 5, 3, 12;
+  --surface-rgb: 16, 11, 30;
+  --panel-top-rgb: 29, 18, 49;
+  --panel-bottom-rgb: 17, 11, 31;
+  --shadow-rgb: 194, 123, 255;
+  --text-rgb: 245, 233, 255;
+  --text-dim-rgb: 210, 188, 232;
 }
 
 *,
@@ -35,9 +89,9 @@ body {
   font-family: var(--font-mono);
   color: var(--text);
   background:
-    radial-gradient(circle at 20% 20%, rgba(60, 255, 130, 0.12), transparent 45%),
-    radial-gradient(circle at 80% 0%, rgba(0, 180, 90, 0.18), transparent 50%),
-    radial-gradient(circle at 50% 100%, rgba(20, 120, 60, 0.2), transparent 55%),
+    radial-gradient(circle at 20% 20%, rgba(var(--accent-rgb), 0.14), transparent 45%),
+    radial-gradient(circle at 80% 0%, rgba(var(--accent-rgb), 0.16), transparent 50%),
+    radial-gradient(circle at 50% 100%, rgba(var(--accent-rgb), 0.12), transparent 55%),
     linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
   letter-spacing: 0.02em;
   text-rendering: optimizeLegibility;
@@ -81,7 +135,7 @@ a {
 
 a:hover {
   color: var(--accent-strong);
-  text-shadow: 0 0 8px rgba(71, 255, 138, 0.6);
+  text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.6);
 }
 
 button,
@@ -92,7 +146,7 @@ textarea {
 }
 
 ::selection {
-  background: rgba(71, 255, 138, 0.35);
+  background: rgba(var(--accent-rgb), 0.35);
   color: #031208;
 }
 

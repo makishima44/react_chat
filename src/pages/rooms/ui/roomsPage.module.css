@@ -13,7 +13,7 @@
 .headerControls {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
   text-transform: none;
   letter-spacing: normal;
@@ -34,23 +34,23 @@
 .operatorName {
   font-size: 12px;
   color: var(--text-dim);
-  letter-spacing: 0.18em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .content {
   display: grid;
-  gap: 20px;
+  gap: 18px;
 }
 
 .createForm {
   display: grid;
   gap: 12px;
   padding: 16px;
-  background: rgba(2, 10, 5, 0.82);
-  border: 1px solid rgba(120, 255, 120, 0.25);
+  background: rgba(var(--surface-rgb), 0.82);
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.25);
   border-radius: 10px;
-  box-shadow: inset 0 0 18px rgba(71, 255, 138, 0.12);
+  box-shadow: inset 0 0 18px rgba(var(--accent-rgb), 0.12);
 }
 
 .formError {
@@ -93,8 +93,8 @@
   text-align: left;
   padding: 14px 16px;
   border-radius: 10px;
-  border: 1px solid rgba(120, 255, 120, 0.25);
-  background: linear-gradient(180deg, rgba(2, 12, 6, 0.92), rgba(2, 10, 5, 0.72));
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.25);
+  background: linear-gradient(180deg, rgba(var(--surface-rgb), 0.92), rgba(var(--surface-rgb), 0.72));
   color: var(--text);
   cursor: pointer;
   display: grid;
@@ -103,13 +103,13 @@
 }
 
 .roomCard:hover {
-  border-color: rgba(120, 255, 120, 0.45);
-  box-shadow: 0 0 16px rgba(71, 255, 138, 0.2);
+  border-color: rgba(var(--accent-soft-rgb), 0.45);
+  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.2);
   transform: translateY(-2px);
 }
 
 .roomCard:focus-visible {
-  outline: 2px solid rgba(120, 255, 120, 0.7);
+  outline: 2px solid rgba(var(--accent-soft-rgb), 0.7);
   outline-offset: 2px;
 }
 
@@ -137,9 +137,9 @@
 }
 
 .deleteButton {
-  border: 1px solid rgba(255, 96, 96, 0.5);
-  background: rgba(40, 8, 8, 0.6);
-  color: #ff8b8b;
+  border: 1px solid rgba(var(--danger-rgb), 0.5);
+  background: rgba(var(--danger-rgb), 0.15);
+  color: rgba(255, 212, 212, 0.95);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -150,8 +150,8 @@
 }
 
 .deleteButton:hover {
-  border-color: rgba(255, 120, 120, 0.85);
-  box-shadow: 0 0 10px rgba(255, 90, 90, 0.35);
+  border-color: rgba(var(--danger-rgb), 0.85);
+  box-shadow: 0 0 10px rgba(var(--danger-rgb), 0.35);
   transform: translateY(-1px);
 }
 
@@ -172,14 +172,14 @@
 }
 
 .dangerAction {
-  border: 1px solid rgba(255, 96, 96, 0.6);
-  background: rgba(70, 10, 10, 0.7);
+  border: 1px solid rgba(var(--danger-rgb), 0.6);
+  background: rgba(var(--danger-rgb), 0.2);
   color: #ffd1d1;
 }
 
 .dangerAction:hover {
-  border-color: rgba(255, 120, 120, 0.9);
-  box-shadow: 0 0 12px rgba(255, 90, 90, 0.4);
+  border-color: rgba(var(--danger-rgb), 0.9);
+  box-shadow: 0 0 12px rgba(var(--danger-rgb), 0.4);
 }
 
 .emptyState {
@@ -189,13 +189,50 @@
   padding: 12px 4px;
 }
 
+@media (max-width: 900px) {
+  .roomsFrame {
+    min-height: 74vh;
+  }
+
+  .roomGrid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
 @media (max-width: 720px) {
   .roomsFrame {
+    width: min(980px, 98vw);
     min-height: 80vh;
   }
 
   .headerControls {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .operatorName {
+    order: 3;
+    width: 100%;
+    text-align: right;
+    font-size: 11px;
+  }
+
+  .roomGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .createForm {
+    padding: 12px;
+  }
+
+  .roomCard {
+    padding: 12px;
+  }
+
+  .roomHeader {
+    flex-direction: column;
+    gap: 6px;
   }
 }
