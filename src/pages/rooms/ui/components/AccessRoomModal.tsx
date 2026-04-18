@@ -4,6 +4,7 @@ import { Button } from "@/shared/ui/button";
 
 import s from "../roomsPage.module.css";
 import modalS from "@/pages/chat/ui/chatPage.module.css";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 type AccessRoomModalProps = {
   accessTarget: Room;
@@ -22,23 +23,25 @@ export const AccessRoomModal = ({
   onClose,
   onConfirm,
 }: AccessRoomModalProps) => {
+  const { t } = useAppPreferences();
+
   return (
     <div className={modalS.modalOverlay} onClick={onClose}>
       <div className={modalS.modal} onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="access-room-title">
         <div className={modalS.modalHeader}>
           <h2 className={modalS.modalTitle} id="access-room-title">
-            Доступ к комнате
+            {t("roomsAccessTitle")}
           </h2>
-          <button type="button" className={modalS.modalClose} onClick={onClose} aria-label="Закрыть">
+          <button type="button" className={modalS.modalClose} onClick={onClose} aria-label={t("commonCancel")}>
             ×
           </button>
         </div>
 
         <div className={s.accessModalBody}>
-          <p className={modalS.challengePrompt}>Комната "{accessTarget.name || "Безымянный канал"}" защищена паролем.</p>
+          <p className={modalS.challengePrompt}>{t("roomsAccessPrompt", { name: accessTarget.name || t("roomsUnnamed") })}</p>
           <Input
-            label="Пароль"
-            placeholder="Введите пароль"
+            label={t("roomsAccessPasswordLabel")}
+            placeholder={t("roomsAccessPasswordPlaceholder")}
             value={accessPassword}
             type="password"
             onChange={(event) => onPasswordChange(event.target.value)}
@@ -50,10 +53,10 @@ export const AccessRoomModal = ({
 
         <div className={modalS.modalActions}>
           <Button type="button" variant="ghost" onClick={onClose}>
-            Отмена
+            {t("commonCancel")}
           </Button>
           <Button type="button" onClick={onConfirm}>
-            Войти
+            {t("roomsAccessConfirm")}
           </Button>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavigateFunction } from "react-router-dom";
 
 import type { Room } from "@/entities/room/model/types";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 type UseRoomAccessParams = {
   challengeOpen: boolean;
@@ -13,6 +14,7 @@ export const useRoomAccess = ({ challengeOpen, navigate, clearDeleteError }: Use
   const [accessTarget, setAccessTarget] = useState<Room | null>(null);
   const [accessPassword, setAccessPassword] = useState("");
   const [accessError, setAccessError] = useState("");
+  const { t } = useAppPreferences();
 
   const handleOpenRoom = (roomId: string, room?: Room) => {
     if (challengeOpen) return;
@@ -41,11 +43,11 @@ export const useRoomAccess = ({ challengeOpen, navigate, clearDeleteError }: Use
     if (!accessTarget) return;
     const trimmed = accessPassword.trim();
     if (!trimmed) {
-      setAccessError("Введите пароль.");
+      setAccessError(t("roomAccessPasswordRequired"));
       return;
     }
     if (trimmed !== (accessTarget.password ?? "")) {
-      setAccessError("Неверный пароль.");
+      setAccessError(t("roomAccessPasswordInvalid"));
       return;
     }
     const targetId = accessTarget.id;

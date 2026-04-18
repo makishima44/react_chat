@@ -3,10 +3,12 @@ import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 
 import type { Room } from "@/entities/room/model/types";
 import { db } from "@/shared/api/firebase/firebaseConfig";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 export const useRoomsQuery = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [roomsError, setRoomsError] = useState("");
+  const { t } = useAppPreferences();
 
   useEffect(() => {
     const q = query(collection(db, "rooms"), orderBy("createdAt", "desc"));
@@ -21,12 +23,12 @@ export const useRoomsQuery = () => {
         setRoomsError("");
       },
       () => {
-        setRoomsError("Failed to sync rooms. Please refresh.");
+        setRoomsError(t("roomsSyncError"));
       },
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [t]);
 
   return { rooms, roomsError, setRoomsError };
 };

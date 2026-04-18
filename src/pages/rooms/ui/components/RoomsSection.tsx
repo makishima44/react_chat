@@ -4,6 +4,7 @@ import clsx from "clsx";
 import type { Room } from "@/entities/room/model/types";
 
 import s from "../roomsPage.module.css";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 type RoomsSectionProps = {
   rooms: Room[];
@@ -24,6 +25,8 @@ export const RoomsSection = ({
   onOpenRoom,
   onOpenDeleteModal,
 }: RoomsSectionProps) => {
+  const { t } = useAppPreferences();
+
   const handleRoomKeyDown = (event: KeyboardEvent<HTMLDivElement>, roomId: string, room: Room) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -34,15 +37,15 @@ export const RoomsSection = ({
   return (
     <div className={s.roomsSection}>
       <div className={s.sectionHeader}>
-        <h2 className={s.sectionTitle}>Доступные комнаты</h2>
-        <span className={s.sectionHint}>{rooms.length} активных</span>
+        <h2 className={s.sectionTitle}>{t("roomsSectionTitle")}</h2>
+        <span className={s.sectionHint}>{t("roomsSectionActive", { count: rooms.length })}</span>
       </div>
 
       {roomsError && <div className={s.formError}>{roomsError}</div>}
       {deleteError && <div className={s.formError}>{deleteError}</div>}
 
       {rooms.length === 0 ? (
-        <div className={s.emptyState}>Комнат пока нет. Создайте первую.</div>
+        <div className={s.emptyState}>{t("roomsEmpty")}</div>
       ) : (
         <div className={s.roomGrid}>
           {rooms.map((room) => (
@@ -56,7 +59,7 @@ export const RoomsSection = ({
               onKeyDown={(event) => handleRoomKeyDown(event, room.id, room)}
             >
               <div className={s.roomHeader}>
-                <div className={s.roomName}>{room.name || "Безымянный канал"}</div>
+                <div className={s.roomName}>{room.name || t("roomsUnnamed")}</div>
                 {room.createdBy === currentUserId && (
                   <button
                     type="button"
@@ -67,11 +70,13 @@ export const RoomsSection = ({
                       onOpenDeleteModal(room);
                     }}
                   >
-                    {deletingRoomId === room.id ? "Удаляю..." : "Удалить"}
+                    {deletingRoomId === room.id ? t("roomsDeleteSubmitting") : t("commonDelete")}
                   </button>
                 )}
               </div>
-              <div className={s.roomMeta}>{room.createdByName ? `Создал: ${room.createdByName}` : "Создатель неизвестен"}</div>
+              <div className={s.roomMeta}>
+                {room.createdByName ? t("commonCreatedBy", { name: room.createdByName }) : t("commonUnknownCreator")}
+              </div>
             </div>
           ))}
         </div>

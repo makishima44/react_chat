@@ -1,10 +1,12 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 export const useChallengeGate = () => {
   const [challengeOpen, setChallengeOpen] = useState(false);
   const [challengeAnswer, setChallengeAnswer] = useState("");
   const [challengeError, setChallengeError] = useState("");
   const challengeInputRef = useRef<HTMLInputElement | null>(null);
+  const { language, t } = useAppPreferences();
 
   useEffect(() => {
     const needsChallenge = sessionStorage.getItem("challengeRequired") === "1";
@@ -31,13 +33,16 @@ export const useChallengeGate = () => {
   const handleChallengeSubmit = (event: FormEvent) => {
     event.preventDefault();
     const normalized = challengeAnswer.trim().toLowerCase();
-    if (normalized === "мы обретаем свободу") {
+    const expected = language === "ru" ? "мы обретаем свободу" : "we gain freedom";
+
+    if (normalized === expected) {
       sessionStorage.removeItem("challengeRequired");
       setChallengeOpen(false);
       setChallengeError("");
       return;
     }
-    setChallengeError("Неверно. Ты еблан!");
+
+    setChallengeError(t("challengeInvalid"));
   };
 
   return {

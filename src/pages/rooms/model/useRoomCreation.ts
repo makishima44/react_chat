@@ -4,6 +4,7 @@ import { FirebaseError } from "firebase/app";
 import { NavigateFunction } from "react-router-dom";
 
 import { db } from "@/shared/api/firebase/firebaseConfig";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 type UseRoomCreationParams = {
   challengeOpen: boolean;
@@ -17,6 +18,7 @@ export const useRoomCreation = ({ challengeOpen, currentUserId, currentUserName,
   const [newRoomPassword, setNewRoomPassword] = useState("");
   const [createError, setCreateError] = useState("");
   const [creating, setCreating] = useState(false);
+  const { t } = useAppPreferences();
 
   const handleRoomNameChange = (value: string) => {
     setNewRoomName(value);
@@ -35,19 +37,19 @@ export const useRoomCreation = ({ challengeOpen, currentUserId, currentUserName,
     const trimmed = newRoomName.trim();
     const trimmedPassword = newRoomPassword.trim();
     if (!trimmed) {
-      setCreateError("Введите название комнаты.");
+      setCreateError(t("roomCreateNameRequired"));
       return;
     }
     if (trimmed.length < 2 || trimmed.length > 40) {
-      setCreateError("Название должно быть от 2 до 40 символов.");
+      setCreateError(t("roomCreateNameLength"));
       return;
     }
     if (!trimmedPassword) {
-      setCreateError("Введите пароль комнаты.");
+      setCreateError(t("roomCreatePasswordRequired"));
       return;
     }
     if (trimmedPassword.length < 4 || trimmedPassword.length > 32) {
-      setCreateError("Пароль должен быть от 4 до 32 символов.");
+      setCreateError(t("roomCreatePasswordLength"));
       return;
     }
 
@@ -68,9 +70,9 @@ export const useRoomCreation = ({ challengeOpen, currentUserId, currentUserName,
     } catch (err) {
       const firebaseError = err as FirebaseError;
       if (firebaseError.code === "permission-denied") {
-        setCreateError("Нет доступа для создания комнаты.");
+        setCreateError(t("roomCreateDenied"));
       } else {
-        setCreateError("Не удалось создать комнату. Попробуйте снова.");
+        setCreateError(t("roomCreateFailed"));
       }
     } finally {
       setCreating(false);

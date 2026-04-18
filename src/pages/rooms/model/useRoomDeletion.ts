@@ -3,6 +3,7 @@ import { FirebaseError } from "firebase/app";
 
 import type { Room } from "@/entities/room/model/types";
 import { deleteRoomWithMessages } from "@/pages/rooms/lib/deleteRoomWithMessages";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 type UseRoomDeletionParams = {
   challengeOpen: boolean;
@@ -13,13 +14,14 @@ export const useRoomDeletion = ({ challengeOpen, currentUserId }: UseRoomDeletio
   const [deletingRoomId, setDeletingRoomId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Room | null>(null);
+  const { t } = useAppPreferences();
 
   const handleOpenDeleteModal = (room: Room) => {
     if (challengeOpen || deletingRoomId) return;
 
     const isOwner = room.createdBy === currentUserId;
     if (!isOwner) {
-      setDeleteError("Нет доступа для удаления комнаты.");
+      setDeleteError(t("roomDeleteDenied"));
       return;
     }
 
@@ -39,7 +41,7 @@ export const useRoomDeletion = ({ challengeOpen, currentUserId }: UseRoomDeletio
 
     const isOwner = room.createdBy === currentUserId;
     if (!isOwner) {
-      setDeleteError("Нет доступа для удаления комнаты.");
+      setDeleteError(t("roomDeleteDenied"));
       return;
     }
 
@@ -52,9 +54,9 @@ export const useRoomDeletion = ({ challengeOpen, currentUserId }: UseRoomDeletio
     } catch (err) {
       const firebaseError = err as FirebaseError;
       if (firebaseError.code === "permission-denied") {
-        setDeleteError("Нет доступа для удаления комнаты.");
+        setDeleteError(t("roomDeleteDenied"));
       } else {
-        setDeleteError("Не удалось удалить комнату. Попробуйте снова.");
+        setDeleteError(t("roomDeleteFailed"));
       }
     } finally {
       setDeletingRoomId(null);

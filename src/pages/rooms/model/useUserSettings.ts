@@ -2,12 +2,14 @@ import { FormEvent, useEffect, useState } from "react";
 import { updateProfile, User } from "firebase/auth";
 
 import { getNicknameError } from "@/shared/lib/validation";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 export const useUserSettings = (authUser: User | null) => {
   const [nickname, setNickname] = useState(authUser?.displayName ?? "");
   const [nicknameError, setNicknameError] = useState("");
   const [savingNickname, setSavingNickname] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const { t } = useAppPreferences();
 
   const openSettings = () => {
     setNickname(authUser?.displayName ?? "");
@@ -40,7 +42,7 @@ export const useUserSettings = (authUser: User | null) => {
   const handleNicknameSave = async (event?: FormEvent) => {
     event?.preventDefault();
     if (!authUser || savingNickname) return;
-    const nextError = getNicknameError(nickname);
+    const nextError = getNicknameError(nickname, t);
     setNicknameError(nextError);
     if (nextError) return;
 
@@ -54,7 +56,7 @@ export const useUserSettings = (authUser: User | null) => {
       setNicknameError("");
       setSettingsOpen(false);
     } catch {
-      setNicknameError("Failed to update nickname. Please try again.");
+      setNicknameError(t("nicknameSaveFailed"));
     } finally {
       setSavingNickname(false);
     }

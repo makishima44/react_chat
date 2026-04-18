@@ -4,6 +4,7 @@ import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 
 import s from "../roomsPage.module.css";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 type CreateRoomFormProps = {
   newRoomName: string;
@@ -24,19 +25,21 @@ export const CreateRoomForm = ({
   onRoomPasswordChange,
   onSubmit,
 }: CreateRoomFormProps) => {
+  const { t } = useAppPreferences();
+
   return (
     <form className={s.createForm} onSubmit={onSubmit}>
       <Input
-        label="Название комнаты"
-        placeholder="Например: Delta-7"
+        label={t("roomsCreateNameLabel")}
+        placeholder={t("roomsCreateNamePlaceholder")}
         value={newRoomName}
         onChange={(event) => onRoomNameChange(event.target.value)}
         maxLength={40}
         required
       />
       <Input
-        label="Пароль комнаты"
-        placeholder="Минимум 4 символа"
+        label={t("roomsCreatePasswordLabel")}
+        placeholder={t("roomsCreatePasswordPlaceholder")}
         value={newRoomPassword}
         type="password"
         onChange={(event) => onRoomPasswordChange(event.target.value)}
@@ -45,7 +48,7 @@ export const CreateRoomForm = ({
       />
       {createError && <div className={s.formError}>{createError}</div>}
       <Button type="submit" disabled={creating}>
-        {creating ? "Создаю..." : "Создать комнату"}
+        {creating ? t("roomsCreateSubmitting") : t("roomsCreateSubmit")}
       </Button>
     </form>
   );

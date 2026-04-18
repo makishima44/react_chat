@@ -18,12 +18,14 @@ import { useUserSettings } from "../model/useUserSettings";
 import { useRoomCreation } from "../model/useRoomCreation";
 import { useRoomAccess } from "../model/useRoomAccess";
 import { useRoomDeletion } from "../model/useRoomDeletion";
+import { useAppPreferences } from "@/shared/model/preferences";
 
 export const RoomsPage = () => {
   const navigate = useNavigate();
   const authUser = auth.currentUser;
+  const { t } = useAppPreferences();
   const currentUserId = authUser?.uid ?? "anonymous";
-  const currentUserName = authUser?.displayName?.trim() || authUser?.email || "anonymous@node";
+  const currentUserName = authUser?.displayName?.trim() || authUser?.email || t("commonAnonymous");
 
   const { rooms, roomsError, setRoomsError } = useRoomsQuery();
   const {
@@ -82,15 +84,15 @@ export const RoomsPage = () => {
       await signOut(auth);
       navigate("/login");
     } catch {
-      setRoomsError("Logout failed. Please try again.");
+      setRoomsError(t("logoutError"));
     }
   };
 
   return (
     <div className={s.page}>
       <TerminalFrame
-        title="Channel Directory"
-        subtitle="Select an existing room or spin up a new secure channel."
+        title={t("roomsTitle")}
+        subtitle={t("roomsSubtitle")}
         headerSlot={<RoomsHeaderControls currentUserName={currentUserName} onOpenSettings={openSettings} onLogout={handleLogout} />}
         className={s.roomsFrame}
       >
