@@ -250,6 +250,7 @@
   display: inline-flex;
   gap: 6px;
   align-items: baseline;
+  min-width: 0;
 }
 
 .prompt {
@@ -263,6 +264,12 @@
 
 .separator {
   color: var(--text-dim);
+}
+
+.messageTime {
+  color: rgba(var(--text-rgb), 0.48);
+  font-size: 11px;
+  white-space: nowrap;
 }
 
 .text {
@@ -613,6 +620,10 @@
 @media (max-width: 560px) {
   .message {
     gap: 4px;
+  }
+
+  .messageMeta {
+    width: 100%;
   }
 
   .messageActions {

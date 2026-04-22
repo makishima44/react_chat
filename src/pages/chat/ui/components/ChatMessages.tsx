@@ -23,6 +23,27 @@ type ChatMessagesProps = {
   onReplyMessage: (message: Message) => void;
 };
 
+const formatMessageTime = (message: Message, pendingLabel: string) => {
+  if (!message.createdAt) return pendingLabel;
+
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(message.createdAt.toDate());
+};
+
+const formatMessageDateTime = (message: Message, pendingLabel: string) => {
+  if (!message.createdAt) return pendingLabel;
+
+  return new Intl.DateTimeFormat(undefined, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(message.createdAt.toDate());
+};
+
 export const ChatMessages = ({
   messages,
   currentUserId,
@@ -55,6 +76,8 @@ export const ChatMessages = ({
         const isProcessing = processingMessageId === msg.id;
         const mentionChunks = splitMessageByMentions(msg.text, mentionAliases);
         const mentionsCurrentUser = isMessageMentioningUser(msg.text, mentionAliases) && !isOwn;
+        const messageTime = formatMessageTime(msg, t("chatTimePending"));
+        const messageDateTime = formatMessageDateTime(msg, t("chatTimePending"));
 
         return (
           <div
@@ -65,6 +88,9 @@ export const ChatMessages = ({
               <span className={s.prompt}>&gt;</span>
               <span className={s.user}>{displayName}</span>
               <span className={s.separator}>:</span>
+              <time className={s.messageTime} title={messageDateTime}>
+                {messageTime}
+              </time>
             </div>
 
             {isEditing ? (
