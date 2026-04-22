@@ -18,6 +18,7 @@ import { getMentionAliases, isMessageMentioningUser } from "@/pages/chat/model/m
 import { useAppPreferences } from "@/shared/model/preferences";
 
 type NotificationPermissionState = NotificationPermission | "unsupported";
+type OnlineUser = { id: string; userId?: string; userName?: string; isTyping?: boolean };
 
 export const ChatPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -31,7 +32,7 @@ export const ChatPage = () => {
   const [replyTarget, setReplyTarget] = useState<Message | null>(null);
   const [roomName, setRoomName] = useState("");
   const [roomStatus, setRoomStatus] = useState<"loading" | "ready" | "missing">("loading");
-  const [onlineUsers, setOnlineUsers] = useState<Array<{ id: string; userId?: string; userName?: string; isTyping?: boolean }>>([]);
+  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermissionState>("unsupported");
   const navigate = useNavigate();
   const { roomId } = useParams();
@@ -516,8 +517,22 @@ export const ChatPage = () => {
         />
 
         <div className={s.presenceBar}>
-          <span className={s.onlineState}>{t("chatOnline", { count: onlineCount })}</span>
-          {typingLabel && <span className={s.typingState}>{typingLabel}</span>}
+          <div className={s.presenceSummary}>
+            <span className={s.onlineState}>{t("chatOnline", { count: onlineCount })}</span>
+            {typingLabel && <span className={s.typingState}>{typingLabel}</span>}
+          </div>
+          {onlineUsers.length > 0 && (
+            <div className={s.participants} aria-label={t("chatParticipants")}>
+              <span className={s.participantsLabel}>{t("chatParticipants")}:</span>
+              <div className={s.participantList}>
+                {onlineUsers.map((user) => (
+                  <span key={user.id} className={s.participantChip} title={user.userName || t("commonAnonymous")}>
+                    {user.userName || t("commonAnonymous")}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
           {notificationPermission === "default" && (
             <button type="button" className={s.notificationButton} onClick={handleEnableNotifications}>
               {t("chatEnableMentionAlerts")}

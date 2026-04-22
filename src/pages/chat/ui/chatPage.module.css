@@ -464,13 +464,60 @@
   flex-wrap: wrap;
 }
 
+.presenceSummary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
 .onlineState {
   color: var(--accent);
+  white-space: nowrap;
 }
 
 .typingState {
   color: var(--text);
   font-style: italic;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.participants {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.participantsLabel {
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.participantList {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.participantChip {
+  max-width: 132px;
+  padding: 1px 7px;
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.26);
+  border-radius: 999px;
+  color: var(--text);
+  background: rgba(var(--surface-rgb), 0.58);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .notificationButton {
@@ -587,6 +634,23 @@
   .presenceBar {
     align-items: flex-start;
     flex-direction: column;
+    gap: 8px;
+  }
+
+  .presenceSummary,
+  .participants {
+    width: 100%;
+  }
+
+  .participants {
+    min-width: 0;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .participantList {
+    flex-wrap: wrap;
+    overflow: visible;
   }
 
   .modal {
