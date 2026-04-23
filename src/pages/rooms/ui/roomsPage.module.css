@@ -125,9 +125,36 @@
   gap: 10px;
 }
 
+.roomTitleRow {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .roomName {
   font-size: 15px;
   color: var(--text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unreadBadge {
+  flex: 0 0 auto;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(var(--accent-rgb), 0.2);
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.45);
+  color: var(--accent-strong);
+  font-size: 11px;
+  line-height: 1;
 }
 
 .roomMeta {
@@ -234,5 +261,9 @@
   .roomHeader {
     flex-direction: column;
     gap: 6px;
+  }
+
+  .roomTitleRow {
+    width: 100%;
   }
 }

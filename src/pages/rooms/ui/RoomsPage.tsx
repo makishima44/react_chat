@@ -27,7 +27,7 @@ export const RoomsPage = () => {
   const currentUserId = authUser?.uid ?? "anonymous";
   const currentUserName = authUser?.displayName?.trim() || authUser?.email || t("commonAnonymous");
 
-  const { rooms, roomsError, setRoomsError } = useRoomsQuery();
+  const { rooms, roomsError, setRoomsError } = useRoomsQuery(currentUserId);
   const {
     challengeOpen,
     challengeAnswer,

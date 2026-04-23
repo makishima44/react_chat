@@ -330,6 +330,28 @@ export const ChatPage = () => {
   }, [roomId]);
 
   useEffect(() => {
+    if (!roomId || roomStatus !== "ready" || messages.length === 0 || typeof window === "undefined") return;
+
+    const latestMessage = [...messages].reverse().find((message) => message.createdAt);
+    const latestMessageAt = latestMessage?.createdAt?.toMillis();
+    if (!latestMessageAt || !authUser) return;
+
+    const storageKey = `react_chat_last_seen_${authUser.uid}`;
+
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      const currentValue = raw ? (JSON.parse(raw) as Record<string, number>) : {};
+      const previousSeen = currentValue[roomId] ?? 0;
+
+      if (latestMessageAt > previousSeen) {
+        window.localStorage.setItem(storageKey, JSON.stringify({ ...currentValue, [roomId]: latestMessageAt }));
+      }
+    } catch {
+      // Local persistence should not affect chat behavior.
+    }
+  }, [authUser, messages, roomId, roomStatus]);
+
+  useEffect(() => {
     if (!roomId || roomStatus === "missing") {
       setMessages([]);
       return;

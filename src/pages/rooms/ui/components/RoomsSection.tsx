@@ -59,7 +59,14 @@ export const RoomsSection = ({
               onKeyDown={(event) => handleRoomKeyDown(event, room.id, room)}
             >
               <div className={s.roomHeader}>
-                <div className={s.roomName}>{room.name || t("roomsUnnamed")}</div>
+                <div className={s.roomTitleRow}>
+                  <div className={s.roomName}>{room.name || t("roomsUnnamed")}</div>
+                  {!!room.unreadCount && (
+                    <span className={s.unreadBadge} title={t("roomsUnreadCountTitle", { count: room.unreadCount })}>
+                      {room.unreadCount}
+                    </span>
+                  )}
+                </div>
                 {room.createdBy === currentUserId && (
                   <button
                     type="button"

@@ -7,4 +7,5 @@ export type Room = {
   createdBy?: string;
   createdByName?: string;
   password?: string;
+  unreadCount?: number;
 };
