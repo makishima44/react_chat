@@ -22,6 +22,7 @@ type OnlineUser = { id: string; userId?: string; userName?: string; isTyping?: b
 
 export const ChatPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState("");
@@ -325,6 +326,7 @@ export const ChatPage = () => {
   useEffect(() => {
     knownMessageIdsRef.current = new Set();
     notifiedMessageIdsRef.current = new Set();
+    setSearchQuery("");
   }, [roomId]);
 
   useEffect(() => {
@@ -456,6 +458,20 @@ export const ChatPage = () => {
 
   const typingUsers = onlineUsers.filter((user) => user.isTyping && user.userId !== currentUserId);
   const onlineCount = onlineUsers.length;
+  const normalizedSearchQuery = searchQuery.trim().toLocaleLowerCase();
+  const filteredMessages = useMemo(() => {
+    if (!normalizedSearchQuery) return messages;
+
+    return messages.filter((message) => {
+      const author = `${message.userName ?? ""} ${message.user ?? ""}`.toLocaleLowerCase();
+      const replyText = `${message.replyTo?.text ?? ""} ${message.replyTo?.userName ?? ""} ${message.replyTo?.user ?? ""}`.toLocaleLowerCase();
+      return (
+        message.text.toLocaleLowerCase().includes(normalizedSearchQuery) ||
+        author.includes(normalizedSearchQuery) ||
+        replyText.includes(normalizedSearchQuery)
+      );
+    });
+  }, [messages, normalizedSearchQuery]);
   const typingLabel =
     typingUsers.length > 0
       ? t("chatTyping", { names: typingUsers.map((user) => user.userName || t("commonAnonymous")).join(", ") })
@@ -498,8 +514,35 @@ export const ChatPage = () => {
         headerSlot={<ChatHeaderControls onGoToRooms={() => navigate("/rooms")} onLogout={handleLogout} />}
         className={s.chatFrame}
       >
+        <div className={s.searchBar}>
+          <span className={s.searchLabel}>{t("commonSearch")}</span>
+          <input
+            type="text"
+            className={s.searchInput}
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder={t("chatSearchPlaceholder")}
+            aria-label={t("chatSearchPlaceholder")}
+          />
+          <div className={s.searchMeta}>
+            <span className={s.searchCount} aria-live="polite">
+              {normalizedSearchQuery ? t("chatSearchResults", { count: filteredMessages.length }) : "\u00A0"}
+            </span>
+            <button
+              type="button"
+              className={s.searchClearButton}
+              onClick={() => setSearchQuery("")}
+              disabled={!searchQuery}
+              aria-hidden={!searchQuery}
+            >
+              {t("chatSearchClear")}
+            </button>
+          </div>
+        </div>
+
         <ChatMessages
-          messages={messages}
+          messages={filteredMessages}
+          searchQuery={normalizedSearchQuery}
           currentUserId={currentUserId}
           currentUserEmail={currentUserEmail}
           currentUserName={currentUserName}
