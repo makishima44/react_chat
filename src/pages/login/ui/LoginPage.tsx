@@ -39,7 +39,6 @@ export const LoginPage = () => {
 
     try {
       await loginUser(email, password);
-      sessionStorage.setItem("challengeRequired", "1");
       navigate("/rooms");
     } catch (err) {
       const firebaseError = err as FirebaseError;

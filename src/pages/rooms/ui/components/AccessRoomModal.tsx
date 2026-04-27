@@ -38,7 +38,7 @@ export const AccessRoomModal = ({
         </div>
 
         <div className={s.accessModalBody}>
-          <p className={modalS.challengePrompt}>{t("roomsAccessPrompt", { name: accessTarget.name || t("roomsUnnamed") })}</p>
+          <p className={modalS.modalPrompt}>{t("roomsAccessPrompt", { name: accessTarget.name || t("roomsUnnamed") })}</p>
           <Input
             label={t("roomsAccessPasswordLabel")}
             placeholder={t("roomsAccessPasswordPlaceholder")}

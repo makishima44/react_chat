@@ -28,8 +28,8 @@ export const DeleteRoomModal = ({ deleteTarget, deletingRoomId, onClose, onConfi
         </div>
 
         <div className={s.deleteModalBody}>
-          <p className={modalS.challengePrompt}>{t("roomsDeleteRoomPrompt", { name: deleteTarget.name || t("roomsUnnamed") })}</p>
-          <p className={modalS.challengePrompt}>{t("roomsDeleteRoomWarning")}</p>
+          <p className={modalS.modalPrompt}>{t("roomsDeleteRoomPrompt", { name: deleteTarget.name || t("roomsUnnamed") })}</p>
+          <p className={modalS.modalPrompt}>{t("roomsDeleteRoomWarning")}</p>
         </div>
 
         <div className={modalS.modalActions}>
