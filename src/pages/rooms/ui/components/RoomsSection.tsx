@@ -2,6 +2,7 @@ import type { KeyboardEvent } from "react";
 import clsx from "clsx";
 
 import type { Room } from "@/entities/room/model/types";
+import { canDeleteRoom, getRoomRole, roomRoleTranslationKeys } from "@/entities/room/model/roles";
 
 import s from "../roomsPage.module.css";
 import { useAppPreferences } from "@/shared/model/preferences";
@@ -48,44 +49,51 @@ export const RoomsSection = ({
         <div className={s.emptyState}>{t("roomsEmpty")}</div>
       ) : (
         <div className={s.roomGrid}>
-          {rooms.map((room) => (
-            <div
-              key={room.id}
-              className={clsx(s.roomCard, deletingRoomId === room.id && s.roomCardDisabled)}
-              role="button"
-              tabIndex={0}
-              aria-disabled={deletingRoomId === room.id}
-              onClick={() => onOpenRoom(room.id, room)}
-              onKeyDown={(event) => handleRoomKeyDown(event, room.id, room)}
-            >
-              <div className={s.roomHeader}>
-                <div className={s.roomTitleRow}>
-                  <div className={s.roomName}>{room.name || t("roomsUnnamed")}</div>
-                  {!!room.unreadCount && (
-                    <span className={s.unreadBadge} title={t("roomsUnreadCountTitle", { count: room.unreadCount })}>
-                      {room.unreadCount}
-                    </span>
+          {rooms.map((room) => {
+            const currentRole = getRoomRole(room, currentUserId);
+
+            return (
+              <div
+                key={room.id}
+                className={clsx(s.roomCard, deletingRoomId === room.id && s.roomCardDisabled)}
+                role="button"
+                tabIndex={0}
+                aria-disabled={deletingRoomId === room.id}
+                onClick={() => onOpenRoom(room.id, room)}
+                onKeyDown={(event) => handleRoomKeyDown(event, room.id, room)}
+              >
+                <div className={s.roomHeader}>
+                  <div className={s.roomTitleRow}>
+                    <div className={s.roomName}>{room.name || t("roomsUnnamed")}</div>
+                    {!!room.unreadCount && (
+                      <span className={s.unreadBadge} title={t("roomsUnreadCountTitle", { count: room.unreadCount })}>
+                        {room.unreadCount}
+                      </span>
+                    )}
+                  </div>
+                  <span className={clsx(s.roleBadge, s[`roleBadge_${currentRole}`])}>
+                    {t(roomRoleTranslationKeys[currentRole])}
+                  </span>
+                  {canDeleteRoom(room, currentUserId) && (
+                    <button
+                      type="button"
+                      className={s.deleteButton}
+                      disabled={deletingRoomId === room.id}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onOpenDeleteModal(room);
+                      }}
+                    >
+                      {deletingRoomId === room.id ? t("roomsDeleteSubmitting") : t("commonDelete")}
+                    </button>
                   )}
                 </div>
-                {room.createdBy === currentUserId && (
-                  <button
-                    type="button"
-                    className={s.deleteButton}
-                    disabled={deletingRoomId === room.id}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onOpenDeleteModal(room);
-                    }}
-                  >
-                    {deletingRoomId === room.id ? t("roomsDeleteSubmitting") : t("commonDelete")}
-                  </button>
-                )}
+                <div className={s.roomMeta}>
+                  {room.createdByName ? t("commonCreatedBy", { name: room.createdByName }) : t("commonUnknownCreator")}
+                </div>
               </div>
-              <div className={s.roomMeta}>
-                {room.createdByName ? t("commonCreatedBy", { name: room.createdByName }) : t("commonUnknownCreator")}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

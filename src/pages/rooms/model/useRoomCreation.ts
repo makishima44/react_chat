@@ -7,13 +7,12 @@ import { db } from "@/shared/api/firebase/firebaseConfig";
 import { useAppPreferences } from "@/shared/model/preferences";
 
 type UseRoomCreationParams = {
-  challengeOpen: boolean;
   currentUserId: string;
   currentUserName: string;
   navigate: NavigateFunction;
 };
 
-export const useRoomCreation = ({ challengeOpen, currentUserId, currentUserName, navigate }: UseRoomCreationParams) => {
+export const useRoomCreation = ({ currentUserId, currentUserName, navigate }: UseRoomCreationParams) => {
   const [newRoomName, setNewRoomName] = useState("");
   const [newRoomPassword, setNewRoomPassword] = useState("");
   const [createError, setCreateError] = useState("");
@@ -32,7 +31,7 @@ export const useRoomCreation = ({ challengeOpen, currentUserId, currentUserName,
 
   const handleCreateRoom = async (event: FormEvent) => {
     event.preventDefault();
-    if (creating || challengeOpen) return;
+    if (creating) return;
 
     const trimmed = newRoomName.trim();
     const trimmedPassword = newRoomPassword.trim();
@@ -63,6 +62,17 @@ export const useRoomCreation = ({ challengeOpen, currentUserId, currentUserName,
         createdAt: serverTimestamp(),
         createdBy: currentUserId,
         createdByName: currentUserName,
+        roles: {
+          [currentUserId]: "owner",
+        },
+        members: {
+          [currentUserId]: {
+            userId: currentUserId,
+            userName: currentUserName,
+            role: "owner",
+            joinedAt: serverTimestamp(),
+          },
+        },
       });
       setNewRoomName("");
       setNewRoomPassword("");

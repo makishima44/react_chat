@@ -2,25 +2,24 @@ import { useState } from "react";
 import { FirebaseError } from "firebase/app";
 
 import type { Room } from "@/entities/room/model/types";
+import { canDeleteRoom } from "@/entities/room/model/roles";
 import { deleteRoomWithMessages } from "@/pages/rooms/lib/deleteRoomWithMessages";
 import { useAppPreferences } from "@/shared/model/preferences";
 
 type UseRoomDeletionParams = {
-  challengeOpen: boolean;
   currentUserId: string;
 };
 
-export const useRoomDeletion = ({ challengeOpen, currentUserId }: UseRoomDeletionParams) => {
+export const useRoomDeletion = ({ currentUserId }: UseRoomDeletionParams) => {
   const [deletingRoomId, setDeletingRoomId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Room | null>(null);
   const { t } = useAppPreferences();
 
   const handleOpenDeleteModal = (room: Room) => {
-    if (challengeOpen || deletingRoomId) return;
+    if (deletingRoomId) return;
 
-    const isOwner = room.createdBy === currentUserId;
-    if (!isOwner) {
+    if (!canDeleteRoom(room, currentUserId)) {
       setDeleteError(t("roomDeleteDenied"));
       return;
     }
@@ -37,10 +36,9 @@ export const useRoomDeletion = ({ challengeOpen, currentUserId }: UseRoomDeletio
   const handleConfirmDelete = async () => {
     if (!deleteTarget) return;
     const room = deleteTarget;
-    if (challengeOpen || deletingRoomId) return;
+    if (deletingRoomId) return;
 
-    const isOwner = room.createdBy === currentUserId;
-    if (!isOwner) {
+    if (!canDeleteRoom(room, currentUserId)) {
       setDeleteError(t("roomDeleteDenied"));
       return;
     }

@@ -188,6 +188,36 @@
   transform: none;
 }
 
+.roleBadge {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.28);
+  border-radius: 6px;
+  background: rgba(var(--surface-rgb), 0.68);
+  color: var(--text-dim);
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.roleBadge_owner {
+  color: var(--accent-strong);
+  border-color: rgba(var(--accent-soft-rgb), 0.55);
+  box-shadow: inset 0 0 10px rgba(var(--accent-rgb), 0.14);
+}
+
+.roleBadge_moderator {
+  color: #ffd666;
+  border-color: rgba(var(--warning-rgb), 0.45);
+  background: rgba(var(--warning-rgb), 0.1);
+}
+
+.roleBadge_member {
+  color: var(--text-dim);
+}
+
 .deleteModalBody {
   display: grid;
   gap: 8px;

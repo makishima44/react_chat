@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 import { auth } from "@/shared/api/firebase/firebaseConfig";
 import { TerminalFrame } from "@/shared/ui/terminal-frame/TerminalFrame";
-import { ChatChallengeModal } from "@/pages/chat/ui/components/ChatChallengeModal";
 import { ChatSettingsModal } from "@/pages/chat/ui/components/ChatSettingsModal";
 
 import s from "./roomsPage.module.css";
@@ -13,7 +12,6 @@ import { RoomsSection } from "./components/RoomsSection";
 import { DeleteRoomModal } from "./components/DeleteRoomModal";
 import { AccessRoomModal } from "./components/AccessRoomModal";
 import { useRoomsQuery } from "../model/useRoomsQuery";
-import { useChallengeGate } from "../model/useChallengeGate";
 import { useUserSettings } from "../model/useUserSettings";
 import { useRoomCreation } from "../model/useRoomCreation";
 import { useRoomAccess } from "../model/useRoomAccess";
@@ -28,14 +26,6 @@ export const RoomsPage = () => {
   const currentUserName = authUser?.displayName?.trim() || authUser?.email || t("commonAnonymous");
 
   const { rooms, roomsError, setRoomsError } = useRoomsQuery(currentUserId);
-  const {
-    challengeOpen,
-    challengeAnswer,
-    challengeError,
-    challengeInputRef,
-    handleChallengeAnswerChange,
-    handleChallengeSubmit,
-  } = useChallengeGate();
   const {
     nickname,
     nicknameError,
@@ -55,14 +45,12 @@ export const RoomsPage = () => {
     handleRoomPasswordChange,
     handleCreateRoom,
   } = useRoomCreation({
-    challengeOpen,
     currentUserId,
     currentUserName,
     navigate,
   });
   const { deletingRoomId, deleteError, deleteTarget, setDeleteError, handleOpenDeleteModal, handleCloseDeleteModal, handleConfirmDelete } =
     useRoomDeletion({
-      challengeOpen,
       currentUserId,
     });
   const {
@@ -74,8 +62,9 @@ export const RoomsPage = () => {
     handleCloseAccessModal,
     handleConfirmAccess,
   } = useRoomAccess({
-    challengeOpen,
     navigate,
+    currentUserId,
+    currentUserName,
     clearDeleteError: () => setDeleteError(""),
   });
 
@@ -118,16 +107,6 @@ export const RoomsPage = () => {
           />
         </div>
       </TerminalFrame>
-
-      {challengeOpen && (
-        <ChatChallengeModal
-          challengeAnswer={challengeAnswer}
-          challengeError={challengeError}
-          inputRef={challengeInputRef}
-          onAnswerChange={handleChallengeAnswerChange}
-          onSubmit={handleChallengeSubmit}
-        />
-      )}
 
       {deleteTarget && (
         <DeleteRoomModal deleteTarget={deleteTarget} deletingRoomId={deletingRoomId} onClose={handleCloseDeleteModal} onConfirm={handleConfirmDelete} />
