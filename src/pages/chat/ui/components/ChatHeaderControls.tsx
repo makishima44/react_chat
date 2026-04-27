@@ -4,11 +4,12 @@ import { useAppPreferences } from "@/shared/model/preferences";
 
 type ChatHeaderControlsProps = {
   onOpenSettings?: () => void;
+  onOpenRoomRoles?: () => void;
   onLogout: () => void;
   onGoToRooms: () => void;
 };
 
-export const ChatHeaderControls = ({ onOpenSettings, onLogout, onGoToRooms }: ChatHeaderControlsProps) => {
+export const ChatHeaderControls = ({ onOpenSettings, onOpenRoomRoles, onLogout, onGoToRooms }: ChatHeaderControlsProps) => {
   const { t } = useAppPreferences();
 
   return (
@@ -21,6 +22,11 @@ export const ChatHeaderControls = ({ onOpenSettings, onLogout, onGoToRooms }: Ch
               fill="currentColor"
             />
           </svg>
+        </Button>
+      )}
+      {onOpenRoomRoles && (
+        <Button type="button" variant="ghost" onClick={onOpenRoomRoles}>
+          {t("roomRoles")}
         </Button>
       )}
       <Button variant="ghost" onClick={onGoToRooms}>

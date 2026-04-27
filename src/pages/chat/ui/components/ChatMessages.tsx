@@ -16,6 +16,7 @@ type ChatMessagesProps = {
   editingMessageId: string | null;
   editDraft: string;
   processingMessageId: string | null;
+  canModerate: boolean;
   onStartEdit: (message: Message) => void;
   onCancelEdit: () => void;
   onEditDraftChange: (value: string) => void;
@@ -109,6 +110,7 @@ export const ChatMessages = ({
   editingMessageId,
   editDraft,
   processingMessageId,
+  canModerate,
   onStartEdit,
   onCancelEdit,
   onEditDraftChange,
@@ -127,6 +129,7 @@ export const ChatMessages = ({
       {messages.map((msg) => {
         const displayName = msg.userName || msg.user || t("commonAnonymous");
         const isOwn = isOwnMessage(msg);
+        const canDeleteMessage = isOwn || canModerate;
         const isEditing = editingMessageId === msg.id;
         const isProcessing = processingMessageId === msg.id;
         const mentionChunks = splitMessageByMentions(msg.text, mentionAliases);
@@ -183,13 +186,15 @@ export const ChatMessages = ({
                   <button type="button" disabled={isProcessing} onClick={() => onReplyMessage(msg)}>
                     {t("chatReply")}
                   </button>
-                  {isOwn && (
+                  {(isOwn || canModerate) && (
                     <>
-                      <button type="button" disabled={isProcessing} onClick={() => onStartEdit(msg)}>
-                        {t("chatEdit")}
-                      </button>
+                      {isOwn && (
+                        <button type="button" disabled={isProcessing} onClick={() => onStartEdit(msg)}>
+                          {t("chatEdit")}
+                        </button>
+                      )}
                       <button type="button" disabled={isProcessing} onClick={() => onDeleteMessage(msg)}>
-                        {t("commonDelete")}
+                        {canDeleteMessage && !isOwn ? t("chatModerateDelete") : t("commonDelete")}
                       </button>
                     </>
                   )}

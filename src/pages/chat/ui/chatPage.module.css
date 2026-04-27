@@ -52,6 +52,19 @@
   gap: 16px;
 }
 
+.modalWide {
+  width: min(680px, 94vw);
+  max-height: min(720px, 88vh);
+  overflow: auto;
+  background: linear-gradient(180deg, rgba(var(--panel-top-rgb), 0.98), rgba(var(--panel-bottom-rgb), 0.96));
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.3);
+  border-radius: 12px;
+  box-shadow: 0 0 24px rgba(var(--accent-rgb), 0.18);
+  padding: 18px 20px 20px;
+  display: grid;
+  gap: 16px;
+}
+
 .modalHeader {
   display: flex;
   align-items: center;
@@ -168,43 +181,17 @@
   box-shadow: inset 0 0 10px rgba(var(--accent-rgb), 0.25);
 }
 
-.challengeForm {
-  display: grid;
-  gap: 16px;
-}
-
-.challengePrompt {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text);
-  line-height: 1.5;
-}
-
-.challengeForm input {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(var(--accent-soft-rgb), 0.25);
-  background: rgba(var(--surface-rgb), 0.7);
-  color: var(--text);
-  font-size: 14px;
-}
-
-.challengeForm input:focus {
-  outline: none;
-  border-color: rgba(var(--accent-soft-rgb), 0.5);
-  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.2);
-}
-
-.challengeError {
-  color: var(--danger);
-  font-size: 12px;
-}
-
 .modalActions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.modalPrompt {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
 }
 
 .messages {
@@ -228,6 +215,36 @@
   background: rgba(var(--surface-rgb), 0.82);
   border: 1px solid rgba(var(--accent-soft-rgb), 0.25);
   border-radius: 8px;
+}
+
+.roomRoleBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  background: rgba(var(--surface-rgb), 0.72);
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.22);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.roomRoleLabel {
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.roomRoleValue {
+  color: var(--accent-strong);
+  padding: 2px 8px;
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.35);
+  border-radius: 999px;
+  background: rgba(var(--accent-rgb), 0.12);
+}
+
+.roomRoleCapability {
+  color: #ffd666;
 }
 
 .searchLabel {
@@ -655,6 +672,84 @@
   color: var(--text-dim);
 }
 
+.rolesList {
+  display: grid;
+  gap: 10px;
+}
+
+.roleRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.24);
+  border-radius: 8px;
+  background: rgba(var(--surface-rgb), 0.64);
+}
+
+.roleIdentity {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.roleName {
+  color: var(--text);
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roleUserId {
+  color: var(--text-dim);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roleSelector {
+  display: inline-flex;
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.28);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.roleOption {
+  min-width: 96px;
+  border: 0;
+  border-right: 1px solid rgba(var(--accent-soft-rgb), 0.24);
+  background: rgba(var(--surface-rgb), 0.72);
+  color: var(--text-dim);
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.roleOption:last-child {
+  border-right: 0;
+}
+
+.roleOption:hover:not(:disabled) {
+  color: var(--accent-strong);
+  background: rgba(var(--accent-rgb), 0.12);
+}
+
+.roleOption:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.roleOptionActive {
+  color: var(--accent-strong);
+  background: rgba(var(--accent-rgb), 0.2);
+  box-shadow: inset 0 0 10px rgba(var(--accent-rgb), 0.22);
+}
+
 @media (max-width: 900px) {
   .chatFrame {
     min-height: 74vh;
@@ -744,6 +839,27 @@
     width: min(460px, 96vw);
     padding: 14px;
     gap: 14px;
+  }
+
+  .modalWide {
+    width: min(680px, 96vw);
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .roleRow {
+    grid-template-columns: 1fr;
+  }
+
+  .roleSelector {
+    width: 100%;
+  }
+
+  .roleOption {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 6px;
+    font-size: 10px;
   }
 
   .modalActions {

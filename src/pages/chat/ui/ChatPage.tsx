@@ -5,6 +5,8 @@ import { FirebaseError } from "firebase/app";
 import { useNavigate, useParams } from "react-router-dom";
 
 import type { Message } from "@/entities/message/model/types";
+import type { Room, RoomMember, RoomRole } from "@/entities/room/model/types";
+import { canManageRoom, canModerateRoom, getRoomRole, normalizeRoomMembers, roomRoleTranslationKeys } from "@/entities/room/model/roles";
 import { db, auth } from "@/shared/api/firebase/firebaseConfig";
 import { TerminalFrame } from "@/shared/ui/terminal-frame/TerminalFrame";
 import { Button } from "@/shared/ui/button";
@@ -14,6 +16,7 @@ import { ChatHeaderControls } from "./components/ChatHeaderControls";
 import { ChatInput } from "./components/ChatInput";
 import { ChatMessages } from "./components/ChatMessages";
 import { DeleteMessageModal } from "./components/DeleteMessageModal";
+import { RoomRolesModal } from "./components/RoomRolesModal";
 import { getMentionAliases, isMessageMentioningUser } from "@/pages/chat/model/mentions";
 import { useAppPreferences } from "@/shared/model/preferences";
 
@@ -32,7 +35,10 @@ export const ChatPage = () => {
   const [deleteTarget, setDeleteTarget] = useState<Message | null>(null);
   const [replyTarget, setReplyTarget] = useState<Message | null>(null);
   const [roomName, setRoomName] = useState("");
+  const [roomDetails, setRoomDetails] = useState<Room | null>(null);
   const [roomStatus, setRoomStatus] = useState<"loading" | "ready" | "missing">("loading");
+  const [rolesOpen, setRolesOpen] = useState(false);
+  const [updatingRoleUserId, setUpdatingRoleUserId] = useState<string | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermissionState>("unsupported");
   const navigate = useNavigate();
@@ -49,6 +55,10 @@ export const ChatPage = () => {
   const currentUserName = authUser?.displayName?.trim() || currentUserEmail || t("commonAnonymous");
   const presenceDocId = roomId && authUser ? `${roomId}_${authUser.uid}` : null;
   const mentionAliases = useMemo(() => getMentionAliases(currentUserName, currentUserEmail), [currentUserName, currentUserEmail]);
+  const currentRoomRole = getRoomRole(roomDetails, currentUserId);
+  const canManageCurrentRoom = canManageRoom(roomDetails, currentUserId);
+  const canModerateCurrentRoom = canModerateRoom(roomDetails, currentUserId);
+  const roomMembers = useMemo(() => (roomDetails ? normalizeRoomMembers(roomDetails) : []), [roomDetails]);
 
   const isOwnMessage = useCallback(
     (message: Message) =>
@@ -214,7 +224,7 @@ export const ChatPage = () => {
   };
 
   const handleDeleteMessage = (message: Message) => {
-    if (processingMessageId || !isOwnMessage(message)) return;
+    if (processingMessageId || (!isOwnMessage(message) && !canModerateCurrentRoom)) return;
     setDeleteTarget(message);
     setSendError("");
   };
@@ -235,7 +245,7 @@ export const ChatPage = () => {
   };
 
   const handleConfirmDelete = async () => {
-    if (!deleteTarget || processingMessageId || !isOwnMessage(deleteTarget)) return;
+    if (!deleteTarget || processingMessageId || (!isOwnMessage(deleteTarget) && !canModerateCurrentRoom)) return;
 
     setProcessingMessageId(deleteTarget.id);
     setSendError("");
@@ -280,20 +290,49 @@ export const ChatPage = () => {
     }
   };
 
+  const handleChangeRole = async (member: RoomMember, role: RoomRole) => {
+    if (!roomId || !roomDetails || !canManageCurrentRoom || member.role === "owner" || role === "owner" || member.role === role) return;
+
+    setUpdatingRoleUserId(member.userId);
+    setSendError("");
+
+    try {
+      await setDoc(
+        doc(db, "rooms", roomId),
+        {
+          roles: {
+            [member.userId]: role,
+          },
+          members: {
+            [member.userId]: {
+              ...member,
+              role,
+            },
+          },
+        },
+        { merge: true },
+      );
+    } catch (err) {
+      const firebaseError = err as FirebaseError;
+      if (firebaseError.code === "permission-denied") {
+        setSendError(t("roomRolesDenied"));
+      } else {
+        setSendError(t("roomRolesFailed"));
+      }
+    } finally {
+      setUpdatingRoleUserId(null);
+    }
+  };
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   useEffect(() => {
-    if (sessionStorage.getItem("challengeRequired") === "1") {
-      navigate("/rooms", { replace: true });
-    }
-  }, [navigate]);
-
-  useEffect(() => {
     if (!roomId) return;
     setRoomStatus("loading");
     setRoomName("");
+    setRoomDetails(null);
     const roomRef = doc(db, "rooms", roomId);
     const unsubscribe = onSnapshot(
       roomRef,
@@ -301,13 +340,17 @@ export const ChatPage = () => {
         if (!snapshot.exists()) {
           setRoomStatus("missing");
           setRoomName("");
+          setRoomDetails(null);
           return;
         }
-        const data = snapshot.data() as { name?: string };
+        const data = snapshot.data() as Omit<Room, "id">;
+        const room = { id: snapshot.id, ...data };
         setRoomName(data?.name ?? t("chatTitle"));
+        setRoomDetails(room);
         setRoomStatus("ready");
       },
       () => {
+        setRoomDetails(null);
         setRoomStatus("missing");
       },
     );
@@ -478,6 +521,34 @@ export const ChatPage = () => {
     };
   }, [authUser, currentUserName, presenceDocId, roomId, roomStatus]);
 
+  useEffect(() => {
+    if (!roomId || !authUser || roomStatus !== "ready" || !roomDetails) return;
+
+    const role = getRoomRole(roomDetails, authUser.uid);
+    const currentMember = roomDetails.members?.[authUser.uid];
+    if (roomDetails.roles?.[authUser.uid] === role && currentMember?.role === role && currentMember.userName === currentUserName && currentMember.joinedAt) {
+      return;
+    }
+
+    void setDoc(
+      doc(db, "rooms", roomId),
+      {
+        roles: {
+          [authUser.uid]: role,
+        },
+        members: {
+          [authUser.uid]: {
+            userId: authUser.uid,
+            userName: currentUserName,
+            role,
+            joinedAt: roomDetails.members?.[authUser.uid]?.joinedAt ?? serverTimestamp(),
+          },
+        },
+      },
+      { merge: true },
+    ).catch(() => {});
+  }, [authUser, currentUserName, roomDetails, roomId, roomStatus]);
+
   const typingUsers = onlineUsers.filter((user) => user.isTyping && user.userId !== currentUserId);
   const onlineCount = onlineUsers.length;
   const normalizedSearchQuery = searchQuery.trim().toLocaleLowerCase();
@@ -533,9 +604,21 @@ export const ChatPage = () => {
       <TerminalFrame
         title={t("chatTitle")}
         subtitle={roomName ? t("chatSubtitleWithRoom", { name: roomName }) : t("chatSubtitleFallback")}
-        headerSlot={<ChatHeaderControls onGoToRooms={() => navigate("/rooms")} onLogout={handleLogout} />}
+        headerSlot={
+          <ChatHeaderControls
+            onGoToRooms={() => navigate("/rooms")}
+            onOpenRoomRoles={canManageCurrentRoom ? () => setRolesOpen(true) : undefined}
+            onLogout={handleLogout}
+          />
+        }
         className={s.chatFrame}
       >
+        <div className={s.roomRoleBar}>
+          <span className={s.roomRoleLabel}>{t("roomRoleCurrent")}:</span>
+          <span className={s.roomRoleValue}>{t(roomRoleTranslationKeys[currentRoomRole])}</span>
+          {canModerateCurrentRoom && <span className={s.roomRoleCapability}>{t("roomRoleCanModerate")}</span>}
+        </div>
+
         <div className={s.searchBar}>
           <span className={s.searchLabel}>{t("commonSearch")}</span>
           <input
@@ -573,6 +656,7 @@ export const ChatPage = () => {
           editingMessageId={editingMessageId}
           editDraft={editDraft}
           processingMessageId={processingMessageId}
+          canModerate={canModerateCurrentRoom}
           onStartEdit={handleStartEdit}
           onCancelEdit={handleCancelEdit}
           onEditDraftChange={setEditDraft}
@@ -626,6 +710,16 @@ export const ChatPage = () => {
           deleting={processingMessageId === deleteTarget.id}
           onClose={handleCloseDeleteModal}
           onConfirm={handleConfirmDelete}
+        />
+      )}
+
+      {rolesOpen && canManageCurrentRoom && (
+        <RoomRolesModal
+          members={roomMembers}
+          currentUserId={currentUserId}
+          updatingUserId={updatingRoleUserId}
+          onClose={() => setRolesOpen(false)}
+          onChangeRole={handleChangeRole}
         />
       )}
     </div>
