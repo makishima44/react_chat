@@ -7,6 +7,8 @@ import { RegistrationPage } from "@/pages/registration/ui/RegistrationPage";
 import { LoginPage } from "@/pages/login/ui/LoginPage";
 import { RoomsPage } from "@/pages/rooms/ui/RoomsPage";
 import { ChatPage } from "@/pages/chat/ui/ChatPage";
+import { DirectMessagesPage } from "@/pages/direct-messages/ui/DirectMessagesPage";
+import { DirectChatPage } from "@/pages/direct-chat/ui/DirectChatPage";
 import { MatrixSplash } from "@/widgets/splash/ui/MatrixSplash";
 import s from "./App.module.css";
 
@@ -52,6 +54,22 @@ const App = () => {
           element={
             <PrivateRoute>
               <Navigate to="/rooms" replace />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dm"
+          element={
+            <PrivateRoute>
+              <DirectMessagesPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dm/:chatId"
+          element={
+            <PrivateRoute>
+              <DirectChatPage />
             </PrivateRoute>
           }
         />

@@ -17,8 +17,10 @@ import { ChatInput } from "./components/ChatInput";
 import { ChatMessages } from "./components/ChatMessages";
 import { DeleteMessageModal } from "./components/DeleteMessageModal";
 import { RoomRolesModal } from "./components/RoomRolesModal";
+import { ChatSettingsModal } from "./components/ChatSettingsModal";
 import { getMentionAliases, isMessageMentioningUser } from "@/pages/chat/model/mentions";
 import { useAppPreferences } from "@/shared/model/preferences";
+import { useUserSettings } from "@/pages/rooms/model/useUserSettings";
 
 type NotificationPermissionState = NotificationPermission | "unsupported";
 type OnlineUser = { id: string; userId?: string; userName?: string; isTyping?: boolean };
@@ -53,6 +55,16 @@ export const ChatPage = () => {
   const currentUserId = authUser?.uid ?? "anonymous";
   const currentUserEmail = authUser?.email ?? "";
   const currentUserName = authUser?.displayName?.trim() || currentUserEmail || t("commonAnonymous");
+  const {
+    nickname,
+    nicknameError,
+    savingNickname,
+    settingsOpen,
+    openSettings,
+    closeSettings,
+    handleNicknameChange,
+    handleNicknameSave,
+  } = useUserSettings(authUser);
   const presenceDocId = roomId && authUser ? `${roomId}_${authUser.uid}` : null;
   const mentionAliases = useMemo(() => getMentionAliases(currentUserName, currentUserEmail), [currentUserName, currentUserEmail]);
   const currentRoomRole = getRoomRole(roomDetails, currentUserId);
@@ -583,6 +595,7 @@ export const ChatPage = () => {
           headerSlot={
             <ChatHeaderControls
               onGoToRooms={() => navigate("/rooms")}
+              onGoToDirectMessages={() => navigate("/dm")}
               onLogout={handleLogout}
             />
           }
@@ -606,7 +619,9 @@ export const ChatPage = () => {
         subtitle={roomName ? t("chatSubtitleWithRoom", { name: roomName }) : t("chatSubtitleFallback")}
         headerSlot={
           <ChatHeaderControls
+            onOpenSettings={openSettings}
             onGoToRooms={() => navigate("/rooms")}
+            onGoToDirectMessages={() => navigate("/dm")}
             onOpenRoomRoles={canManageCurrentRoom ? () => setRolesOpen(true) : undefined}
             onLogout={handleLogout}
           />
@@ -720,6 +735,19 @@ export const ChatPage = () => {
           updatingUserId={updatingRoleUserId}
           onClose={() => setRolesOpen(false)}
           onChangeRole={handleChangeRole}
+        />
+      )}
+
+      {settingsOpen && (
+        <ChatSettingsModal
+          authUser={authUser}
+          nickname={nickname}
+          nicknameError={nicknameError}
+          savingNickname={savingNickname}
+          currentUserName={currentUserName}
+          onClose={closeSettings}
+          onSubmit={handleNicknameSave}
+          onNicknameChange={handleNicknameChange}
         />
       )}
     </div>

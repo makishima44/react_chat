@@ -7,9 +7,10 @@ type ChatHeaderControlsProps = {
   onOpenRoomRoles?: () => void;
   onLogout: () => void;
   onGoToRooms: () => void;
+  onGoToDirectMessages?: () => void;
 };
 
-export const ChatHeaderControls = ({ onOpenSettings, onOpenRoomRoles, onLogout, onGoToRooms }: ChatHeaderControlsProps) => {
+export const ChatHeaderControls = ({ onOpenSettings, onOpenRoomRoles, onLogout, onGoToRooms, onGoToDirectMessages }: ChatHeaderControlsProps) => {
   const { t } = useAppPreferences();
 
   return (
@@ -27,6 +28,11 @@ export const ChatHeaderControls = ({ onOpenSettings, onOpenRoomRoles, onLogout, 
       {onOpenRoomRoles && (
         <Button type="button" variant="ghost" onClick={onOpenRoomRoles}>
           {t("roomRoles")}
+        </Button>
+      )}
+      {onGoToDirectMessages && (
+        <Button type="button" variant="ghost" onClick={onGoToDirectMessages}>
+          {t("directMessagesNav")}
         </Button>
       )}
       <Button variant="ghost" onClick={onGoToRooms}>

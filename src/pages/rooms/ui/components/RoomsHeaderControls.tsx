@@ -7,9 +7,10 @@ type RoomsHeaderControlsProps = {
   currentUserName: string;
   onOpenSettings: () => void;
   onLogout: () => void;
+  onGoToDirectMessages: () => void;
 };
 
-export const RoomsHeaderControls = ({ currentUserName, onOpenSettings, onLogout }: RoomsHeaderControlsProps) => {
+export const RoomsHeaderControls = ({ currentUserName, onOpenSettings, onLogout, onGoToDirectMessages }: RoomsHeaderControlsProps) => {
   const { t } = useAppPreferences();
 
   return (
@@ -21,6 +22,9 @@ export const RoomsHeaderControls = ({ currentUserName, onOpenSettings, onLogout 
             fill="currentColor"
           />
         </svg>
+      </Button>
+      <Button type="button" variant="ghost" onClick={onGoToDirectMessages}>
+        {t("directMessagesNav")}
       </Button>
       <span className={s.operatorName}>{currentUserName}</span>
       <Button variant="ghost" onClick={onLogout}>

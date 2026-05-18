@@ -1,0 +1,164 @@
+.page {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.directChatFrame {
+  width: min(980px, 96vw);
+  min-height: min(66vh, 660px);
+}
+
+.peerBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  background: rgba(var(--surface-rgb), 0.72);
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.22);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.peerLabel {
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.peerName {
+  color: var(--accent-strong);
+  padding: 2px 8px;
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.35);
+  border-radius: 999px;
+  background: rgba(var(--accent-rgb), 0.12);
+}
+
+.peerEmail {
+  color: var(--text-dim);
+}
+
+.searchBar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(var(--surface-rgb), 0.82);
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.25);
+  border-radius: 8px;
+}
+
+.searchLabel {
+  color: var(--text-dim);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.searchInput {
+  min-width: 0;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.searchInput:focus {
+  outline: none;
+}
+
+.searchMeta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.searchCount {
+  color: var(--text-dim);
+  font-size: 12px;
+  white-space: nowrap;
+  min-width: 88px;
+  text-align: right;
+}
+
+.searchClearButton {
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.35);
+  background: rgba(var(--surface-rgb), 0.7);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  min-width: 72px;
+}
+
+.searchClearButton:hover {
+  color: var(--accent-strong);
+  border-color: rgba(var(--accent-soft-rgb), 0.55);
+}
+
+.searchClearButton:disabled {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.sendError {
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.roomState {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  background: rgba(var(--surface-rgb), 0.82);
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.25);
+  border-radius: 8px;
+  color: var(--text-dim);
+}
+
+@media (max-width: 720px) {
+  .directChatFrame {
+    width: min(980px, 98vw);
+    min-height: 80vh;
+  }
+
+  .searchBar {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .searchMeta {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .searchBar {
+    padding: 8px;
+  }
+
+  .searchMeta {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .searchCount {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .searchClearButton {
+    width: 100%;
+    min-width: 0;
+  }
+}

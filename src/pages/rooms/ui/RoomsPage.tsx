@@ -82,7 +82,14 @@ export const RoomsPage = () => {
       <TerminalFrame
         title={t("roomsTitle")}
         subtitle={t("roomsSubtitle")}
-        headerSlot={<RoomsHeaderControls currentUserName={currentUserName} onOpenSettings={openSettings} onLogout={handleLogout} />}
+        headerSlot={
+          <RoomsHeaderControls
+            currentUserName={currentUserName}
+            onOpenSettings={openSettings}
+            onGoToDirectMessages={() => navigate("/dm")}
+            onLogout={handleLogout}
+          />
+        }
         className={s.roomsFrame}
       >
         <div className={s.content}>
