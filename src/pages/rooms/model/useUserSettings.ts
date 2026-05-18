@@ -3,6 +3,7 @@ import { updateProfile, User } from "firebase/auth";
 
 import { getNicknameError } from "@/shared/lib/validation";
 import { useAppPreferences } from "@/shared/model/preferences";
+import { syncUserProfile } from "@/shared/api/firebase/syncUserProfile";
 
 export const useUserSettings = (authUser: User | null) => {
   const [nickname, setNickname] = useState(authUser?.displayName ?? "");
@@ -52,6 +53,7 @@ export const useUserSettings = (authUser: User | null) => {
     setSavingNickname(true);
     try {
       await updateProfile(authUser, { displayName: trimmed });
+      await syncUserProfile(authUser);
       setNickname(trimmed);
       setNicknameError("");
       setSettingsOpen(false);
