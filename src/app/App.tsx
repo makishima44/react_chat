@@ -10,6 +10,7 @@ import { ChatPage } from "@/pages/chat/ui/ChatPage";
 import { DirectMessagesPage } from "@/pages/direct-messages/ui/DirectMessagesPage";
 import { DirectChatPage } from "@/pages/direct-chat/ui/DirectChatPage";
 import { MatrixSplash } from "@/widgets/splash/ui/MatrixSplash";
+import { PwaInstallPrompt } from "@/widgets/pwa-install/ui/PwaInstallPrompt";
 import s from "./App.module.css";
 
 const App = () => {
@@ -32,6 +33,7 @@ const App = () => {
           onSkip={() => setSplashState("hidden")}
         />
       )}
+      <PwaInstallPrompt />
       <Routes>
         <Route
           path="/register"
