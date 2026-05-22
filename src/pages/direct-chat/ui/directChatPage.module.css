@@ -3,11 +3,18 @@
   display: flex;
   justify-content: center;
   align-items: stretch;
+  flex: 1;
+  min-height: 0;
 }
 
 .directChatFrame {
   width: min(980px, 96vw);
   min-height: min(66vh, 660px);
+}
+
+.directChatFrameContent {
+  flex: 1;
+  min-height: 0;
 }
 
 .peerBar {
@@ -128,7 +135,12 @@
 @media (max-width: 720px) {
   .directChatFrame {
     width: min(980px, 100%);
-    min-height: 80dvh;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .directChatFrameContent {
+    gap: 8px;
   }
 
   .peerBar {

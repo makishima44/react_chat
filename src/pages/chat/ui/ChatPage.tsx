@@ -627,6 +627,7 @@ export const ChatPage = () => {
           />
         }
         className={s.chatFrame}
+        contentClassName={s.chatFrameContent}
       >
         <div className={s.roomRoleBar}>
           <span className={s.roomRoleLabel}>{t("roomRoleCurrent")}:</span>

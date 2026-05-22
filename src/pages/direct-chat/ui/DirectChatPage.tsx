@@ -345,6 +345,7 @@ export const DirectChatPage = () => {
           />
         }
         className={s.directChatFrame}
+        contentClassName={s.directChatFrameContent}
       >
         <div className={s.peerBar}>
           <span className={s.peerLabel}>{t("directChatPeerLabel")}:</span>

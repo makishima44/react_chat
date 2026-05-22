@@ -9,6 +9,7 @@ type TerminalFrameProps = {
   headerSlot?: ReactNode;
   footer?: ReactNode;
   className?: string;
+  contentClassName?: string;
   children: ReactNode;
 };
 
@@ -18,6 +19,7 @@ export const TerminalFrame = ({
   headerSlot,
   footer,
   className,
+  contentClassName,
   children,
 }: TerminalFrameProps) => {
   const { t } = useAppPreferences();
@@ -41,7 +43,7 @@ export const TerminalFrame = ({
         {subtitle && <p className={s.subtitle}>{subtitle}</p>}
       </div>
 
-      <div className={s.content}>{children}</div>
+      <div className={clsx(s.content, contentClassName)}>{children}</div>
 
       {footer && <div className={s.footer}>{footer}</div>}
     </section>

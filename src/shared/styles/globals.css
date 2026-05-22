@@ -2,6 +2,7 @@
 
 :root {
   color-scheme: dark;
+  --app-height: 100dvh;
   --font-mono: "Share Tech Mono", "Courier New", Courier, monospace;
   --font-display: "VT323", "Share Tech Mono", "Courier New", Courier, monospace;
   --radius: 10px;
@@ -82,6 +83,7 @@
 html,
 body {
   min-height: 100%;
+  height: 100%;
 }
 
 html {
@@ -90,6 +92,7 @@ html {
 
 body {
   margin: 0;
+  min-height: var(--app-height);
   min-width: 320px;
   overflow-x: hidden;
   font-family: var(--font-mono);
@@ -129,7 +132,8 @@ body::after {
 }
 
 #root {
-  min-height: 100vh;
+  min-height: var(--app-height);
+  height: var(--app-height);
   position: relative;
   z-index: 1;
 }

@@ -34,6 +34,12 @@
   width: 100%;
 }
 
+:global(:root[data-keyboard-open="true"]) .prompt {
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+}
+
 @media (max-width: 560px) {
   .prompt {
     right: max(8px, env(safe-area-inset-right));

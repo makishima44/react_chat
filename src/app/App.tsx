@@ -11,10 +11,12 @@ import { DirectMessagesPage } from "@/pages/direct-messages/ui/DirectMessagesPag
 import { DirectChatPage } from "@/pages/direct-chat/ui/DirectChatPage";
 import { MatrixSplash } from "@/widgets/splash/ui/MatrixSplash";
 import { PwaInstallPrompt } from "@/widgets/pwa-install/ui/PwaInstallPrompt";
+import { useViewportHeight } from "./model/useViewportHeight";
 import s from "./App.module.css";
 
 const App = () => {
   const [splashState, setSplashState] = useState<"visible" | "fading" | "hidden">("visible");
+  useViewportHeight();
 
   useEffect(() => {
     const fadeTimer = window.setTimeout(() => setSplashState("fading"), 2200);

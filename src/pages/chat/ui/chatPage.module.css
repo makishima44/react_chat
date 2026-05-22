@@ -3,11 +3,18 @@
   display: flex;
   justify-content: center;
   align-items: stretch;
+  flex: 1;
+  min-height: 0;
 }
 
 .chatFrame {
   width: min(980px, 96vw);
   min-height: min(66vh, 660px);
+}
+
+.chatFrameContent {
+  flex: 1;
+  min-height: 0;
 }
 
 .headerControls {
@@ -201,6 +208,8 @@
   max-height: 52vh;
   padding: 12px 14px;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   background: rgba(var(--surface-rgb), 0.82);
   border: 1px solid rgba(var(--accent-soft-rgb), 0.25);
   border-radius: 8px;
@@ -475,6 +484,7 @@
   background: rgba(var(--surface-rgb), 0.82);
   border: 1px solid rgba(var(--accent-soft-rgb), 0.25);
   border-radius: 8px;
+  scroll-margin-bottom: 16px;
 }
 
 .replyComposer {
@@ -768,7 +778,12 @@
 @media (max-width: 720px) {
   .chatFrame {
     width: min(980px, 100%);
-    min-height: 80dvh;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .chatFrameContent {
+    gap: 8px;
   }
 
   .headerControls {
@@ -792,7 +807,9 @@
 
   .messages {
     max-height: none;
-    min-height: clamp(280px, 42dvh, 380px);
+    min-height: 0;
+    padding: 10px;
+    order: 4;
   }
 
   .searchBar {
@@ -800,12 +817,14 @@
     align-items: stretch;
     gap: 8px;
     padding: 8px;
+    order: 2;
   }
 
   .roomRoleBar {
     align-items: flex-start;
     gap: 6px;
     padding: 8px;
+    order: 1;
   }
 
   .searchMeta {
@@ -815,12 +834,19 @@
 
   .inputArea {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas:
-      "reply reply"
-      "prompt input"
-      "button button";
+      "reply reply reply"
+      "prompt input button";
     align-items: center;
+    gap: 8px;
+    order: 5;
+    margin-top: auto;
+    padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+    border-radius: 12px;
+    box-shadow: 0 -10px 24px rgba(var(--accent-rgb), 0.12);
+    background:
+      linear-gradient(180deg, rgba(var(--panel-top-rgb), 0.96), rgba(var(--panel-bottom-rgb), 0.98));
   }
 
   .replyComposer {
@@ -833,17 +859,24 @@
 
   .inputArea input {
     grid-area: input;
+    min-width: 0;
+    min-height: 40px;
   }
 
   .inputArea button {
     grid-area: button;
-    width: 100%;
+    width: auto;
+    min-width: 96px;
+    padding-inline: 14px;
+    white-space: nowrap;
   }
 
   .presenceBar {
     align-items: flex-start;
     flex-direction: column;
     gap: 8px;
+    order: 3;
+    padding-inline: 2px;
   }
 
   .presenceSummary,
@@ -915,6 +948,10 @@
   .notificationDenied {
     align-self: flex-start;
   }
+
+  .sendError {
+    order: 6;
+  }
 }
 
 @media (max-width: 560px) {
@@ -939,6 +976,16 @@
     flex-wrap: wrap;
   }
 
+  .presenceBar {
+    gap: 6px;
+    font-size: 11px;
+  }
+
+  .presenceSummary {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
   .replyPreview {
     margin-left: 0;
   }
@@ -949,13 +996,9 @@
 }
 
 @media (max-width: 420px) {
-  .messages {
-    min-height: 240px;
-    padding: 8px;
-  }
-
   .inputArea {
     padding: 8px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
   }
 
   .searchBar {
@@ -981,6 +1024,11 @@
   .messageActions button {
     font-size: 11px;
     padding: 2px 6px;
+  }
+
+  .inputArea button {
+    min-width: 84px;
+    padding-inline: 10px;
   }
 
   .replyComposer {

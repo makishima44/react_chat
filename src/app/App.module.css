@@ -1,5 +1,5 @@
 .app {
-  min-height: 100vh;
+  min-height: var(--app-height);
   width: 100%;
   display: flex;
   justify-content: center;
@@ -9,6 +9,12 @@
     max(10px, env(safe-area-inset-right))
     max(10px, env(safe-area-inset-bottom))
     max(10px, env(safe-area-inset-left));
+}
+
+@media (max-width: 720px) {
+  .app {
+    height: var(--app-height);
+  }
 }
 
 @media (max-width: 560px) {
