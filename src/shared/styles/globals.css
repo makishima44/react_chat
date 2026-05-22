@@ -84,8 +84,14 @@ body {
   min-height: 100%;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
+  min-width: 320px;
+  overflow-x: hidden;
   font-family: var(--font-mono);
   color: var(--text);
   background:

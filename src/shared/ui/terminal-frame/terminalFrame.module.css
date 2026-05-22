@@ -71,6 +71,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .titleBlock {
@@ -148,8 +149,23 @@
 
 @media (max-width: 560px) {
   .frame {
-    width: min(720px, 96vw);
-    padding: 14px;
+    width: min(720px, 100%);
+    padding: 14px 12px 12px;
+    gap: 12px;
+  }
+
+  .header {
+    gap: 8px;
+  }
+
+  .headerLeft {
+    gap: 8px;
+    min-height: auto;
+  }
+
+  .headerRight {
+    width: 100%;
+    justify-content: stretch;
   }
 
   .title {
@@ -158,6 +174,38 @@
 
   .headerSlot {
     width: 100%;
-    justify-content: flex-end;
+    justify-content: stretch;
+    gap: 6px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 420px) {
+  .frame {
+    padding: 12px 10px 10px;
+    gap: 10px;
+  }
+
+  .header {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+  }
+
+  .statusText {
+    font-size: 11px;
+  }
+
+  .title {
+    font-size: 24px;
+    letter-spacing: 0.08em;
+  }
+
+  .caret {
+    width: 10px;
+    height: 14px;
+    margin-left: 6px;
   }
 }

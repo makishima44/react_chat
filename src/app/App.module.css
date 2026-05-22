@@ -4,11 +4,19 @@
   display: flex;
   justify-content: center;
   align-items: stretch;
-  padding: 10px 10px max(10px, env(safe-area-inset-bottom));
+  padding:
+    max(10px, env(safe-area-inset-top))
+    max(10px, env(safe-area-inset-right))
+    max(10px, env(safe-area-inset-bottom))
+    max(10px, env(safe-area-inset-left));
 }
 
 @media (max-width: 560px) {
   .app {
-    padding: 8px;
+    padding:
+      max(8px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
   }
 }

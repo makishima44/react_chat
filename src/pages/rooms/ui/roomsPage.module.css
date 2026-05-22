@@ -21,6 +21,7 @@
 
 .iconButton {
   width: 40px;
+  min-width: 40px;
   padding: 0;
   display: grid;
   place-items: center;
@@ -41,6 +42,10 @@
 .content {
   display: grid;
   gap: 18px;
+}
+
+.headerControls > button {
+  min-width: 0;
 }
 
 .createForm {
@@ -258,30 +263,51 @@
 
 @media (max-width: 720px) {
   .roomsFrame {
-    width: min(980px, 98vw);
-    min-height: 80vh;
+    width: min(980px, 100%);
+    min-height: 80dvh;
   }
 
   .headerControls {
     width: 100%;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .headerControls > button:not(.iconButton) {
+    width: 100%;
+    padding-inline: 10px;
   }
 
   .operatorName {
-    order: 3;
-    width: 100%;
-    text-align: right;
+    order: 4;
+    grid-column: 1 / -1;
+    width: auto;
+    text-align: left;
     font-size: 11px;
+    padding-inline: 2px;
   }
 
   .roomGrid {
     grid-template-columns: 1fr;
+  }
+
+  .content {
+    gap: 14px;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
   }
 }
 
 @media (max-width: 420px) {
   .createForm {
     padding: 12px;
+    gap: 10px;
   }
 
   .roomCard {
@@ -294,6 +320,10 @@
   }
 
   .roomTitleRow {
+    width: 100%;
+  }
+
+  .deleteButton {
     width: 100%;
   }
 }

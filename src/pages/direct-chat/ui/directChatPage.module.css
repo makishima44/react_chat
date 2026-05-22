@@ -127,13 +127,20 @@
 
 @media (max-width: 720px) {
   .directChatFrame {
-    width: min(980px, 98vw);
-    min-height: 80vh;
+    width: min(980px, 100%);
+    min-height: 80dvh;
+  }
+
+  .peerBar {
+    align-items: flex-start;
+    gap: 6px;
   }
 
   .searchBar {
     grid-template-columns: 1fr;
     align-items: stretch;
+    gap: 8px;
+    padding: 8px;
   }
 
   .searchMeta {
@@ -143,6 +150,18 @@
 }
 
 @media (max-width: 420px) {
+  .peerBar {
+    padding: 8px;
+  }
+
+  .peerName,
+  .peerEmail {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .searchBar {
     padding: 8px;
   }
@@ -150,6 +169,7 @@
   .searchMeta {
     display: grid;
     grid-template-columns: 1fr;
+    gap: 6px;
   }
 
   .searchCount {
