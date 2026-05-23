@@ -18,6 +18,7 @@ import { ChatSettingsModal } from "@/pages/chat/ui/components/ChatSettingsModal"
 import { useUserSettings } from "@/pages/rooms/model/useUserSettings";
 import { getMentionAliases } from "@/pages/chat/model/mentions";
 import { useAppPreferences } from "@/shared/model/preferences";
+import { useMobileComposerVisibility } from "@/shared/lib/useMobileComposerVisibility";
 
 import s from "./directChatPage.module.css";
 
@@ -71,6 +72,7 @@ export const DirectChatPage = () => {
     handleNicknameChange,
     handleNicknameSave,
   } = useUserSettings(authUser);
+  const { composerRef, inputRef } = useMobileComposerVisibility();
 
   const peer = useMemo(() => Object.values(chat?.memberProfiles ?? {}).find((member) => member.userId !== currentUserId) ?? null, [chat?.memberProfiles, currentUserId]);
   const mappedMessages = useMemo(() => messages.map(mapDirectMessageToMessage), [messages]);
@@ -404,6 +406,8 @@ export const DirectChatPage = () => {
           sending={sending}
           disabled={chatStatus !== "ready"}
           replyTarget={replyTarget}
+          composerRef={composerRef}
+          inputRef={inputRef}
           onChange={setInput}
           onCancelReply={() => setReplyTarget(null)}
           onSubmit={handleSend}

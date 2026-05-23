@@ -39,6 +39,7 @@
   .button {
     height: 42px;
     padding: 0 14px;
+    font-size: 13px;
     letter-spacing: 0.12em;
   }
 }

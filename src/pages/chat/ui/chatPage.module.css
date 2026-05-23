@@ -34,6 +34,10 @@
   place-items: center;
 }
 
+.headerControls > button {
+  min-width: 0;
+}
+
 .icon {
   width: 18px;
   height: 18px;
@@ -761,10 +765,6 @@
   box-shadow: inset 0 0 10px rgba(var(--accent-rgb), 0.22);
 }
 
-.headerControls > button {
-  min-width: 0;
-}
-
 @media (max-width: 900px) {
   .chatFrame {
     min-height: 74vh;
@@ -789,20 +789,20 @@
   .headerControls {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
     gap: 8px;
     align-items: stretch;
   }
 
   .headerControls > button {
     width: 100%;
-    padding-inline: 10px;
+    min-height: 44px;
+    padding-inline: 12px;
   }
 
   .iconButton {
-    width: 42px;
-    min-width: 42px;
-    justify-self: start;
+    width: 100%;
+    min-width: 0;
   }
 
   .messages {
@@ -955,8 +955,9 @@
 }
 
 @media (max-width: 560px) {
-  .headerControls {
-    grid-template-columns: auto 1fr;
+  .headerControls > button {
+    font-size: 12px;
+    letter-spacing: 0.1em;
   }
 
   .message {
@@ -996,6 +997,15 @@
 }
 
 @media (max-width: 420px) {
+  .headerControls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .headerControls > button {
+    min-height: 42px;
+    padding-inline: 10px;
+  }
+
   .inputArea {
     padding: 8px;
     padding-bottom: calc(8px + env(safe-area-inset-bottom));

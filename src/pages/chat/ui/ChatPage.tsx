@@ -21,6 +21,7 @@ import { ChatSettingsModal } from "./components/ChatSettingsModal";
 import { getMentionAliases, isMessageMentioningUser } from "@/pages/chat/model/mentions";
 import { useAppPreferences } from "@/shared/model/preferences";
 import { useUserSettings } from "@/pages/rooms/model/useUserSettings";
+import { useMobileComposerVisibility } from "@/shared/lib/useMobileComposerVisibility";
 
 type NotificationPermissionState = NotificationPermission | "unsupported";
 type OnlineUser = { id: string; userId?: string; userName?: string; isTyping?: boolean };
@@ -71,6 +72,7 @@ export const ChatPage = () => {
   const canManageCurrentRoom = canManageRoom(roomDetails, currentUserId);
   const canModerateCurrentRoom = canModerateRoom(roomDetails, currentUserId);
   const roomMembers = useMemo(() => (roomDetails ? normalizeRoomMembers(roomDetails) : []), [roomDetails]);
+  const { composerRef, inputRef } = useMobileComposerVisibility();
 
   const isOwnMessage = useCallback(
     (message: Message) =>
@@ -712,6 +714,8 @@ export const ChatPage = () => {
           sending={sending}
           disabled={roomStatus !== "ready"}
           replyTarget={replyTarget}
+          composerRef={composerRef}
+          inputRef={inputRef}
           onChange={handleInputChange}
           onCancelReply={handleCancelReply}
           onSubmit={handleSend}

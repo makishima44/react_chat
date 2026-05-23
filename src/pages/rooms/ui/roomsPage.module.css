@@ -270,18 +270,24 @@
   .headerControls {
     width: 100%;
     display: grid;
-    grid-template-columns: auto repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
     gap: 8px;
     align-items: stretch;
   }
 
-  .headerControls > button:not(.iconButton) {
+  .headerControls > button {
     width: 100%;
-    padding-inline: 10px;
+    min-height: 44px;
+    padding-inline: 12px;
+  }
+
+  .iconButton {
+    width: 100%;
+    min-width: 0;
   }
 
   .operatorName {
-    order: 4;
+    order: 10;
     grid-column: 1 / -1;
     width: auto;
     text-align: left;
@@ -305,6 +311,17 @@
 }
 
 @media (max-width: 420px) {
+  .headerControls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .headerControls > button {
+    min-height: 42px;
+    padding-inline: 10px;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+  }
+
   .createForm {
     padding: 12px;
     gap: 10px;
