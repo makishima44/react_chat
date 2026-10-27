@@ -5,6 +5,7 @@ import { NavigateFunction } from "react-router-dom";
 
 import { db } from "@/shared/api/firebase/firebaseConfig";
 import { useAppPreferences } from "@/shared/model/preferences";
+import type { RoomCategory } from "@/entities/room/model/types";
 
 type UseRoomCreationParams = {
   currentUserId: string;
@@ -12,9 +13,16 @@ type UseRoomCreationParams = {
   navigate: NavigateFunction;
 };
 
-export const useRoomCreation = ({ currentUserId, currentUserName, navigate }: UseRoomCreationParams) => {
+export const useRoomCreation = ({
+  currentUserId,
+  currentUserName,
+  navigate,
+}: UseRoomCreationParams) => {
   const [newRoomName, setNewRoomName] = useState("");
   const [newRoomPassword, setNewRoomPassword] = useState("");
+  const [newRoomDescription, setNewRoomDescription] = useState("");
+  const [newRoomCategory, setNewRoomCategory] =
+    useState<RoomCategory>("general");
   const [createError, setCreateError] = useState("");
   const [creating, setCreating] = useState(false);
   const { t } = useAppPreferences();
@@ -29,27 +37,31 @@ export const useRoomCreation = ({ currentUserId, currentUserName, navigate }: Us
     if (createError) setCreateError("");
   };
 
+  const handleRoomDescriptionChange = (value: string) =>
+    setNewRoomDescription(value);
+  const handleRoomCategoryChange = (value: RoomCategory) =>
+    setNewRoomCategory(value);
+
   const handleCreateRoom = async (event: FormEvent) => {
     event.preventDefault();
-    if (creating) return;
+    if (creating) return false;
 
     const trimmed = newRoomName.trim();
     const trimmedPassword = newRoomPassword.trim();
     if (!trimmed) {
       setCreateError(t("roomCreateNameRequired"));
-      return;
+      return false;
     }
     if (trimmed.length < 2 || trimmed.length > 40) {
       setCreateError(t("roomCreateNameLength"));
-      return;
+      return false;
     }
-    if (!trimmedPassword) {
-      setCreateError(t("roomCreatePasswordRequired"));
-      return;
-    }
-    if (trimmedPassword.length < 4 || trimmedPassword.length > 32) {
+    if (
+      trimmedPassword &&
+      (trimmedPassword.length < 4 || trimmedPassword.length > 32)
+    ) {
       setCreateError(t("roomCreatePasswordLength"));
-      return;
+      return false;
     }
 
     setCreating(true);
@@ -58,7 +70,11 @@ export const useRoomCreation = ({ currentUserId, currentUserName, navigate }: Us
     try {
       const docRef = await addDoc(collection(db, "rooms"), {
         name: trimmed,
-        password: trimmedPassword,
+        ...(trimmedPassword ? { password: trimmedPassword } : {}),
+        ...(newRoomDescription.trim()
+          ? { description: newRoomDescription.trim() }
+          : {}),
+        category: newRoomCategory,
         createdAt: serverTimestamp(),
         createdBy: currentUserId,
         createdByName: currentUserName,
@@ -76,7 +92,10 @@ export const useRoomCreation = ({ currentUserId, currentUserName, navigate }: Us
       });
       setNewRoomName("");
       setNewRoomPassword("");
+      setNewRoomDescription("");
+      setNewRoomCategory("general");
       navigate(`/chat/${docRef.id}`);
+      return true;
     } catch (err) {
       const firebaseError = err as FirebaseError;
       if (firebaseError.code === "permission-denied") {
@@ -84,6 +103,7 @@ export const useRoomCreation = ({ currentUserId, currentUserName, navigate }: Us
       } else {
         setCreateError(t("roomCreateFailed"));
       }
+      return false;
     } finally {
       setCreating(false);
     }
@@ -92,10 +112,14 @@ export const useRoomCreation = ({ currentUserId, currentUserName, navigate }: Us
   return {
     newRoomName,
     newRoomPassword,
+    newRoomDescription,
+    newRoomCategory,
     createError,
     creating,
     handleRoomNameChange,
     handleRoomPasswordChange,
+    handleRoomDescriptionChange,
+    handleRoomCategoryChange,
     handleCreateRoom,
   };
 };

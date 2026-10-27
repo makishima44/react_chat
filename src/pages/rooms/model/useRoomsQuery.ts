@@ -22,7 +22,11 @@ const readRoomLastSeen = (userId: string) => {
   }
 };
 
-export const useRoomsQuery = (currentUserId: string) => {
+type UseRoomsQueryOptions = {
+  trackUnreadCounts?: boolean;
+};
+
+export const useRoomsQuery = (currentUserId: string, { trackUnreadCounts = true }: UseRoomsQueryOptions = {}) => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [roomsError, setRoomsError] = useState("");
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
@@ -36,7 +40,7 @@ export const useRoomsQuery = (currentUserId: string) => {
         const nextRooms = snapshot.docs.map((docSnapshot) => ({
           id: docSnapshot.id,
           ...(docSnapshot.data() as Omit<Room, "id">),
-          unreadCount: unreadCounts[docSnapshot.id] ?? 0,
+          unreadCount: trackUnreadCounts ? unreadCounts[docSnapshot.id] ?? 0 : 0,
         }));
         setRooms(nextRooms);
         setRoomsError("");
@@ -47,9 +51,14 @@ export const useRoomsQuery = (currentUserId: string) => {
     );
 
     return () => unsubscribe();
-  }, [t, unreadCounts]);
+  }, [t, trackUnreadCounts, unreadCounts]);
 
   useEffect(() => {
+    if (!trackUnreadCounts) {
+      setUnreadCounts({});
+      return;
+    }
+
     const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const lastSeenByRoom = readRoomLastSeen(currentUserId);
@@ -73,7 +82,7 @@ export const useRoomsQuery = (currentUserId: string) => {
     });
 
     return () => unsubscribe();
-  }, [currentUserId]);
+  }, [currentUserId, trackUnreadCounts]);
 
   return { rooms, roomsError, setRoomsError };
 };
