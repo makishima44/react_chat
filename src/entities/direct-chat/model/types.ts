@@ -4,6 +4,7 @@ export type DirectChatMemberProfile = {
   userId: string;
   displayName: string;
   email: string;
+  avatarId?: string;
 };
 
 export type DirectChat = {
@@ -22,6 +23,7 @@ export type DirectMessageReply = {
   text: string;
   userId: string;
   userName: string;
+  avatarId?: string;
 };
 
 export type DirectMessage = {
@@ -31,5 +33,6 @@ export type DirectMessage = {
   editedAt?: Timestamp | null;
   userId: string;
   userName: string;
+  avatarId?: string;
   replyTo?: DirectMessageReply | null;
 };

@@ -6,6 +6,7 @@ export type UserProfile = {
   emailLower: string;
   displayName: string;
   displayNameLower: string;
+  avatarId?: string;
   searchPrefixes: string[];
   createdAt?: Timestamp | null;
   updatedAt?: Timestamp | null;

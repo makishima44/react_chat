@@ -78,6 +78,7 @@ type SendDirectMessageParams = {
     text: string;
     userId: string;
     userName: string;
+    avatarId?: string;
   } | null;
 };
 
@@ -94,6 +95,7 @@ export const sendDirectMessage = async ({ chatId, currentUser, text, replyTo }: 
     editedAt: null,
     userId: currentUser.userId,
     userName: currentUser.displayName,
+    avatarId: currentUser.avatarId,
     replyTo: replyTo ?? null,
   });
 

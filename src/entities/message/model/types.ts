@@ -5,6 +5,7 @@ export type MessageReply = {
   text: string;
   user?: string;
   userName?: string;
+  avatarId?: string;
 };
 
 export type Message = {
@@ -15,6 +16,7 @@ export type Message = {
   user: string;
   userId?: string;
   userName?: string;
+  avatarId?: string;
   roomId?: string;
   replyTo?: MessageReply | null;
 };

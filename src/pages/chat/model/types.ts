@@ -4,6 +4,7 @@ export type OnlineUser = {
   id: string;
   userId?: string;
   userName?: string;
+  avatarId?: string;
   isTyping?: boolean;
 };
 

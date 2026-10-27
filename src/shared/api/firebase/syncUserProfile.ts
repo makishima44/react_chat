@@ -3,6 +3,7 @@ import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 
 import { db } from "./firebaseConfig";
 import { createSearchPrefixes } from "@/shared/lib/searchPrefixes";
+import { DEFAULT_AVATAR_ID } from "@/entities/user/model/avatarOptions";
 
 export const syncUserProfile = async (user: User) => {
   const email = user.email?.trim() ?? "";
@@ -17,6 +18,7 @@ export const syncUserProfile = async (user: User) => {
       emailLower: email.toLocaleLowerCase(),
       displayName,
       displayNameLower: displayName.toLocaleLowerCase(),
+      avatarId: existingProfile.data()?.avatarId ?? DEFAULT_AVATAR_ID,
       searchPrefixes: createSearchPrefixes(displayName, email, email.split("@")[0] ?? ""),
       lastSeenAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
