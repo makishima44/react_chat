@@ -4,49 +4,44 @@ import { useNavigate } from "react-router-dom";
 
 import type { UserProfile } from "@/entities/user/model/types";
 import { auth } from "@/shared/api/firebase/firebaseConfig";
+import { Avatar } from "@/shared/ui/avatar/Avatar";
 import { getOrCreateDirectChat, searchUserProfiles } from "@/shared/api/firebase/directChats";
-import { TerminalFrame } from "@/shared/ui/terminal-frame/TerminalFrame";
-import { ChatHeaderControls } from "@/pages/chat/ui/components/ChatHeaderControls";
 import { ChatSettingsModal } from "@/pages/chat/ui/components/ChatSettingsModal";
+import { RoomsSidebar } from "@/pages/rooms/ui/components/RoomsSidebar";
 import { useUserSettings } from "@/pages/rooms/model/useUserSettings";
 import { useAppPreferences } from "@/shared/model/preferences";
 import { useDirectChatsQuery } from "../model/useDirectChatsQuery";
+import { useRoomsQuery } from "@/pages/rooms/model/useRoomsQuery";
 import { DirectChatsSection } from "./components/DirectChatsSection";
 import { UserSearchPanel } from "./components/UserSearchPanel";
 
 import s from "./directMessagesPage.module.css";
+import shell from "@/pages/rooms/ui/roomsPage.module.css";
 
 export const DirectMessagesPage = () => {
   const navigate = useNavigate();
   const authUser = auth.currentUser;
-  const { t } = useAppPreferences();
+  const { t, theme, setTheme } = useAppPreferences();
   const currentUserId = authUser?.uid ?? "anonymous";
   const currentUserEmail = authUser?.email ?? "";
   const currentUserName = authUser?.displayName?.trim() || currentUserEmail || t("commonAnonymous");
+  const settings = useUserSettings(authUser);
+  const { rooms } = useRoomsQuery(currentUserId, { trackUnreadCounts: false });
   const [searchValue, setSearchValue] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState("");
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [directChatActionId, setDirectChatActionId] = useState<string | null>(null);
   const { directChats, directChatsError } = useDirectChatsQuery(currentUserId);
-  const {
-    nickname,
-    nicknameError,
-    savingNickname,
-    settingsOpen,
-    openSettings,
-    closeSettings,
-    handleNicknameChange,
-    handleNicknameSave,
-  } = useUserSettings(authUser);
 
   const currentMemberProfile = useMemo(
     () => ({
       userId: currentUserId,
       displayName: currentUserName,
       email: currentUserEmail,
+      avatarId: settings.avatarId,
     }),
-    [currentUserEmail, currentUserId, currentUserName],
+    [settings.avatarId, currentUserEmail, currentUserId, currentUserName],
   );
 
   const handleLogout = async () => {
@@ -94,6 +89,7 @@ export const DirectMessagesPage = () => {
         userId: profile.id,
         displayName: profile.displayName,
         email: profile.email,
+        avatarId: profile.avatarId,
       });
       navigate(`/dm/${chatId}`);
     } catch {
@@ -104,53 +100,71 @@ export const DirectMessagesPage = () => {
   };
 
   return (
-    <div className={s.page}>
-      <TerminalFrame
-        title={t("directMessagesTitle")}
-        subtitle={t("directMessagesSubtitle")}
-        headerSlot={
-          <ChatHeaderControls
-            onOpenSettings={openSettings}
-            onGoToRooms={() => navigate("/rooms")}
-            onGoToDirectMessages={() => navigate("/dm")}
-            onLogout={handleLogout}
-          />
-        }
-        className={s.directMessagesFrame}
-      >
-        <div className={s.grid}>
-          <UserSearchPanel
-            searchValue={searchValue}
-            searchError={searchError}
-            searchLoading={searchLoading || !!directChatActionId}
-            searchResults={searchResults}
-            onSearchValueChange={(value) => {
-              setSearchValue(value);
-              setSearchError("");
-            }}
-            onSearchSubmit={handleSearchSubmit}
-            onStartDirectChat={handleStartDirectChat}
-          />
-
-          <div className={s.chatColumn}>
-            {directChatsError && <div className={s.formError}>{directChatsError}</div>}
-            <DirectChatsSection directChats={directChats} currentUserId={currentUserId} onOpenChat={(chatId) => navigate(`/dm/${chatId}`)} />
+    <main className={shell.shell}>
+      <RoomsSidebar
+        currentUserId={currentUserId}
+        currentUserName={currentUserName}
+        avatarId={settings.avatarId}
+        roomCount={rooms.length}
+        directMessagesCount={directChats.length}
+        activeSection="direct-messages"
+        directChats={directChats}
+        theme={theme}
+        onThemeChange={setTheme}
+        onOpenSettings={settings.openSettings}
+        onNavigate={navigate}
+        onLogout={handleLogout}
+      />
+      <section className={shell.main}>
+        <header className={shell.topbar}>
+          <span>{t("directMessagesBreadcrumb")}</span>
+          <button type="button" className={shell.mobileProfile} onClick={settings.openSettings}>
+            <Avatar avatarId={settings.avatarId} size="small" />
+          </button>
+        </header>
+        <div className={shell.content}>
+          <div className={shell.welcome}>
+            <div>
+              <p className={shell.eyebrow}>{t("directMessagesEyebrow")}</p>
+              <h1>{t("directMessagesHeading")}</h1>
+              <p>{t("directMessagesDescription")}</p>
+            </div>
+          </div>
+          <div className={s.grid}>
+            <UserSearchPanel
+              searchValue={searchValue}
+              searchError={searchError}
+              searchLoading={searchLoading || !!directChatActionId}
+              searchResults={searchResults}
+              onSearchValueChange={(value) => {
+                setSearchValue(value);
+                setSearchError("");
+              }}
+              onSearchSubmit={handleSearchSubmit}
+              onStartDirectChat={handleStartDirectChat}
+            />
+            <div className={s.chatColumn}>
+              {directChatsError && <div className={s.formError}>{directChatsError}</div>}
+              <DirectChatsSection directChats={directChats} currentUserId={currentUserId} onOpenChat={(chatId) => navigate(`/dm/${chatId}`)} />
+            </div>
           </div>
         </div>
-      </TerminalFrame>
+      </section>
 
-      {settingsOpen && (
+      {settings.settingsOpen && (
         <ChatSettingsModal
           authUser={authUser}
-          nickname={nickname}
-          nicknameError={nicknameError}
-          savingNickname={savingNickname}
+          nickname={settings.nickname}
+          avatarId={settings.avatarId}
+          nicknameError={settings.nicknameError}
+          savingNickname={settings.savingNickname}
           currentUserName={currentUserName}
-          onClose={closeSettings}
-          onSubmit={handleNicknameSave}
-          onNicknameChange={handleNicknameChange}
+          onClose={settings.closeSettings}
+          onSubmit={settings.handleNicknameSave}
+          onNicknameChange={settings.handleNicknameChange}
+          onAvatarChange={settings.handleAvatarChange}
         />
       )}
-    </div>
+    </main>
   );
 };

@@ -4,6 +4,7 @@ import { collection, deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp
 
 import type { DirectChat, DirectMessage } from "@/entities/direct-chat/model/types";
 import type { Message } from "@/entities/message/model/types";
+import type { AvatarId } from "@/entities/user/model/avatarOptions";
 import { db } from "@/shared/api/firebase/firebaseConfig";
 import { sendDirectMessage, syncDirectChatSummary } from "@/shared/api/firebase/directChats";
 import { getMentionAliases } from "@/pages/chat/model/mentions";
@@ -18,6 +19,7 @@ const mapDirectMessageToMessage = (message: DirectMessage): Message => ({
   user: message.userName,
   userId: message.userId,
   userName: message.userName,
+  avatarId: message.avatarId,
   replyTo: message.replyTo
     ? {
         id: message.replyTo.id,
@@ -33,6 +35,7 @@ type UseDirectChatConversationParams = {
   currentUserId: string;
   currentUserEmail: string;
   currentUserName: string;
+  currentUserAvatar: AvatarId;
 };
 
 export const useDirectChatConversation = ({
@@ -40,6 +43,7 @@ export const useDirectChatConversation = ({
   currentUserId,
   currentUserEmail,
   currentUserName,
+  currentUserAvatar,
 }: UseDirectChatConversationParams) => {
   const { t } = useAppPreferences();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -171,6 +175,7 @@ export const useDirectChatConversation = ({
           userId: currentUserId,
           displayName: currentUserName,
           email: currentUserEmail,
+          avatarId: currentUserAvatar,
         },
         text: trimmed,
         replyTo: replyTarget
@@ -179,6 +184,7 @@ export const useDirectChatConversation = ({
               text: replyTarget.text,
               userId: replyTarget.userId ?? "",
               userName: replyTarget.userName || replyTarget.user || t("commonAnonymous"),
+              avatarId: replyTarget.avatarId,
             }
           : null,
       });

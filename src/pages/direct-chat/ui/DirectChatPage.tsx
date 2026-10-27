@@ -2,9 +2,12 @@ import { useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { useNavigate, useParams } from "react-router-dom";
 
+import type { OnlineUser } from "@/pages/chat/model/types";
+import type { Room } from "@/entities/room/model/types";
 import { auth } from "@/shared/api/firebase/firebaseConfig";
 import { Button } from "@/shared/ui/button";
 import { TerminalFrame } from "@/shared/ui/terminal-frame/TerminalFrame";
+import { ChatWorkspace } from "@/pages/chat/ui/components/ChatWorkspace";
 import { ChatHeaderControls } from "@/pages/chat/ui/components/ChatHeaderControls";
 import { ChatInput } from "@/pages/chat/ui/components/ChatInput";
 import { ChatMessages } from "@/pages/chat/ui/components/ChatMessages";
@@ -13,10 +16,16 @@ import { DeleteMessageModal } from "@/pages/chat/ui/components/DeleteMessageModa
 import { useUserSettings } from "@/pages/rooms/model/useUserSettings";
 import { useAppPreferences } from "@/shared/model/preferences";
 import { useMobileComposerVisibility } from "@/shared/lib/useMobileComposerVisibility";
+import { useRoomsQuery } from "@/pages/rooms/model/useRoomsQuery";
+import { useDirectChatsQuery } from "@/pages/direct-messages/model/useDirectChatsQuery";
+import { useRoomAccess } from "@/pages/rooms/model/useRoomAccess";
+import { AccessRoomModal } from "@/pages/rooms/ui/components/AccessRoomModal";
 import { useDirectChatConversation } from "../model/useDirectChatConversation";
 import { DirectChatSearchBar } from "./components/DirectChatSearchBar";
 
 import s from "./directChatPage.module.css";
+
+const noOnlineUsers: OnlineUser[] = [];
 
 export const DirectChatPage = () => {
   const navigate = useNavigate();
@@ -26,6 +35,18 @@ export const DirectChatPage = () => {
   const currentUserId = authUser?.uid ?? "anonymous";
   const currentUserEmail = authUser?.email ?? "";
   const currentUserName = authUser?.displayName?.trim() || currentUserEmail || t("commonAnonymous");
+  const {
+    nickname,
+    avatarId,
+    nicknameError,
+    savingNickname,
+    settingsOpen,
+    openSettings,
+    closeSettings,
+    handleNicknameChange,
+    handleAvatarChange,
+    handleNicknameSave,
+  } = useUserSettings(authUser);
   const {
     chatStatus,
     peer,
@@ -59,18 +80,12 @@ export const DirectChatPage = () => {
     currentUserId,
     currentUserEmail,
     currentUserName,
+    currentUserAvatar: avatarId,
   });
-  const {
-    nickname,
-    nicknameError,
-    savingNickname,
-    settingsOpen,
-    openSettings,
-    closeSettings,
-    handleNicknameChange,
-    handleNicknameSave,
-  } = useUserSettings(authUser);
   const { composerRef, inputRef } = useMobileComposerVisibility();
+  const { rooms } = useRoomsQuery(currentUserId, { trackUnreadCounts: false });
+  const { directChats } = useDirectChatsQuery(currentUserId);
+  const roomAccess = useRoomAccess({ navigate, currentUserId, currentUserName });
 
   useEffect(() => {
     if (!chatId) {
@@ -119,26 +134,33 @@ export const DirectChatPage = () => {
 
   return (
     <div className={s.page}>
-      <TerminalFrame
-        title={t("directChatTitle")}
-        subtitle={peer ? t("directChatSubtitleWithUser", { name: peer.displayName || peer.email }) : t("directChatSubtitleFallback")}
-        headerSlot={
+      <ChatWorkspace
+        roomId=""
+        roomName=""
+        rooms={rooms}
+        directChats={directChats}
+        onlineUsers={noOnlineUsers}
+        currentUserId={currentUserId}
+        currentUserName={currentUserName}
+        currentUserAvatar={avatarId}
+        conversationType="direct"
+        directChatId={chatId}
+        peerName={peer?.displayName || peer?.email || t("commonAnonymous")}
+        peerId={peer?.userId}
+        peerAvatarId={peer?.avatarId}
+        headerControls={
           <ChatHeaderControls
             onOpenSettings={openSettings}
             onGoToRooms={() => navigate("/rooms")}
             onGoToDirectMessages={() => navigate("/dm")}
             onLogout={handleLogout}
+            workspace
           />
         }
-        className={s.directChatFrame}
-        contentClassName={s.directChatFrameContent}
+        onOpenRoom={(room: Room) => roomAccess.handleOpenRoom(room.id, room)}
+        onNavigate={navigate}
+        onOpenSettings={openSettings}
       >
-        <div className={s.peerBar}>
-          <span className={s.peerLabel}>{t("directChatPeerLabel")}:</span>
-          <span className={s.peerName}>{peer?.displayName || peer?.email || t("commonAnonymous")}</span>
-          {peer?.email && <span className={s.peerEmail}>{peer.email}</span>}
-        </div>
-
         <DirectChatSearchBar
           searchQuery={searchQuery}
           resultCount={filteredMessages.length}
@@ -153,6 +175,7 @@ export const DirectChatPage = () => {
           currentUserId={currentUserId}
           currentUserEmail={currentUserEmail}
           currentUserName={currentUserName}
+          currentUserAvatar={avatarId}
           mentionAliases={mentionAliases}
           messagesEndRef={messagesEndRef}
           editingMessageId={editingMessageId}
@@ -180,7 +203,7 @@ export const DirectChatPage = () => {
         />
 
         {sendError && <div className={s.sendError}>{sendError}</div>}
-      </TerminalFrame>
+      </ChatWorkspace>
 
       {deleteTarget && (
         <DeleteMessageModal
@@ -195,12 +218,24 @@ export const DirectChatPage = () => {
         <ChatSettingsModal
           authUser={authUser}
           nickname={nickname}
+          avatarId={avatarId}
           nicknameError={nicknameError}
           savingNickname={savingNickname}
           currentUserName={currentUserName}
           onClose={closeSettings}
           onSubmit={handleNicknameSave}
           onNicknameChange={handleNicknameChange}
+          onAvatarChange={handleAvatarChange}
+        />
+      )}
+      {roomAccess.accessTarget && (
+        <AccessRoomModal
+          accessTarget={roomAccess.accessTarget}
+          accessPassword={roomAccess.accessPassword}
+          accessError={roomAccess.accessError}
+          onPasswordChange={roomAccess.handleAccessPasswordChange}
+          onClose={roomAccess.handleCloseAccessModal}
+          onConfirm={roomAccess.handleConfirmAccess}
         />
       )}
     </div>

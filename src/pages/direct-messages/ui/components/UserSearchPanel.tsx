@@ -1,4 +1,6 @@
 import type { UserProfile } from "@/entities/user/model/types";
+import { Avatar } from "@/shared/ui/avatar/Avatar";
+import { DEFAULT_AVATAR_ID, getAvatarIdForUser, isAvatarId } from "@/entities/user/model/avatarOptions";
 import { Button } from "@/shared/ui/button";
 import { useAppPreferences } from "@/shared/model/preferences";
 
@@ -54,6 +56,7 @@ export const UserSearchPanel = ({
         ) : (
           searchResults.map((profile) => (
             <button key={profile.id} type="button" className={s.userCard} onClick={() => onStartDirectChat(profile)}>
+                <Avatar avatarId={isAvatarId(profile.avatarId) ? profile.avatarId : getAvatarIdForUser(profile.id) ?? DEFAULT_AVATAR_ID} size="medium" alt="" />
               <div className={s.userIdentity}>
                 <span className={s.userName}>{profile.displayName}</span>
                 <span className={s.userEmail}>{profile.email}</span>

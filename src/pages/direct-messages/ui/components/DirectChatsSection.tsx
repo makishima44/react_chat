@@ -1,4 +1,6 @@
 import type { DirectChat } from "@/entities/direct-chat/model/types";
+import { Avatar } from "@/shared/ui/avatar/Avatar";
+import { getAvatarIdForUser } from "@/entities/user/model/avatarOptions";
 import { useAppPreferences } from "@/shared/model/preferences";
 
 import s from "../directMessagesPage.module.css";
@@ -40,12 +42,15 @@ export const DirectChatsSection = ({ directChats, currentUserId, onOpenChat }: D
 
             return (
               <button key={chat.id} type="button" className={s.chatCard} onClick={() => onOpenChat(chat.id)}>
-                <div className={s.chatTop}>
-                  <span className={s.chatName}>{peer.displayName || peer.email}</span>
-                  <span className={s.chatTime}>{formatPreviewTime(chat.lastMessageAt)}</span>
+                <Avatar avatarId={getAvatarIdForUser(peer.userId)} size="medium" alt="" />
+                <div className={s.chatContent}>
+                  <div className={s.chatTop}>
+                    <span className={s.chatName}>{peer.displayName || peer.email}</span>
+                    <span className={s.chatTime}>{formatPreviewTime(chat.lastMessageAt)}</span>
+                  </div>
+                  <div className={s.chatEmail}>{peer.email}</div>
+                  <div className={s.chatPreview}>{chat.lastMessageText?.trim() || t("directMessagesEmptyPreview")}</div>
                 </div>
-                <div className={s.chatEmail}>{peer.email}</div>
-                <div className={s.chatPreview}>{chat.lastMessageText?.trim() || t("directMessagesEmptyPreview")}</div>
               </button>
             );
           })}
