@@ -1,0 +1,74 @@
+.avatarField {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.avatarField legend {
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.avatarGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.avatarOption {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 7px 3px 6px;
+  color: var(--text-dim);
+  background: rgba(var(--surface-rgb), 0.64);
+  border: 1px solid rgba(var(--accent-soft-rgb), 0.2);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease;
+}
+
+.avatarOption:hover {
+  color: var(--text);
+  border-color: rgba(var(--accent-soft-rgb), 0.48);
+  transform: translateY(-1px);
+}
+
+.avatarOptionActive {
+  color: var(--accent-strong);
+  background: rgba(var(--accent-rgb), 0.12);
+  border-color: rgba(var(--accent-rgb), 0.72);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.14);
+}
+
+.avatarOption span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .avatarGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .avatarOption {
+    grid-template-columns: 40px minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    gap: 8px;
+    padding: 6px;
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatarOption {
+    transition: none;
+  }
+}

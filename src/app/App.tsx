@@ -1,42 +1,27 @@
-import { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { PrivateRoute } from "./providers/router/PrivateRoute";
 import { PublicRoute } from "./providers/router/PublicRoute";
 import { RegistrationPage } from "@/pages/registration/ui/RegistrationPage";
 import { LoginPage } from "@/pages/login/ui/LoginPage";
-import { RoomsPage } from "@/pages/rooms/ui/RoomsPage";
 import { ChatPage } from "@/pages/chat/ui/ChatPage";
 import { DirectMessagesPage } from "@/pages/direct-messages/ui/DirectMessagesPage";
 import { DirectChatPage } from "@/pages/direct-chat/ui/DirectChatPage";
-import { MatrixSplash } from "@/widgets/splash/ui/MatrixSplash";
+import { ChatPreviewPage } from "@/pages/chat/ui/ChatPreviewPage";
+import { RoomsPage } from "@/pages/rooms/ui/RoomsPage";
 import { PwaInstallPrompt } from "@/widgets/pwa-install/ui/PwaInstallPrompt";
 import { useViewportHeight } from "./model/useViewportHeight";
 import s from "./App.module.css";
 
 const App = () => {
-  const [splashState, setSplashState] = useState<"visible" | "fading" | "hidden">("visible");
   useViewportHeight();
-
-  useEffect(() => {
-    const fadeTimer = window.setTimeout(() => setSplashState("fading"), 2200);
-    const hideTimer = window.setTimeout(() => setSplashState("hidden"), 3000);
-    return () => {
-      window.clearTimeout(fadeTimer);
-      window.clearTimeout(hideTimer);
-    };
-  }, []);
 
   return (
     <div className={s.app}>
-      {splashState !== "hidden" && (
-        <MatrixSplash
-          state={splashState}
-          onSkip={() => setSplashState("hidden")}
-        />
-      )}
       <PwaInstallPrompt />
       <Routes>
+        {import.meta.env.DEV && <Route path="/_dev/chat-preview" element={<ChatPreviewPage />} />}
+        {import.meta.env.DEV && <Route path="/_dev/rooms-preview" element={<RoomsPage />} />}
         <Route
           path="/register"
           element={

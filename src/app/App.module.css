@@ -1,4 +1,5 @@
 .app {
+  height: var(--app-height);
   min-height: var(--app-height);
   width: 100%;
   display: flex;

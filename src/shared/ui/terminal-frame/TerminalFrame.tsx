@@ -28,8 +28,8 @@ export const TerminalFrame = ({
     <section className={clsx(s.frame, className)}>
       <div className={s.header}>
         <div className={s.headerLeft}>
-          <span className={s.statusDot} aria-hidden="true" />
-          <span className={s.statusText}>{t("shellReady")}</span>
+          <span className={s.brandMark} aria-hidden="true">a</span>
+          <span className={s.brandName}>{t("appName")}</span>
         </div>
 
         <div className={s.headerRight}>{headerSlot && <div className={s.headerSlot}>{headerSlot}</div>}</div>
