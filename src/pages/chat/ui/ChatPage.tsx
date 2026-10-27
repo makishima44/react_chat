@@ -10,6 +10,9 @@ import { Button } from "@/shared/ui/button";
 import { getMentionAliases } from "@/pages/chat/model/mentions";
 import { useAppPreferences } from "@/shared/model/preferences";
 import { useUserSettings } from "@/pages/rooms/model/useUserSettings";
+import { useRoomsQuery } from "@/pages/rooms/model/useRoomsQuery";
+import { useRoomAccess } from "@/pages/rooms/model/useRoomAccess";
+import { useDirectChatsQuery } from "@/pages/direct-messages/model/useDirectChatsQuery";
 import { useMobileComposerVisibility } from "@/shared/lib/useMobileComposerVisibility";
 import { useChatRoom } from "@/pages/chat/model/useChatRoom";
 import { useNotificationPermission } from "@/pages/chat/model/useNotificationPermission";
@@ -30,6 +33,8 @@ import { ChatSettingsModal } from "./components/ChatSettingsModal";
 import { RoomRoleBar } from "./components/RoomRoleBar";
 import { ChatSearchBar } from "./components/ChatSearchBar";
 import { ChatPresenceBar } from "./components/ChatPresenceBar";
+import { ChatWorkspace } from "./components/ChatWorkspace";
+import { AccessRoomModal } from "@/pages/rooms/ui/components/AccessRoomModal";
 
 export const ChatPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,16 +47,29 @@ export const ChatPage = () => {
   const currentUserId = authUser?.uid ?? "anonymous";
   const currentUserEmail = authUser?.email ?? "";
   const currentUserName = authUser?.displayName?.trim() || currentUserEmail || t("commonAnonymous");
+  const { rooms } = useRoomsQuery(currentUserId, { trackUnreadCounts: false });
+  const { directChats } = useDirectChatsQuery(currentUserId);
   const {
     nickname,
+    avatarId,
     nicknameError,
     savingNickname,
     settingsOpen,
     openSettings,
     closeSettings,
     handleNicknameChange,
+    handleAvatarChange,
     handleNicknameSave,
   } = useUserSettings(authUser);
+  const {
+    accessTarget,
+    accessPassword,
+    accessError,
+    handleAccessPasswordChange,
+    handleOpenRoom,
+    handleCloseAccessModal,
+    handleConfirmAccess,
+  } = useRoomAccess({ navigate, currentUserId, currentUserName });
   const { roomName, roomDetails, roomStatus } = useChatRoom(roomId, t);
   const mentionAliases = useMemo(() => getMentionAliases(currentUserName, currentUserEmail), [currentUserName, currentUserEmail]);
   const currentRoomRole = getRoomRole(roomDetails, currentUserId);
@@ -65,6 +83,7 @@ export const ChatPage = () => {
     authUser,
     roomStatus,
     currentUserName,
+    currentUserAvatar: avatarId,
   });
 
   const isOwnMessage = useCallback(
@@ -113,6 +132,7 @@ export const ChatPage = () => {
     currentUserId,
     currentUserEmail,
     currentUserName,
+    currentUserAvatar: avatarId,
     canModerateCurrentRoom,
     isOwnMessage,
     setTypingState,
@@ -193,20 +213,28 @@ export const ChatPage = () => {
 
   return (
     <div className={s.page}>
-      <TerminalFrame
-        title={t("chatTitle")}
-        subtitle={roomName ? t("chatSubtitleWithRoom", { name: roomName }) : t("chatSubtitleFallback")}
-        headerSlot={
+      <ChatWorkspace
+        roomId={roomId}
+        roomName={roomName}
+        rooms={rooms}
+        directChats={directChats}
+        onlineUsers={onlineUsers}
+        currentUserId={currentUserId}
+        currentUserName={currentUserName}
+        currentUserAvatar={avatarId}
+        headerControls={
           <ChatHeaderControls
             onOpenSettings={openSettings}
             onGoToRooms={() => navigate("/rooms")}
             onGoToDirectMessages={() => navigate("/dm")}
             onOpenRoomRoles={canManageCurrentRoom ? openRoles : undefined}
             onLogout={handleLogout}
+            workspace
           />
         }
-        className={s.chatFrame}
-        contentClassName={s.chatFrameContent}
+        onOpenRoom={(room) => handleOpenRoom(room.id, room)}
+        onNavigate={navigate}
+        onOpenSettings={openSettings}
       >
         <RoomRoleBar currentRoomRole={currentRoomRole} canModerateCurrentRoom={canModerateCurrentRoom} />
 
@@ -224,6 +252,7 @@ export const ChatPage = () => {
           currentUserId={currentUserId}
           currentUserEmail={currentUserEmail}
           currentUserName={currentUserName}
+          currentUserAvatar={avatarId}
           mentionAliases={mentionAliases}
           messagesEndRef={messagesEndRef}
           editingMessageId={editingMessageId}
@@ -243,6 +272,7 @@ export const ChatPage = () => {
           typingUsers={typingUsers}
           notificationPermission={notificationPermission}
           onEnableNotifications={requestNotificationPermission}
+          showParticipants={false}
         />
 
         <ChatInput
@@ -258,7 +288,7 @@ export const ChatPage = () => {
         />
 
         {(sendError || streamError) && <div className={s.sendError}>{sendError || streamError}</div>}
-      </TerminalFrame>
+      </ChatWorkspace>
 
       {deleteTarget && (
         <DeleteMessageModal
@@ -283,12 +313,25 @@ export const ChatPage = () => {
         <ChatSettingsModal
           authUser={authUser}
           nickname={nickname}
+          avatarId={avatarId}
           nicknameError={nicknameError}
           savingNickname={savingNickname}
           currentUserName={currentUserName}
           onClose={closeSettings}
           onSubmit={handleNicknameSave}
           onNicknameChange={handleNicknameChange}
+          onAvatarChange={handleAvatarChange}
+        />
+      )}
+
+      {accessTarget && (
+        <AccessRoomModal
+          accessTarget={accessTarget}
+          accessPassword={accessPassword}
+          accessError={accessError}
+          onPasswordChange={handleAccessPasswordChange}
+          onClose={handleCloseAccessModal}
+          onConfirm={handleConfirmAccess}
         />
       )}
     </div>

@@ -8,13 +8,14 @@ type ChatHeaderControlsProps = {
   onLogout: () => void;
   onGoToRooms: () => void;
   onGoToDirectMessages?: () => void;
+  workspace?: boolean;
 };
 
-export const ChatHeaderControls = ({ onOpenSettings, onOpenRoomRoles, onLogout, onGoToRooms, onGoToDirectMessages }: ChatHeaderControlsProps) => {
+export const ChatHeaderControls = ({ onOpenSettings, onOpenRoomRoles, onLogout, onGoToRooms, onGoToDirectMessages, workspace = false }: ChatHeaderControlsProps) => {
   const { t } = useAppPreferences();
 
   return (
-    <div className={s.headerControls}>
+    <div className={s.headerControls} data-workspace-controls={workspace ? "true" : undefined}>
       {onOpenSettings && (
         <Button type="button" variant="ghost" className={s.iconButton} onClick={onOpenSettings} aria-label={t("chatOpenSettingsAria")}>
           <svg className={s.icon} viewBox="0 0 24 24" role="img" aria-hidden="true">
@@ -30,16 +31,18 @@ export const ChatHeaderControls = ({ onOpenSettings, onOpenRoomRoles, onLogout, 
           {t("roomRoles")}
         </Button>
       )}
-      {onGoToDirectMessages && (
+      {!workspace && onGoToDirectMessages && (
         <Button type="button" variant="ghost" onClick={onGoToDirectMessages}>
           {t("directMessagesNav")}
         </Button>
       )}
-      <Button variant="ghost" onClick={onGoToRooms}>
-        {t("commonRooms")}
-      </Button>
-      <Button variant="ghost" onClick={onLogout}>
-        {t("commonLogout")}
+      {!workspace && (
+        <Button variant="ghost" onClick={onGoToRooms}>
+          {t("commonRooms")}
+        </Button>
+      )}
+      <Button variant="ghost" className={workspace ? s.workspaceLogout : undefined} onClick={onLogout}>
+        {workspace ? t("chatExitShort") : t("commonLogout")}
       </Button>
     </div>
   );

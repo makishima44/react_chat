@@ -1,6 +1,8 @@
 import { FormEvent, Fragment, RefObject } from "react";
 import clsx from "clsx";
 import type { Message } from "@/entities/message/model/types";
+import { getAvatarIdForUser, isAvatarId, type AvatarId } from "@/entities/user/model/avatarOptions";
+import { Avatar } from "@/shared/ui/avatar/Avatar";
 import { isMessageMentioningUser, splitMessageByMentions, type MentionChunk } from "@/pages/chat/model/mentions";
 import s from "../chatPage.module.css";
 import { useAppPreferences } from "@/shared/model/preferences";
@@ -11,6 +13,7 @@ type ChatMessagesProps = {
   currentUserId: string;
   currentUserEmail: string;
   currentUserName: string;
+  currentUserAvatar: AvatarId;
   mentionAliases: string[];
   messagesEndRef: RefObject<HTMLDivElement | null>;
   editingMessageId: string | null;
@@ -105,6 +108,7 @@ export const ChatMessages = ({
   currentUserId,
   currentUserEmail,
   currentUserName,
+  currentUserAvatar,
   mentionAliases,
   messagesEndRef,
   editingMessageId,
@@ -143,12 +147,18 @@ export const ChatMessages = ({
             className={clsx(s.message, isOwn && s.messageOwn, isEditing && s.messageEditing, mentionsCurrentUser && s.messageMentioned)}
           >
             <div className={s.messageMeta}>
-              <span className={s.prompt}>&gt;</span>
-              <span className={s.user}>{displayName}</span>
-              <span className={s.separator}>:</span>
-              <time className={s.messageTime} title={messageDateTime}>
-                {messageTime}
-              </time>
+              <Avatar
+                avatarId={isOwn ? currentUserAvatar : isAvatarId(msg.avatarId) ? msg.avatarId : getAvatarIdForUser(msg.userId || displayName)}
+                size="medium"
+                alt=""
+                className={s.messageAvatar}
+              />
+              <div className={s.messageIdentity}>
+                <span className={s.user}>{displayName}</span>
+                <time className={s.messageTime} title={messageDateTime}>
+                  {messageTime}
+                </time>
+              </div>
             </div>
 
             {isEditing ? (
@@ -171,7 +181,7 @@ export const ChatMessages = ({
                 </div>
               </form>
             ) : (
-              <>
+              <div className={s.messageBody}>
                 {msg.replyTo && (
                   <div className={s.replyPreview}>
                     <span className={s.replyPreviewAuthor}>{msg.replyTo.userName || msg.replyTo.user || t("commonAnonymous")}</span>
@@ -199,7 +209,7 @@ export const ChatMessages = ({
                     </>
                   )}
                 </div>
-              </>
+              </div>
             )}
           </div>
         );

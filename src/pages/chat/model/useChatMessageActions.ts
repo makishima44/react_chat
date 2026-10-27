@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { addDoc, collection, deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import type { Message } from "@/entities/message/model/types";
+import type { AvatarId } from "@/entities/user/model/avatarOptions";
 import { db } from "@/shared/api/firebase/firebaseConfig";
 import type { TranslateFn } from "@/shared/model/preferences";
 import { getPermissionError } from "./firebaseErrors";
@@ -11,6 +12,7 @@ type UseChatMessageActionsParams = {
   currentUserId: string;
   currentUserEmail: string;
   currentUserName: string;
+  currentUserAvatar: AvatarId;
   canModerateCurrentRoom: boolean;
   isOwnMessage: (message: Message) => boolean;
   setTypingState: (nextTyping: boolean) => Promise<void>;
@@ -23,6 +25,7 @@ export const useChatMessageActions = ({
   currentUserId,
   currentUserEmail,
   currentUserName,
+  currentUserAvatar,
   canModerateCurrentRoom,
   isOwnMessage,
   setTypingState,
@@ -54,6 +57,7 @@ export const useChatMessageActions = ({
         user: currentUserEmail || currentUserName,
         userId: currentUserId,
         userName: currentUserName,
+        avatarId: currentUserAvatar,
         roomId,
         replyTo: replyTarget
           ? {
@@ -61,6 +65,7 @@ export const useChatMessageActions = ({
               text: replyTarget.text,
               user: replyTarget.user,
               userName: replyTarget.userName,
+              avatarId: replyTarget.avatarId,
             }
           : null,
       });

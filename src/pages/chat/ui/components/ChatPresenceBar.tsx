@@ -7,9 +7,10 @@ type ChatPresenceBarProps = {
   typingUsers: OnlineUser[];
   notificationPermission: NotificationPermissionState;
   onEnableNotifications: () => void;
+  showParticipants?: boolean;
 };
 
-export const ChatPresenceBar = ({ onlineUsers, typingUsers, notificationPermission, onEnableNotifications }: ChatPresenceBarProps) => {
+export const ChatPresenceBar = ({ onlineUsers, typingUsers, notificationPermission, onEnableNotifications, showParticipants = true }: ChatPresenceBarProps) => {
   const { t } = useAppPreferences();
   const typingLabel =
     typingUsers.length > 0
@@ -22,7 +23,7 @@ export const ChatPresenceBar = ({ onlineUsers, typingUsers, notificationPermissi
         <span className={s.onlineState}>{t("chatOnline", { count: onlineUsers.length })}</span>
         {typingLabel && <span className={s.typingState}>{typingLabel}</span>}
       </div>
-      {onlineUsers.length > 0 && (
+      {showParticipants && onlineUsers.length > 0 && (
         <div className={s.participants} aria-label={t("chatParticipants")}>
           <span className={s.participantsLabel}>{t("chatParticipants")}:</span>
           <div className={s.participantList}>

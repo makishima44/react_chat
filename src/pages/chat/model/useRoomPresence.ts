@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { collection, doc, onSnapshot, query, serverTimestamp, setDoc, where } from "firebase/firestore";
 import type { User } from "firebase/auth";
+import type { AvatarId } from "@/entities/user/model/avatarOptions";
 import { db } from "@/shared/api/firebase/firebaseConfig";
 import type { ChatRoomStatus, OnlineUser } from "./types";
 
@@ -9,9 +10,10 @@ type UseRoomPresenceParams = {
   authUser: User | null;
   roomStatus: ChatRoomStatus;
   currentUserName: string;
+  currentUserAvatar: AvatarId;
 };
 
-export const useRoomPresence = ({ roomId, authUser, roomStatus, currentUserName }: UseRoomPresenceParams) => {
+export const useRoomPresence = ({ roomId, authUser, roomStatus, currentUserName, currentUserAvatar }: UseRoomPresenceParams) => {
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const typingTimeoutRef = useRef<number | null>(null);
   const isTypingRef = useRef(false);
@@ -29,6 +31,7 @@ export const useRoomPresence = ({ roomId, authUser, roomStatus, currentUserName 
             roomId,
             userId: authUser.uid,
             userName: currentUserName,
+            avatarId: currentUserAvatar,
             isOnline: true,
             isTyping: nextTyping,
             lastActiveAt: serverTimestamp(),
@@ -39,7 +42,7 @@ export const useRoomPresence = ({ roomId, authUser, roomStatus, currentUserName 
         // Best-effort UI signal; chat should continue to work even if presence write fails.
       }
     },
-    [authUser, currentUserName, presenceDocId, roomId],
+    [authUser, currentUserAvatar, currentUserName, presenceDocId, roomId],
   );
 
   const handleTypingInput = useCallback(
@@ -82,7 +85,7 @@ export const useRoomPresence = ({ roomId, authUser, roomStatus, currentUserName 
         const activeUsers = snapshot.docs
           .map((docSnapshot) => ({
             id: docSnapshot.id,
-            ...(docSnapshot.data() as { userId?: string; userName?: string; isOnline?: boolean; isTyping?: boolean }),
+            ...(docSnapshot.data() as { userId?: string; userName?: string; avatarId?: string; isOnline?: boolean; isTyping?: boolean }),
           }))
           .filter((entry) => entry.isOnline);
 
@@ -107,6 +110,7 @@ export const useRoomPresence = ({ roomId, authUser, roomStatus, currentUserName 
           roomId,
           userId: authUser.uid,
           userName: currentUserName,
+          avatarId: currentUserAvatar,
           isOnline,
           isTyping,
           lastActiveAt: serverTimestamp(),
@@ -132,7 +136,7 @@ export const useRoomPresence = ({ roomId, authUser, roomStatus, currentUserName 
       isTypingRef.current = false;
       void writePresence(false, false).catch(() => {});
     };
-  }, [authUser, currentUserName, presenceDocId, roomId, roomStatus]);
+  }, [authUser, currentUserAvatar, currentUserName, presenceDocId, roomId, roomStatus]);
 
   const typingUsers = useMemo(() => onlineUsers.filter((user) => user.isTyping && user.userId !== authUser?.uid), [authUser?.uid, onlineUsers]);
 
