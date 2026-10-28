@@ -5,7 +5,7 @@ import { Avatar } from "@/shared/ui/avatar/Avatar";
 import { avatarOptions, type AvatarId } from "@/entities/user/model/avatarOptions";
 import s from "../chatPage.module.css";
 import p from "./chatSettings.module.css";
-import { AppLanguage, AppTheme, useAppPreferences } from "@/shared/model/preferences";
+import { AppLanguage, useAppPreferences } from "@/shared/model/preferences";
 
 type ChatSettingsModalProps = {
   authUser: User | null;
@@ -34,7 +34,6 @@ export const ChatSettingsModal = ({
 }: ChatSettingsModalProps) => {
   const { t, language, setLanguage, theme, setTheme } = useAppPreferences();
   const languageItems: AppLanguage[] = ["ru", "en"];
-  const themeItems: AppTheme[] = ["amber", "purple"];
 
   return (
     <div className={s.modalOverlay} onClick={onClose}>
@@ -103,19 +102,15 @@ export const ChatSettingsModal = ({
 
           <div className={s.preferenceField}>
             <span className={s.preferenceLabel}>{t("prefsTheme")}</span>
-            <div className={s.preferenceGroup} role="group" aria-label={t("prefsTheme")}>
-              {themeItems.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className={`${s.preferenceButton} ${theme === item ? s.preferenceButtonActive : ""}`}
-                  onClick={() => setTheme(item)}
-                >
-                  {item === "purple" && t("prefsThemePurple")}
-                  {item === "amber" && t("prefsThemeAmber")}
-                </button>
-              ))}
-            </div>
+            <button
+              type="button"
+              className={`${s.preferenceButton} ${s.themeToggle}`}
+              aria-pressed={theme === "dark"}
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            >
+              <span aria-hidden="true">{theme === "light" ? "☾" : "☀"}</span>
+              {theme === "light" ? t("themeLight") : t("themeDark")}
+            </button>
           </div>
 
           <div className={s.modalActions}>

@@ -1,7 +1,7 @@
 import type { Timestamp } from "firebase/firestore";
 
 export type RoomRole = "owner" | "moderator" | "member";
-export type RoomCategory = "general" | "tech" | "creative" | "music" | "gaming" | "off-topic";
+export type RoomCategory = "general" | "tech" | "creative" | "music" | "gaming" | "books" | "off-topic";
 
 export type RoomMember = {
   userId: string;

@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 
 export type AppLanguage = "ru" | "en";
-export type AppTheme = "amber" | "purple";
+export type AppTheme = "light" | "dark";
 
 const LANGUAGE_STORAGE_KEY = "react_chat_language";
 const THEME_STORAGE_KEY = "react_chat_theme";
@@ -29,6 +29,8 @@ const translations = {
     prefsLanguageRu: "РУ",
     prefsLanguageEn: "EN",
     prefsTheme: "Тема",
+    themeLight: "Светлая тема",
+    themeDark: "Тёмная тема",
     prefsThemeAmber: "Янтарная",
     prefsThemePurple: "Фиолетовая",
     settingsAvatar: "Аватар",
@@ -76,24 +78,35 @@ const translations = {
     roomsCreateSubmit: "Создать комнату",
     roomsCreateSubmitting: "Создание...",
     roomsNavWorkspace: "Рабочее пространство",
+    roomsNavigationLabel: "Навигация",
+    roomsFindNav: "Найти комнату",
+    roomsMyRooms: "Мои комнаты",
+    roomsActivity: "Активность",
     roomsRecentChats: "Недавние диалоги",
     roomsProfileStatus: "В сети",
     roomsBreadcrumb: "Рабочее пространство   /   Комнаты",
     roomsWelcomeEyebrow: "Всё начинается здесь",
     roomsWelcomeTitle: "Найдите свою комнату",
-    roomsWelcomeSubtitle: "Присоединяйтесь к разговору или создайте пространство для своей команды.",
-    roomsSearchPlaceholder: "Поиск комнат...",
+    roomsWelcomeSubtitle: "Место для ночных мыслей, случайных интересов и хороших разговоров. Присоединяйтесь к комнате или создайте новую.",
+    roomsSearchPlaceholder: "Поиск комнат, тем или людей...",
+    roomsColumnRoom: "Комната",
+    roomsColumnMembers: "Участники",
+    roomsColumnActivity: "Активность",
+    roomsJustNow: "Только что",
+    roomsMembersCount: "{count} участников",
+    roomsOnlineHint: "Обсуждение",
     roomsSortLabel: "Сортировка",
     roomsSortRecent: "Сначала новые",
     roomsSortUnread: "С непрочитанными",
     roomsFilterLabel: "Фильтр комнат",
-    roomsCategory_all: "Все комнаты",
-    roomsCategory_general: "Общее",
-    roomsCategory_tech: "Технологии",
-    roomsCategory_creative: "Творчество",
+    roomsCategory_all: "Все",
+    roomsCategory_general: "Чат",
+    roomsCategory_tech: "Учёба",
+    roomsCategory_creative: "Дизайн",
     roomsCategory_music: "Музыка",
     roomsCategory_gaming: "Игры",
-    roomsCategory_offtopic: "Разное",
+    roomsCategory_books: "Книги",
+    roomsCategory_offtopic: "Жизнь",
     roomsListTitle: "Комнаты",
     roomsModalTitle: "Создать комнату",
     roomsModalSubtitle: "Настройте пространство для вашего разговора.",
@@ -273,6 +286,8 @@ const translations = {
     prefsLanguageRu: "RU",
     prefsLanguageEn: "EN",
     prefsTheme: "Theme",
+    themeLight: "Light theme",
+    themeDark: "Dark theme",
     prefsThemeAmber: "Amber",
     prefsThemePurple: "Purple",
     settingsAvatar: "Avatar",
@@ -320,24 +335,35 @@ const translations = {
     roomsCreateSubmit: "Create room",
     roomsCreateSubmitting: "Creating...",
     roomsNavWorkspace: "Workspace",
+    roomsNavigationLabel: "Navigation",
+    roomsFindNav: "Find a room",
+    roomsMyRooms: "My rooms",
+    roomsActivity: "Activity",
     roomsRecentChats: "Recent messages",
     roomsProfileStatus: "Online",
     roomsBreadcrumb: "Workspace   /   Rooms",
     roomsWelcomeEyebrow: "A place to begin",
     roomsWelcomeTitle: "Find your room",
-    roomsWelcomeSubtitle: "Join a conversation or create a space for your team.",
-    roomsSearchPlaceholder: "Search rooms...",
+    roomsWelcomeSubtitle: "A place for every late thought, random interest, and good conversation. Join a room or make a new one.",
+    roomsSearchPlaceholder: "Search rooms, topics, or people...",
+    roomsColumnRoom: "Room",
+    roomsColumnMembers: "Members",
+    roomsColumnActivity: "Activity",
+    roomsJustNow: "Just now",
+    roomsMembersCount: "{count} members",
+    roomsOnlineHint: "Discussion",
     roomsSortLabel: "Sort by",
     roomsSortRecent: "Recently active",
     roomsSortUnread: "Unread first",
     roomsFilterLabel: "Filter rooms",
-    roomsCategory_all: "All rooms",
-    roomsCategory_general: "General",
-    roomsCategory_tech: "Tech",
-    roomsCategory_creative: "Creative",
+    roomsCategory_all: "All",
+    roomsCategory_general: "Chat",
+    roomsCategory_tech: "Study",
+    roomsCategory_creative: "Design",
     roomsCategory_music: "Music",
     roomsCategory_gaming: "Gaming",
-    roomsCategory_offtopic: "Off-topic",
+    roomsCategory_books: "Books",
+    roomsCategory_offtopic: "Life",
     roomsListTitle: "Rooms",
     roomsModalTitle: "Create a room",
     roomsModalSubtitle: "Set up a space for your conversation.",
@@ -524,10 +550,9 @@ const readLanguage = (): AppLanguage => {
 };
 
 const readTheme = (): AppTheme => {
-  if (typeof window === "undefined") return "amber";
+  if (typeof window === "undefined") return "light";
   const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-  if (stored === "green") return "purple";
-  return stored === "purple" || stored === "amber" ? stored : "amber";
+  return stored === "dark" ? "dark" : "light";
 };
 
 export const AppPreferencesProvider = ({ children }: { children: ReactNode }) => {

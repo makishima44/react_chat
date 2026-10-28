@@ -21,7 +21,7 @@ import shell from "@/pages/rooms/ui/roomsPage.module.css";
 export const DirectMessagesPage = () => {
   const navigate = useNavigate();
   const authUser = auth.currentUser;
-  const { t, theme, setTheme } = useAppPreferences();
+  const { t } = useAppPreferences();
   const currentUserId = authUser?.uid ?? "anonymous";
   const currentUserEmail = authUser?.email ?? "";
   const currentUserName = authUser?.displayName?.trim() || currentUserEmail || t("commonAnonymous");
@@ -105,12 +105,9 @@ export const DirectMessagesPage = () => {
         currentUserId={currentUserId}
         currentUserName={currentUserName}
         avatarId={settings.avatarId}
-        roomCount={rooms.length}
-        directMessagesCount={directChats.length}
+        rooms={rooms}
         activeSection="direct-messages"
         directChats={directChats}
-        theme={theme}
-        onThemeChange={setTheme}
         onOpenSettings={settings.openSettings}
         onNavigate={navigate}
         onLogout={handleLogout}

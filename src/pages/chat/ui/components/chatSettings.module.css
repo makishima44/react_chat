@@ -72,3 +72,5 @@
     transition: none;
   }
 }
+.themeToggle { display: flex; align-items: center; justify-content: center; gap: 10px; min-width: 150px; }
+.themeToggle span { font-size: 19px; line-height: 1; }

@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import type { RoomCategory } from "@/entities/room/model/types";
+import { roomCategoryIcons } from "@/entities/room/model/categoryIcons";
 import { useRoomCreation } from "../../model/useRoomCreation";
 import { useAppPreferences } from "@/shared/model/preferences";
 import s from "../roomsPage.module.css";
@@ -10,6 +11,7 @@ const categories: RoomCategory[] = [
   "creative",
   "music",
   "gaming",
+  "books",
   "off-topic",
 ];
 
@@ -95,6 +97,7 @@ export const CreateRoomDialog = ({
           >
             {categories.map((category) => (
               <option key={category} value={category}>
+                {roomCategoryIcons[category]}{" "}
                 {t(
                   `roomsCategory_${category.replace("-", "")}` as "roomsCategory_general",
                 )}

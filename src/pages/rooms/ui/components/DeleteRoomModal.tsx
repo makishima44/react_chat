@@ -17,7 +17,7 @@ export const DeleteRoomModal = ({ deleteTarget, deletingRoomId, onClose, onConfi
 
   return (
     <div className={modalS.modalOverlay} onClick={onClose}>
-      <div className={modalS.modal} onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="delete-room-title">
+      <div className={`${modalS.modal} ${s.deleteDialog}`} onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="delete-room-title">
         <div className={modalS.modalHeader}>
           <h2 className={modalS.modalTitle} id="delete-room-title">
             {t("roomsDeleteRoomTitle")}
@@ -33,10 +33,10 @@ export const DeleteRoomModal = ({ deleteTarget, deletingRoomId, onClose, onConfi
         </div>
 
         <div className={modalS.modalActions}>
-          <Button type="button" variant="ghost" onClick={onClose} disabled={!!deletingRoomId}>
+          <Button type="button" variant="ghost" className={s.deleteCancel} onClick={onClose} disabled={!!deletingRoomId}>
             {t("commonCancel")}
           </Button>
-          <Button type="button" className={s.dangerAction} onClick={onConfirm} disabled={!!deletingRoomId}>
+          <Button type="button" className={s.deleteConfirm} onClick={onConfirm} disabled={!!deletingRoomId}>
             {deletingRoomId ? t("roomsDeleteSubmitting") : t("commonDelete")}
           </Button>
         </div>

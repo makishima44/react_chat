@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { signOut } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import type { Room, RoomCategory } from "@/entities/room/model/types";
+import { roomCategoryIcons } from "@/entities/room/model/categoryIcons";
 import { auth } from "@/shared/api/firebase/firebaseConfig";
 import { ChatSettingsModal } from "@/pages/chat/ui/components/ChatSettingsModal";
 import { Avatar } from "@/shared/ui/avatar/Avatar";
+import roomIllustration from "@/shared/assets/after-hours-cat.png";
 import { useAppPreferences } from "@/shared/model/preferences";
 import { useRoomsQuery } from "../model/useRoomsQuery";
 import { useUserSettings } from "../model/useUserSettings";
@@ -20,24 +22,18 @@ import { RoomRow } from "./components/RoomRow";
 import { RoomsSidebar } from "./components/RoomsSidebar";
 import s from "./roomsPage.module.css";
 
-const categories: RoomCategory[] = [
-  "general",
-  "tech",
-  "creative",
-  "music",
-  "gaming",
-  "off-topic",
-];
+const categories: RoomCategory[] = ["general", "creative", "gaming", "books", "music", "off-topic", "tech"];
 type RoomFilter = "all" | RoomCategory;
 const filters: RoomFilter[] = ["all", ...categories];
-
 const categoryTranslation = (category: RoomFilter) =>
   `roomsCategory_${category.replace("-", "")}` as "roomsCategory_all";
 
 export const RoomsPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const view = searchParams.get("view");
   const authUser = auth.currentUser;
-  const { t, theme, setTheme } = useAppPreferences();
+  const { t } = useAppPreferences();
   const currentUserId = authUser?.uid ?? "anonymous";
   const currentUserName =
     authUser?.displayName?.trim() || authUser?.email || t("commonAnonymous");
@@ -46,7 +42,6 @@ export const RoomsPage = () => {
   const settings = useUserSettings(authUser);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<RoomFilter>("all");
-  const [sort, setSort] = useState<"recent" | "unread">("recent");
   const [createOpen, setCreateOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const creation = useRoomCreation({
@@ -64,6 +59,8 @@ export const RoomsPage = () => {
   const visibleRooms = useMemo(() => {
     const term = search.trim().toLocaleLowerCase();
     return rooms
+      .filter((room) => view !== "mine" || !!room.members?.[currentUserId] || room.createdBy === currentUserId)
+      .filter((room) => view !== "activity" || !!room.unreadCount)
       .filter(
         (room) => filter === "all" || (room.category ?? "general") === filter,
       )
@@ -74,12 +71,8 @@ export const RoomsPage = () => {
             .toLocaleLowerCase()
             .includes(term),
       )
-      .sort((a, b) =>
-        sort === "unread"
-          ? (b.unreadCount ?? 0) - (a.unreadCount ?? 0)
-          : (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0),
-      );
-  }, [filter, rooms, search, sort]);
+      .sort((a, b) => (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0));
+  }, [currentUserId, filter, rooms, search, view]);
 
   useEffect(() => {
     const focusSearch = (event: KeyboardEvent) => {
@@ -107,10 +100,9 @@ export const RoomsPage = () => {
         currentUserId={currentUserId}
         currentUserName={currentUserName}
         avatarId={settings.avatarId}
-        roomCount={rooms.length}
+        rooms={rooms}
         directChats={directChats}
-        theme={theme}
-        onThemeChange={setTheme}
+        onCreateRoom={() => setCreateOpen(true)}
         onOpenSettings={settings.openSettings}
         onNavigate={navigate}
         onLogout={handleLogout}
@@ -129,22 +121,14 @@ export const RoomsPage = () => {
         <div className={s.content}>
           <div className={s.welcome}>
             <div>
-              <p className={s.eyebrow}>{t("roomsWelcomeEyebrow")}</p>
               <h1>{t("roomsWelcomeTitle")}</h1>
               <p>{t("roomsWelcomeSubtitle")}</p>
             </div>
-            <button
-              className={s.primaryButton}
-              onClick={() => setCreateOpen(true)}
-              type="button"
-            >
-              <span>＋</span>
-              {t("roomsCreateSubmit")}
-            </button>
+            <img className={s.welcomeIllustration} src={roomIllustration} alt="" />
           </div>
           <div className={s.toolbar}>
             <label className={s.search}>
-              <span>⌕</span>
+              <span className={s.searchGlyph} aria-hidden="true" />
               <input
                 ref={searchRef}
                 value={search}
@@ -152,20 +136,10 @@ export const RoomsPage = () => {
                 placeholder={t("roomsSearchPlaceholder")}
                 aria-label={t("roomsSearchPlaceholder")}
               />
-              <kbd>⌘ K</kbd>
             </label>
-            <label className={s.sortLabel}>
-              <span>{t("roomsSortLabel")}</span>
-              <select
-                value={sort}
-                onChange={(event) =>
-                  setSort(event.target.value as "recent" | "unread")
-                }
-              >
-                <option value="recent">{t("roomsSortRecent")}</option>
-                <option value="unread">{t("roomsSortUnread")}</option>
-              </select>
-            </label>
+            <button className={s.primaryButton} onClick={() => setCreateOpen(true)} type="button">
+              <span aria-hidden="true">+</span>{t("roomsCreateSubmit")}
+            </button>
           </div>
           <div
             className={s.filters}
@@ -180,6 +154,7 @@ export const RoomsPage = () => {
                 aria-pressed={filter === value}
                 onClick={() => setFilter(value)}
               >
+                {value !== "all" && <span className={s.filterIcon} aria-hidden="true">{roomCategoryIcons[value]}</span>}
                 {t(categoryTranslation(value))}
               </button>
             ))}
@@ -188,10 +163,9 @@ export const RoomsPage = () => {
             <div className={s.error}>{roomsError || deletion.deleteError}</div>
           )}
           <div className={s.listHeader}>
-            <h2>{t("roomsListTitle")}</h2>
-            <span>
-              {t("roomsSectionActive", { count: visibleRooms.length })}
-            </span>
+            <span>{t("roomsColumnRoom")}</span>
+            <span>{t("roomsColumnMembers")}</span>
+            <span>{t("roomsColumnActivity")}</span>
           </div>
           <div className={s.roomList}>
             {visibleRooms.length === 0 ? (
