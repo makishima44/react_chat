@@ -1,97 +1,167 @@
 # AGENTS.md
 
-## 1) Project Snapshot
+Инструкции для AI-агентов, работающих с репозиторием `react_chat`. Применяются ко всему проекту; вложенные `AGENTS.md`, если появятся, уточняют правила для своих каталогов. Явные инструкции пользователя имеют приоритет в рамках системных ограничений агента.
 
-`react_chat` is a frontend chat application built with **React 19 + TypeScript + Vite**.
-Core capabilities:
-- authentication via Firebase Auth
-- rooms list and room access control
-- real-time messaging via Firestore
-- retro terminal-like UI (CSS Modules + global theme variables)
+## 1. Контекст проекта
 
-Architecture follows a layered, feature-oriented structure (`app / pages / entities / shared / widgets`).
+`react_chat` (название в интерфейсе — **After Hours**) — клиентское приложение для общения в комнатах и личных диалогах.
 
-## 2) Setup, Lint, Test Commands
+- React 19, TypeScript со строгой проверкой типов, Vite.
+- Firebase Auth для аутентификации, Cloud Firestore для данных и подписок в реальном времени.
+- React Router для маршрутов; Formik и Yup для существующих форм.
+- CSS Modules, общие CSS-переменные и `clsx` для оформления.
+- Русская и английская локализации, темы `amber` и `purple`.
+- PWA через `vite-plugin-pwa` и Workbox.
 
-### Install dependencies
-- `npm install`
-- alternative: `pnpm install`
+Версии зависимостей и доступные команды проверяй в `package.json` и lock-файлах. Redux Toolkit установлен, но текущий store содержит заглушку и не подключён в `src/main.tsx`: не считай Redux основным хранилищем состояния.
 
-### Start local development
-- `npm run dev`
+## 2. Порядок работы
 
-### Build (type-check + bundle)
-- `npm run build`
+1. Прочитай инструкции, проверь `git status --short` и изучи файлы, связанные с задачей, включая их вызовы и типы.
+2. Найди существующий пример аналогичного поведения. Используй принятый подход, если задача не требует его менять.
+3. Внеси минимальное законченное изменение: без постороннего рефакторинга, массового форматирования и обновления зависимостей «заодно».
+4. Проверь затронутый сценарий и выполни подходящие проверки из раздела 8.
+5. Просмотри итоговый diff и кратко сообщи результат, выполненные проверки и оставшиеся ограничения.
 
-### Lint
-- `npm run lint`
+Рутинные обратимые решения принимай самостоятельно. Уточняй только то, что существенно меняет результат и не определяется кодом или контекстом задачи. Отвечай на языке пользователя.
 
-### Tests
-- no test runner is configured in `package.json`
-- `npm run test` is currently unavailable
+Сохраняй чужие и пользовательские изменения, включая неотслеживаемые файлы. Не отменяй их ради чистого рабочего дерева. Не выполняй разрушительные Git-команды, массовое удаление данных, публикацию или развёртывание без соответствующего поручения. Уже полученное разрешение не запрашивай повторно.
 
-## 3) Code Style and Conventions (Observed)
+## 3. Команды и окружение
 
-### TypeScript and imports
-- strict TypeScript mode is enabled (`strict`, `noUnusedLocals`, `noUnusedParameters`)
-- path alias `@/` points to `src/`
-- use type-only imports where appropriate (`import type { ... }`)
-- explicit domain types in `entities/*/model/types.ts`
+Все команды выполняются из корня репозитория.
 
-### React patterns
-- function components are declared as arrow constants (`const Component = () => {}`)
-- hooks are extracted into `model/` files and named with `use*`
-- presentational parts are split into small components in `ui/components`
-- route guarding is handled through `PrivateRoute` / `PublicRoute`
+| Действие | npm | pnpm |
+| --- | --- | --- |
+| Установка по lock-файлу | `npm ci` | `pnpm install --frozen-lockfile` |
+| Установка или изменение зависимостей | `npm install` | `pnpm install` |
+| Сервер разработки | `npm run dev` | `pnpm run dev` |
+| Проверка типов и production-сборка | `npm run build` | `pnpm run build` |
+| ESLint | `npm run lint` | `pnpm run lint` |
+| Просмотр готовой сборки | `npm run preview` | `pnpm run preview` |
 
-### Exports and file organization
-- mixed export style is used:
-  - many page/components use named exports (`export const RoomsPage`)
-  - some root-level files use default export (`App`)
-- barrel `index.ts` files are used in shared UI primitives (`shared/ui/*/index.ts`)
+- В репозитории есть `package-lock.json` и `pnpm-lock.yaml`. Учитывай выбор пользователя и существующего окружения; если выбор не определён, используй npm. Не переключай менеджер пакетов посреди задачи и не перегенерируй второй lock-файл без необходимости.
+- Для изменения зависимостей обновляй `package.json` и lock-файл выбранного менеджера. Несоответствие другого lock-файла явно отмечай.
+- Не переустанавливай зависимости, если существующего окружения достаточно. При несовместимости manifest и lock-файла выясни причину, прежде чем их менять.
+- `build` выполняет `tsc -b && vite build`. Отдельного скрипта `typecheck` сейчас нет.
+- Тестовый раннер и скрипт `test` сейчас не настроены. Не представляй `npm run test` как доступную проверку.
+- Vite настроен на порт `3000`; фактический адрес смотри в выводе сервера.
 
-### Styling
-- global design tokens and baseline styles live in `src/shared/styles/globals.css`
-- local styles use CSS Modules (`*.module.css`)
-- CSS module import alias is typically `s` (`import s from "./file.module.css"`)
-- conditional class composition uses `clsx`
+Firebase инициализируется в `src/shared/api/firebase/firebaseConfig.ts`. Нужны следующие переменные окружения:
 
-### Formatting and linting baseline
-- ESLint uses `@eslint/js` recommended + `typescript-eslint` recommended
-- `react-hooks` recommended rules are enabled
-- `react-refresh/only-export-components` is enabled as warning
-- current codebase consistently uses:
-  - double quotes
-  - semicolons
-  - trailing commas in multiline structures
+```dotenv
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
 
-## 4) Directory Map (Agent Navigation Guide)
+Используй локальный `.env` или настроенное окружение. Не записывай реальные значения в документацию, логи или коммиты. Переменные `VITE_*` попадают в клиентскую сборку: серверные секреты и сервисные учётные данные там хранить нельзя. Не придумывай отсутствующие значения; сообщай, какие проверки без них недоступны.
+
+## 4. Структура и размещение кода
 
 ```text
 src/
-  app/                     # app bootstrap, routes, providers
-    providers/
-      router/              # route guards (PrivateRoute/PublicRoute)
-      store/               # Redux store setup
-  entities/                # domain entities and shared entity types
-    message/model/types.ts
-    room/model/types.ts
-  pages/                   # route-level features (login/registration/rooms/chat)
-    <page>/
-      model/               # page hooks and business logic
-      ui/                  # page component + local UI components + CSS modules
-  shared/                  # reusable cross-feature code
-    api/firebase/          # Firebase init and auth helpers
-    lib/                   # validation and small utilities
-    styles/                # global CSS and theme tokens
-    ui/                    # reusable UI primitives (Button/Input/TerminalFrame)
-  widgets/                 # reusable composite UI blocks (e.g., splash)
+  main.tsx                  # точка входа, провайдеры, регистрация service worker
+  app/                      # корневой UI, маршруты, инфраструктура приложения
+    model/                  # общие для приложения hooks
+    providers/              # auth bootstrap, route guards, заготовка store
+  pages/
+    login/                  # вход
+    registration/           # регистрация
+    rooms/                  # список, создание, доступ и удаление комнат
+    chat/                   # сообщения, роли, присутствие и поиск в комнате
+    direct-messages/        # поиск пользователей и список личных диалогов
+    direct-chat/            # личная переписка
+  entities/                 # доменные типы и правила: user, room, message, direct-chat
+  shared/
+    api/firebase/           # Firebase init и переиспользуемые операции с данными
+    assets/                 # ресурсы интерфейса
+    lib/                    # общие утилиты и hooks
+    model/                  # настройки, темы и локализация
+    styles/                 # глобальные стили и токены
+    ui/                     # Button, Input, Avatar, TerminalFrame
+  widgets/                  # составные блоки, в том числе установка PWA
+public/                     # статические ресурсы
 ```
 
-## 5) Practical Notes for AI Agents
+- Логику страницы, подписки и управление состоянием размещай в её `model/`; UI — в `ui/`, небольшие части — в `ui/components/`.
+- Доменные типы размещай в `entities/<entity>/model/types.ts`, правила предметной области — рядом с ними. Локальные типы оставляй рядом с потребителем.
+- Общие операции Firebase размещай в `shared/api/firebase/`. Не переноси туда всю логику страницы только потому, что она использует Firestore.
+- Переиспользуй существующие примитивы и helpers. Новую общую абстракцию вводи при реальной потребности в повторном использовании.
+- Предпочитай зависимости от верхних слоёв к нижним: `app → pages/widgets → entities → shared`. Не добавляй циклические импорты и зависимости нижних слоёв от страниц.
+- Это ориентир для нового кода, а не повод перестраивать проект под строгую методологию. Уже существующие связи, включая переиспользование компонентов между страницами, меняй только в рамках задачи.
 
-- Prefer keeping business logic in page `model` hooks, not in large UI components.
-- Reuse existing shared primitives from `src/shared/ui` before introducing new ones.
-- Keep new styles in CSS Modules unless a truly global style/token change is needed.
-- Preserve existing alias imports (`@/`) and naming conventions to minimize churn.
-- If adding tests, first introduce a test runner and scripts in `package.json`, then document commands here.
+## 5. TypeScript и React
+
+- Соблюдай стиль соседнего кода: двойные кавычки, точки с запятой, trailing commas в многострочных структурах. Не форматируй нетронутые участки.
+- Используй `@/` для импортов между модулями и относительные пути внутри модуля. Типы импортируй через `import type`, где это уместно.
+- Компоненты обычно объявляются как arrow functions; hooks называются `use*`. Сохраняй локальную практику named/default exports и существующие barrel-файлы.
+- Сохраняй строгие настройки TypeScript. Не обходи ошибки через `any`, необоснованные type assertions, `@ts-ignore` или отключение ESLint. Неизвестные внешние данные сужай и проверяй на границе чтения.
+- Не дублируй состояние, вычисляемое из props или других данных. Локальное состояние оставляй локальным; используй существующий контекст настроек, когда он подходит.
+- Соблюдай Rules of Hooks и корректные зависимости эффектов. Убирай подписки, обработчики и таймеры в cleanup; учитывай повторный запуск эффектов в `StrictMode`.
+- Для асинхронного UI предусматривай загрузку, пустой результат, ошибку и повторную попытку, где она нужна. Не допускай повторной отправки формы во время операции.
+- При переключении пользователя, комнаты или диалога сбрасывай относящееся к прежнему контексту состояние и не применяй устаревшие результаты запросов.
+
+## 6. Firebase и целостность данных
+
+Текущие основные пути данных:
+
+| Путь | Назначение |
+| --- | --- |
+| `users/{uid}` | Профили, настройки и поля поиска пользователей |
+| `rooms/{roomId}` | Комнаты, участники и роли |
+| `messages/{messageId}` | Сообщения комнат; связь через `roomId` |
+| `directChats/{chatId}` | Участники личного диалога и сводка последнего сообщения |
+| `directChats/{chatId}/messages/{messageId}` | Сообщения личного диалога |
+
+- Используй общие экземпляры Auth и Firestore из существующего модуля инициализации.
+- Сохраняй совместимость со старыми документами и необязательными полями. Изменение схемы требует учёта всех мест чтения и записи; необходимую миграцию описывай явно.
+- Для времени записи используй существующий подход с `serverTimestamp()`. При чтении учитывай ещё не подтверждённые сервером timestamps.
+- Для каждой подписки `onSnapshot` предусматривай отписку и обработку ошибок. Не добавляй неограниченное чтение коллекций без обоснования; учитывай стоимость подписок и объём истории.
+- При изменении запросов проверяй требования к индексам. Уточняй их по фактическим запросам и обновляй документацию, если она расходится с кодом.
+- Переиспользуй проверки ролей из `entities/room/model/roles.ts`. Route guards и скрытые кнопки управляют UI, но защиту данных должны обеспечивать Firestore Security Rules.
+- Не ослабляй авторизацию ради устранения `permission-denied`. В репозитории сейчас нет файлов правил и индексов Firestore: не утверждай, что серверные ограничения проверены или применены, если проверен только клиент.
+- При изменении личных сообщений сохраняй детерминированное построение ID диалога и согласованность сводки `lastMessage*` после отправки, редактирования и удаления.
+- Если связанные записи должны обновляться атомарно, выбирай transaction или batch по характеру операции. Не предполагавай атомарность нескольких последовательных запросов.
+- Для удаления комнаты учитывай связанные сообщения и частичный сбой; переиспользуй `pages/rooms/lib/deleteRoomWithMessages.ts`, если задача не требует изменения алгоритма.
+- Проверки с записью выполняй на согласованных тестовых данных. Не удаляй реальные комнаты, переписки и пользователей для проверки реализации.
+
+## 7. UI, локализация и PWA
+
+- Сохраняй текущий визуальный язык приложения, если редизайн не входит в задачу. Источник оформления — действующие компоненты и CSS, а не историческое описание интерфейса.
+- Локальные стили пиши в `*.module.css`, обычно с импортом `s`. Глобальные токены находятся в `src/shared/styles/globals.css`; условные классы составляй через `clsx`.
+- Используй существующие цветовые и размерные токены. Проверяй затронутые элементы в обеих темах.
+- Новый пользовательский текст добавляй для `ru` и `en` в `src/shared/model/preferences.tsx` и выводи через существующую функцию `t`. Сохраняй одинаковые ключи и параметры интерполяции.
+- Используй семантические элементы, подписи полей, доступные имена кнопок и видимый фокус. Для диалогов учитывай управление клавиатурой, фокус при открытии и возврат фокуса при закрытии.
+- Проверяй мобильную ширину, длинные сообщения, перенос текста, прокрутку и видимость поля ввода при открытии экранной клавиатуры. Учитывай существующие hooks viewport/composer.
+- Маршруты находятся в `src/app/App.tsx`; сохраняй соответствующие `PrivateRoute` и `PublicRoute`. Служебные preview-маршруты должны оставаться ограничены `import.meta.env.DEV`.
+- PWA настраивается в `vite.config.ts`, регистрация service worker — в `src/main.tsx`. На localhost service worker намеренно отключается; обычный локальный preview не подтверждает работу PWA.
+- При изменениях PWA проверяй manifest, установку, обновление и кэширование в подходящем окружении. Не расширяй кэширование на приватные данные без отдельного обоснованного решения.
+- При изменении маршрутизации учитывай SPA fallback в `vercel.json` и прямое открытие вложенных URL.
+
+## 8. Проверки и критерии завершения
+
+Для изменений исполняемого кода запускай `npm run lint` и `npm run build` либо их аналоги выбранного менеджера. Дополнительно проверяй поведение, затронутое задачей: успешная сборка не подтверждает работу Firebase и пользовательских сценариев.
+
+Выбирай подходящие ручные проверки:
+
+- Auth: вход, выход, неверные данные, перенаправления и прямой переход на защищённую страницу.
+- Комнаты: создание, доступ, отсутствующая комната, действия с учётом роли.
+- Сообщения: отправка, редактирование, удаление, ответы, поиск и синхронизация между клиентами.
+- Личные диалоги: поиск пользователя, открытие переписки, сообщения и обновление сводки в списке.
+- UI: мобильная и десктопная ширина, клавиатура, обе локали и темы для изменённых элементов.
+- Подписки: переход между комнатами/диалогами и выход из аккаунта без отображения устаревших данных.
+
+Не нужно прогонять все сценарии для каждого изменения. Для правок только документации достаточно сверки фактов, ссылок и `git diff --check`; сборка не обязательна.
+
+Если задача требует автоматических тестов, сначала добавь подходящий раннер и команды, затем тесты поведения и регрессий. Не вводи тестовую инфраструктуру ради небольшой несвязанной правки. При появлении тестов обнови этот раздел.
+
+Перед завершением:
+
+- Проверь `git diff --check`, итоговый diff и статус: в изменениях не должно быть случайных файлов, секретов и артефактов сборки.
+- Обнови README или этот файл, если изменились команды, окружение, архитектурные соглашения или внешняя настройка.
+- Укажи, что изменилось и какие проверки действительно выполнены. Если проверка не запускалась или завершилась ошибкой, назови причину; отделяй существующие проблемы от внесённых изменением.
+- Не выдавай предположение, визуальный preview или успешную сборку за проверку полного пользовательского сценария.
