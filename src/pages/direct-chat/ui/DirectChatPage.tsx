@@ -24,6 +24,7 @@ import { useDirectChatConversation } from "../model/useDirectChatConversation";
 import { DirectChatSearchBar } from "./components/DirectChatSearchBar";
 
 import s from "./directChatPage.module.css";
+import chatS from "@/pages/chat/ui/chatPage.module.css";
 
 const noOnlineUsers: OnlineUser[] = [];
 
@@ -133,7 +134,7 @@ export const DirectChatPage = () => {
   }
 
   return (
-    <div className={s.page}>
+    <div className={`${s.page} ${chatS.roomPage} ${s.directConversation}`}>
       <ChatWorkspace
         roomId=""
         roomName=""

@@ -21,7 +21,7 @@
   padding: 17px;
   border: 1px solid rgba(var(--text-rgb), 0.09);
   border-radius: 12px;
-  background: #171615;
+  background: #f5efe7;
 }
 
 .panelHeader {
@@ -33,14 +33,14 @@
 
 .panelTitle {
   margin: 0;
-  color: #eee9e1;
+  color: #28172f;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.01em;
 }
 
 .panelHint {
-  color: #89847b;
+  color: #82748a;
   font-size: 11px;
 }
 
@@ -54,16 +54,16 @@
   width: 100%;
   min-height: 42px;
   padding: 0 12px;
-  border: 1px solid #302d29;
+  border: 1px solid #d8cbd9;
   border-radius: 8px;
   outline: 0;
-  background: #11100f;
+  background: #fffaf2;
   color: var(--text);
   font-size: 13px;
 }
 
 .searchInput::placeholder {
-  color: #706b64;
+  color: #a99bad;
 }
 
 .searchInput:focus-visible {
@@ -97,7 +97,7 @@
 .userCard:hover,
 .chatCard:hover {
   border-color: rgba(var(--text-rgb), 0.1);
-  background: #211f1d;
+  background: #f1e9f2;
 }
 
 .userCard:focus-visible,
@@ -129,7 +129,7 @@
 .chatTime,
 .chatPreview {
   overflow: hidden;
-  color: #8e8981;
+  color: #82748a;
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -161,7 +161,7 @@
 
 .emptyState {
   padding: 9px 2px;
-  color: #8e8981;
+  color: #82748a;
 }
 
 .formError {
@@ -223,4 +223,70 @@
   .chatCard {
     transition: none;
   }
+}
+
+/* Direct message directory shares the light After Hours surfaces. */
+.searchPanel, .chatsSection { background: #fffdf8; border-color: #e8deea; }
+.panelTitle, .userName, .chatName { color: #28172f; }
+.userCard:hover, .chatCard:hover { background: #f2eafa; border-color: #e5d5ec; }
+.searchInput { background: #fffdf8; border-color: #d8cbd9; color: #28172f; }
+:global(:root[data-theme="dark"]) .searchPanel, :global(:root[data-theme="dark"]) .chatsSection { background: #26172e; border-color: #503c59; }
+:global(:root[data-theme="dark"]) .panelTitle, :global(:root[data-theme="dark"]) .userName, :global(:root[data-theme="dark"]) .chatName { color: #faf5ee; }
+:global(:root[data-theme="dark"]) .searchInput { background: #1b1021; border-color: #60486a; color: #faf5ee; }
+
+.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 34px; font-family: "Nunito Sans", Inter, sans-serif; }
+.searchPanel,
+.chatsSection { gap: 24px; min-height: 340px; padding: 0; background: transparent; border: 0; border-radius: 0; }
+.panelHeader { align-items: flex-start; flex-wrap: wrap; padding-bottom: 13px; border-bottom: 1px solid #d8cde9; }
+.panelTitle { color: #1b0c2c; font-size: 26px; font-weight: 900; line-height: 1.2; }
+.panelHint { color: #6e628c; font-size: 16px; }
+.searchForm { gap: 12px; }
+.searchInput { min-height: 64px; padding: 0 20px; background: #fffdf8; border: 2px solid #d4c9e7; border-radius: 12px; color: #1b0c2c; font-size: 20px; }
+.searchInput::placeholder { color: #71648d; }
+.grid .searchForm > button { min-height: 64px; height: auto; padding: 0 24px; background: #ffc329; border-color: #ffc329; border-radius: 11px; box-shadow: none; color: #1b0c2c; font-size: 18px; font-weight: 800; letter-spacing: normal; text-transform: none; }
+.searchResults,
+.chatList { gap: 0; }
+.userCard,
+.chatCard { min-height: 90px; padding: 15px 8px; border: 0; border-bottom: 1px solid #ded5ed; border-radius: 0; }
+.userCard:hover,
+.chatCard:hover { background: #f5efff; border-color: #ded5ed; }
+.userName,
+.chatName { color: #1b0c2c; font-size: 20px; font-weight: 800; }
+.userEmail,
+.chatEmail,
+.chatTime,
+.chatPreview { color: #6e628c; font-size: 15px; }
+.userAction { color: #684095; font-size: 15px; font-weight: 700; }
+.emptyState { color: #6e628c; font-size: 17px; }
+:global(:root[data-theme="dark"]) .searchPanel,
+:global(:root[data-theme="dark"]) .chatsSection { background: transparent; border: 0; }
+:global(:root[data-theme="dark"]) .panelHeader,
+:global(:root[data-theme="dark"]) .userCard,
+:global(:root[data-theme="dark"]) .chatCard { border-color: #493451; }
+:global(:root[data-theme="dark"]) .panelTitle,
+:global(:root[data-theme="dark"]) .userName,
+:global(:root[data-theme="dark"]) .chatName { color: #faf5ee; }
+:global(:root[data-theme="dark"]) .panelHint,
+:global(:root[data-theme="dark"]) .userEmail,
+:global(:root[data-theme="dark"]) .chatEmail,
+:global(:root[data-theme="dark"]) .chatTime,
+:global(:root[data-theme="dark"]) .chatPreview,
+:global(:root[data-theme="dark"]) .emptyState { color: #c4b4ca; }
+:global(:root[data-theme="dark"]) .userCard:hover,
+:global(:root[data-theme="dark"]) .chatCard:hover { background: #35233e; }
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .grid { gap: 26px; }
+  .panelTitle { font-size: 22px; }
+  .panelHint { font-size: 13px; }
+  .searchForm { grid-template-columns: minmax(0, 1fr); }
+  .searchInput { min-height: 52px; font-size: 16px; }
+  .grid .searchForm > button { min-height: 48px; font-size: 16px; }
+  .userName,
+  .chatName { font-size: 17px; }
+  .userEmail,
+  .chatEmail,
+  .chatPreview { font-size: 13px; }
 }

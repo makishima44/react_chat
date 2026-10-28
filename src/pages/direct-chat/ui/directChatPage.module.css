@@ -194,3 +194,20 @@
     min-width: 0;
   }
 }
+
+.directConversation .searchBar { min-height: 54px; padding: 9px 16px; background: #fffdf8; border: 2px solid #d4c9e7; border-radius: 12px; }
+.directConversation .searchBar:not([data-active="true"]) .searchMeta { display: none; }
+.directConversation .searchLabel { color: #6e628c; font-size: 14px; font-weight: 800; letter-spacing: .08em; }
+.directConversation .searchInput { color: #1b0c2c; font-size: 18px; }
+.directConversation .searchInput::placeholder { color: #71648d; }
+.directConversation .searchCount { color: #6e628c; font-size: 15px; }
+.directConversation .searchClearButton { color: #483274; background: #f5efff; border-color: #d4c9e7; font-size: 14px; }
+:global(:root[data-theme="dark"]) .directConversation .searchBar { background: #301f38; border-color: #60486a; }
+:global(:root[data-theme="dark"]) .directConversation .searchInput { color: #faf5ee; }
+:global(:root[data-theme="dark"]) .directConversation .searchLabel,
+:global(:root[data-theme="dark"]) .directConversation .searchCount { color: #c4b4ca; }
+@media (max-width: 760px) {
+  .directConversation .searchBar { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .directConversation .searchMeta { justify-content: space-between; }
+  .directConversation .searchInput { font-size: 15px; }
+}
