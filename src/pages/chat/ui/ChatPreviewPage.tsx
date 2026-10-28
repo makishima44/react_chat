@@ -98,10 +98,11 @@ export const ChatPreviewPage = () => {
   };
 
   return (
-    <div className={s.page}>
+    <div className={`${s.page} ${s.roomPage}`}>
       <ChatWorkspace
         roomId={selectedRoom.id}
         roomName={selectedRoom.name}
+        roomCategory={selectedRoom.category}
         rooms={previewRooms}
         directChats={previewChats}
         onlineUsers={previewMembers}

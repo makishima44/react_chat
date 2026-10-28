@@ -1279,3 +1279,89 @@
     transition: none;
   }
 }
+
+/* Typography and controls shared visually with the room discovery page. */
+.roomPage { color: #1b0c2c; font-family: "Nunito Sans", Inter, sans-serif; }
+.roomPage .roomRoleBar,
+.roomPage .searchBar,
+.roomPage .inputArea { background: #fffdf8; border: 2px solid #d4c9e7; border-radius: 12px; color: #1b0c2c; }
+.roomPage .roomRoleBar { font-size: 15px; }
+.roomPage .roomRoleLabel,
+.roomPage .searchLabel { color: #6e628c; font-size: 14px; font-weight: 800; letter-spacing: .08em; }
+.roomPage .roomRoleValue { color: #483274; background: #eee3fc; border: 0; }
+.roomPage .roomRoleCapability { color: #6e628c; }
+.roomPage .searchBar { min-height: 54px; padding: 9px 16px; }
+.roomPage .searchBar:not([data-active="true"]) .searchMeta { display: none; }
+.roomPage .searchInput { color: #1b0c2c; font-size: 18px; }
+.roomPage .searchInput::placeholder,
+.roomPage .inputArea input::placeholder { color: #71648d; }
+.roomPage .searchCount,
+.roomPage .presenceBar { color: #6e628c; font-size: 15px; }
+.roomPage .searchClearButton,
+.roomPage .messageActions button,
+.roomPage .replyComposerCancel { color: #483274; background: #f5efff; border-color: #d4c9e7; font-size: 14px; }
+.roomPage .messages { color: #1b0c2c; }
+.roomPage .message { font-size: 18px; border-color: #ded5ed; }
+.roomPage .messageIdentity .user { color: #1b0c2c; font-size: 18px; font-weight: 800; }
+.roomPage .messageTime { color: #6e628c; font-size: 13px; }
+.roomPage .messageBody,
+.roomPage .text { color: #1b0c2c; font-size: 18px; line-height: 1.45; }
+.roomPage .messageOwn .messageBody { background: #f5efff; border-color: #ded5ed; }
+.roomPage .mention,
+.roomPage .mentionCurrentUser,
+.roomPage .replyPreviewAuthor,
+.roomPage .onlineState { color: #684095; text-shadow: none; }
+.roomPage .replyPreview,
+.roomPage .replyComposer { background: #f5efff; border-color: #d4c9e7; }
+.roomPage .replyPreviewText,
+.roomPage .replyComposerText { color: #6e628c; }
+.roomPage .inputArea { min-height: 64px; padding: 8px 12px; }
+.roomPage .inputArea input { color: #1b0c2c; font-size: 18px; }
+.roomPage .inputArea button { min-height: 42px; padding-inline: 18px; background: #ffc329; border-color: #ffc329; border-radius: 9px; color: #1b0c2c; font-size: 16px; font-weight: 800; }
+.roomPage .headerControls[data-workspace-controls="true"] > button { color: #483274; background: #f5efff; border-color: #d4c9e7; font-size: 13px; }
+.roomPage .headerControls[data-workspace-controls="true"] > button:hover { background: #eee3fc; }
+
+:global(:root[data-theme="dark"]) .roomPage { color: #faf5ee; }
+:global(:root[data-theme="dark"]) .roomPage .roomRoleBar,
+:global(:root[data-theme="dark"]) .roomPage .searchBar,
+:global(:root[data-theme="dark"]) .roomPage .inputArea { background: #301f38; border-color: #60486a; color: #faf5ee; }
+:global(:root[data-theme="dark"]) .roomPage .messages,
+:global(:root[data-theme="dark"]) .roomPage .messageIdentity .user,
+:global(:root[data-theme="dark"]) .roomPage .messageBody,
+:global(:root[data-theme="dark"]) .roomPage .text,
+:global(:root[data-theme="dark"]) .roomPage .searchInput,
+:global(:root[data-theme="dark"]) .roomPage .inputArea input { color: #faf5ee; }
+:global(:root[data-theme="dark"]) .roomPage .messageOwn .messageBody,
+:global(:root[data-theme="dark"]) .roomPage .replyPreview,
+:global(:root[data-theme="dark"]) .roomPage .replyComposer { background: #35233e; border-color: #60486a; }
+:global(:root[data-theme="dark"]) .roomPage .message { border-color: #493451; }
+:global(:root[data-theme="dark"]) .roomPage .messageTime,
+:global(:root[data-theme="dark"]) .roomPage .presenceBar,
+:global(:root[data-theme="dark"]) .roomPage .searchCount,
+:global(:root[data-theme="dark"]) .roomPage .roomRoleLabel,
+:global(:root[data-theme="dark"]) .roomPage .searchLabel { color: #c4b4ca; }
+
+@media (max-width: 760px) {
+  .roomPage .searchBar { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .roomPage .searchMeta { justify-content: space-between; }
+  .roomPage .message,
+  .roomPage .messageIdentity .user,
+  .roomPage .messageBody,
+  .roomPage .text { font-size: 15px; }
+  .roomPage .searchInput,
+  .roomPage .inputArea input { font-size: 15px; }
+  .roomPage .searchCount,
+  .roomPage .presenceBar { font-size: 12px; }
+  .roomPage .inputArea { min-height: 52px; }
+  .roomPage .inputArea button { min-height: 36px; font-size: 13px; }
+}
+
+.deleteDialog { background: #fffdf8; border: 2px solid #d4c9e7; box-shadow: 0 24px 70px rgba(27, 12, 44, .3); color: #1b0c2c; font-family: "Nunito Sans", Inter, sans-serif; }
+.deleteDialog .modalTitle,
+.deleteDialog .deleteMessagePrompt { color: #1b0c2c; }
+.deleteDialog .deleteMessagePreview { background: #f5efff; border-color: #d4c9e7; color: #483274; }
+.deleteDialog .deleteConfirm { min-height: 48px; background: #ffc329; border: 2px solid #ffc329; border-radius: 11px; box-shadow: none; color: #1b0c2c; font-size: 16px; font-weight: 800; letter-spacing: normal; text-transform: none; }
+.deleteDialog .deleteCancel { min-height: 48px; background: #fffdf8; border: 2px solid #d4c9e7; border-radius: 11px; color: #483274; font-size: 16px; font-weight: 700; letter-spacing: normal; text-transform: none; }
+:global(:root[data-theme="dark"]) .deleteDialog { background: #301f38; border-color: #60486a; color: #faf5ee; }
+:global(:root[data-theme="dark"]) .deleteDialog .modalTitle,
+:global(:root[data-theme="dark"]) .deleteDialog .deleteMessagePrompt { color: #faf5ee; }

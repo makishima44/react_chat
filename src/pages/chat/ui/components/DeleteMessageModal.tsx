@@ -15,7 +15,7 @@ export const DeleteMessageModal = ({ message, deleting, onClose, onConfirm }: De
 
   return (
     <div className={s.modalOverlay} onClick={onClose}>
-      <div className={s.modal} onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="delete-message-title">
+      <div className={`${s.modal} ${s.deleteDialog}`} onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="delete-message-title">
         <div className={s.modalHeader}>
           <h2 className={s.modalTitle} id="delete-message-title">
             {t("chatDeleteTitle")}
@@ -31,10 +31,10 @@ export const DeleteMessageModal = ({ message, deleting, onClose, onConfirm }: De
         </div>
 
         <div className={s.modalActions}>
-          <Button type="button" variant="ghost" onClick={onClose} disabled={deleting}>
+          <Button type="button" variant="ghost" className={s.deleteCancel} onClick={onClose} disabled={deleting}>
             {t("commonCancel")}
           </Button>
-          <Button type="button" onClick={onConfirm} disabled={deleting}>
+          <Button type="button" className={s.deleteConfirm} onClick={onConfirm} disabled={deleting}>
             {deleting ? t("chatDeleteSubmitting") : t("commonDelete")}
           </Button>
         </div>

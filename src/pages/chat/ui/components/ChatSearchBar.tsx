@@ -13,7 +13,7 @@ export const ChatSearchBar = ({ searchQuery, resultCount, hasActiveSearch, onCha
   const { t } = useAppPreferences();
 
   return (
-    <div className={s.searchBar}>
+    <div className={s.searchBar} data-active={hasActiveSearch}>
       <span className={s.searchLabel}>{t("commonSearch")}</span>
       <input
         type="text"

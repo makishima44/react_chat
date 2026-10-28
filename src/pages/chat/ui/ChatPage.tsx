@@ -212,10 +212,11 @@ export const ChatPage = () => {
   }
 
   return (
-    <div className={s.page}>
+    <div className={`${s.page} ${s.roomPage}`}>
       <ChatWorkspace
         roomId={roomId}
         roomName={roomName}
+        roomCategory={roomDetails?.category}
         rooms={rooms}
         directChats={directChats}
         onlineUsers={onlineUsers}

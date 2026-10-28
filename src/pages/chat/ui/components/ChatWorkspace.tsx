@@ -2,6 +2,8 @@ import { ReactNode, useEffect, useState } from "react";
 import clsx from "clsx";
 import type { DirectChat } from "@/entities/direct-chat/model/types";
 import type { Room } from "@/entities/room/model/types";
+import type { RoomCategory } from "@/entities/room/model/types";
+import { getRoomCategoryIcon } from "@/entities/room/model/categoryIcons";
 import type { AvatarId } from "@/entities/user/model/avatarOptions";
 import { getAvatarIdForUser, isAvatarId } from "@/entities/user/model/avatarOptions";
 import type { OnlineUser } from "@/pages/chat/model/types";
@@ -14,6 +16,7 @@ type MobilePanel = "navigation" | "participants" | null;
 type ChatWorkspaceProps = {
   roomId: string;
   roomName: string;
+  roomCategory?: RoomCategory;
   rooms: Room[];
   directChats: DirectChat[];
   onlineUsers: OnlineUser[];
@@ -40,6 +43,7 @@ const getDirectChatPeer = (chat: DirectChat, currentUserId: string) => {
 export const ChatWorkspace = ({
   roomId,
   roomName,
+  roomCategory,
   rooms,
   directChats,
   onlineUsers,
@@ -81,18 +85,10 @@ export const ChatWorkspace = ({
   };
 
   return (
-    <section className={clsx(s.workspace, conversationType === "direct" && s.directWorkspace)} aria-label={t("chatWorkspaceLabel")}>
+    <section className={clsx(s.workspace, s.roomWorkspace, conversationType === "direct" && s.directWorkspace)} aria-label={t("chatWorkspaceLabel")}>
       <header className={s.topbar}>
-        <div className={s.brandBlock}>
-            <span className={s.brandMark} aria-hidden="true">a</span>
-            <span className={s.brandName}>{t("appName")}</span>
-          <span className={s.systemState}>
-            <span className={s.statusDot} aria-hidden="true" />
-            {t("shellReady")}
-          </span>
-        </div>
         <div className={s.topbarControls}>
-          {conversationType === "room" && <button
+          <button
             type="button"
             className={s.mobilePanelButton}
             aria-expanded={navigationOpen}
@@ -100,7 +96,7 @@ export const ChatWorkspace = ({
             onClick={() => setMobilePanel(navigationOpen ? null : "navigation")}
           >
             {t("chatChannelsShort")}
-          </button>}
+          </button>
           {conversationType === "room" && <button
             type="button"
             className={s.mobilePanelButton}
@@ -119,6 +115,10 @@ export const ChatWorkspace = ({
 
       <aside id="chat-navigation" className={clsx(s.sidebar, s.navigation, navigationOpen && s.navigationOpen)}>
         <div className={s.navigationScroll}>
+          <button className={s.brandBlock} type="button" onClick={() => openPath("/rooms")} aria-label={t("appName")}>
+            <span className={s.brandMark} aria-hidden="true">☾</span>
+            <span className={s.brandName}>After<br />Hours</span>
+          </button>
           <div className={s.sectionHeading}>
             <span>{t("chatChannels")}</span>
             <span className={s.sectionCount}>{rooms.length}</span>
@@ -132,7 +132,7 @@ export const ChatWorkspace = ({
                 aria-current={room.id === roomId ? "page" : undefined}
                 onClick={() => openRoom(room)}
               >
-                <span className={s.channelMark} aria-hidden="true">#</span>
+                <span className={s.channelMark} aria-hidden="true">{getRoomCategoryIcon(room.category)}</span>
                 <span className={s.navLabel}>{room.name || t("roomsUnnamed")}</span>
                 {room.unreadCount ? <span className={s.unreadCount}>{room.unreadCount}</span> : null}
               </button>
@@ -181,7 +181,7 @@ export const ChatWorkspace = ({
             {conversationType === "direct" ? (
               <Avatar avatarId={isAvatarId(peerAvatarId) ? peerAvatarId : getAvatarIdForUser(peerId ?? roomId)} size="medium" alt="" />
             ) : (
-              <span className={s.roomHash} aria-hidden="true">#</span>
+              <span className={s.roomHash} aria-hidden="true">{getRoomCategoryIcon(roomCategory)}</span>
             )}
             <div className={s.roomTitleCopy}>
               <h1 className={s.roomTitle}>{conversationType === "direct" ? peerName || t("commonAnonymous") : roomName || t("chatTitle")}</h1>
