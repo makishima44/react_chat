@@ -10,6 +10,7 @@ import { DirectChatPage } from "@/pages/direct-chat/ui/DirectChatPage";
 import { ChatPreviewPage } from "@/pages/chat/ui/ChatPreviewPage";
 import { RoomsPage } from "@/pages/rooms/ui/RoomsPage";
 import { PwaInstallPrompt } from "@/widgets/pwa-install/ui/PwaInstallPrompt";
+import { PwaInstallProvider } from "@/widgets/pwa-install/model/PwaInstallProvider";
 import { useViewportHeight } from "./model/useViewportHeight";
 import s from "./App.module.css";
 
@@ -17,6 +18,7 @@ const App = () => {
   useViewportHeight();
 
   return (
+    <PwaInstallProvider>
     <div className={s.app}>
       <PwaInstallPrompt />
       <Routes>
@@ -81,6 +83,7 @@ const App = () => {
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>
+    </PwaInstallProvider>
   );
 };
 

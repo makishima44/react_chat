@@ -23,6 +23,10 @@
   flex: 1;
 }
 
+.installButton {
+  justify-self: start;
+}
+
 :global(:root[data-theme="dark"]) .settingsModal {
   --accent-strong: rgba(var(--accent-soft-rgb), 0.95);
 }

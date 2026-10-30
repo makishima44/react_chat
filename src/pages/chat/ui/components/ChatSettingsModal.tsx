@@ -6,6 +6,7 @@ import { avatarOptions, type AvatarId } from "@/entities/user/model/avatarOption
 import s from "../chatPage.module.css";
 import p from "./chatSettings.module.css";
 import { AppLanguage, useAppPreferences } from "@/shared/model/preferences";
+import { usePwaInstall } from "@/widgets/pwa-install/model/usePwaInstall";
 
 type ChatSettingsModalProps = {
   authUser: User | null;
@@ -33,6 +34,7 @@ export const ChatSettingsModal = ({
   onAvatarChange,
 }: ChatSettingsModalProps) => {
   const { t, language, setLanguage, theme, setTheme } = useAppPreferences();
+  const { canInstall, showPrompt } = usePwaInstall();
   const languageItems: AppLanguage[] = ["ru", "en"];
 
   return (
@@ -125,6 +127,11 @@ export const ChatSettingsModal = ({
             </div>
           </div>
 
+          {canInstall && (
+            <Button type="button" variant="ghost" className={p.installButton} onClick={() => { showPrompt(); onClose(); }}>
+              {t("commonInstallApp")}
+            </Button>
+          )}
           <div className={s.modalActions}>
             <Button type="button" variant="ghost" onClick={onClose}>
               {t("commonCancel")}
