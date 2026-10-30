@@ -1,32 +1,35 @@
 .button {
   height: 40px;
   padding: 0 18px;
-  border: 1px solid transparent;
-  outline: none;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  border-radius: 6px;
+  border: 2px solid transparent;
+  font-size: 16px;
+  font-weight: 800;
+  border-radius: 11px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .button_primary {
-  background: rgba(var(--accent-rgb), 0.15);
-  border-color: rgba(var(--accent-rgb), 0.7);
-  color: var(--accent-strong);
-  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.2);
+  background: var(--action-bg);
+  border-color: var(--action-bg);
+  color: var(--action-text);
 }
 
 .button_ghost {
-  background: transparent;
-  border-color: rgba(var(--accent-soft-rgb), 0.35);
-  color: var(--text-dim);
+  background: rgba(var(--surface-rgb), 0.7);
+  border-color: rgba(var(--accent-rgb), 0.55);
+  color: var(--text);
+  font-weight: 700;
 }
 
 .button:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.35);
+  filter: brightness(1.04);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--action-text);
+  outline-offset: 2px;
 }
 
 .button:disabled {
@@ -39,7 +42,6 @@
   .button {
     height: 42px;
     padding: 0 14px;
-    font-size: 13px;
-    letter-spacing: 0.12em;
+    font-size: 15px;
   }
 }

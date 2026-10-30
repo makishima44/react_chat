@@ -7,6 +7,8 @@
   --font-mono: var(--font-body);
   --font-display: var(--font-body);
   --radius: 10px;
+  --action-bg: #ffc329;
+  --action-text: #1b0c2c;
 
   --accent-rgb: 238, 174, 89;
   --accent-soft-rgb: 250, 213, 160;
