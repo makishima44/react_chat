@@ -119,6 +119,13 @@ export const ChatPreviewPage = () => {
         currentUserId={previewUser.uid}
         currentUserName={nickname}
         currentUserAvatar={avatarId}
+        mobileStatusControl={
+          <button type="button" className={`${s.iconButton} ${s.mobileNotificationButton}`} aria-label="Упоминания" disabled>
+            <svg className={s.icon} viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        }
         mobileSearchControl={
           <button
             type="button"

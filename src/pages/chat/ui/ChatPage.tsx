@@ -79,6 +79,7 @@ export const ChatPage = () => {
   const roomMembers = useMemo(() => (roomDetails ? normalizeRoomMembers(roomDetails) : []), [roomDetails]);
   const { composerRef, inputRef } = useMobileComposerVisibility();
   const { notificationPermission, requestNotificationPermission } = useNotificationPermission();
+  const notificationLabel = t(notificationPermission === "granted" ? "chatMentionAlertsEnabled" : notificationPermission === "denied" ? "chatMentionAlertsBlocked" : "chatEnableMentionAlerts");
   const { onlineUsers, typingUsers, setTypingState, handleTypingInput } = useRoomPresence({
     roomId,
     authUser,
@@ -224,19 +225,20 @@ export const ChatPage = () => {
         currentUserId={currentUserId}
         currentUserName={currentUserName}
         currentUserAvatar={avatarId}
-        mobileStatusControl={notificationPermission === "default" ? (
+        mobileStatusControl={
           <button
             type="button"
             className={`${s.iconButton} ${s.mobileNotificationButton}`}
-            aria-label={t("chatEnableMentionAlerts")}
-            title={t("chatEnableMentionAlerts")}
+            aria-label={notificationLabel}
+            title={notificationLabel}
+            disabled={notificationPermission !== "default"}
             onClick={requestNotificationPermission}
           >
             <svg className={s.icon} viewBox="0 0 24 24" aria-hidden="true">
               <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-        ) : undefined}
+        }
         mobileSearchControl={
           <button
             type="button"

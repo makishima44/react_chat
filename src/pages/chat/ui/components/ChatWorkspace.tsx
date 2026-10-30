@@ -91,7 +91,7 @@ export const ChatWorkspace = ({
   return (
     <section className={clsx(s.workspace, s.roomWorkspace, conversationType === "direct" && s.directWorkspace)} aria-label={t("chatWorkspaceLabel")}>
       <header className={s.topbar}>
-        <div className={s.topbarControls}>
+        <div className={clsx(s.topbarControls, mobileStatusControl && s.hasMobileStatus)}>
           <button
             type="button"
             className={s.mobilePanelButton}

@@ -702,10 +702,23 @@
   .roomWorkspace .topbar { padding: 4px 12px; justify-content: stretch; }
   .roomWorkspace .topbarControls { width: 100%; gap: 5px; justify-content: space-between; }
   .roomWorkspace .mobilePanelButton { min-height: 40px; padding: 0 9px; border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .roomWorkspace:not(.directWorkspace) .mobilePanelButton { border: 1px solid var(--action-bg); background: var(--action-bg); color: var(--action-text); font-weight: 800; }
+  .roomWorkspace:not(.directWorkspace) .mobilePanelButton:hover,
+  .roomWorkspace:not(.directWorkspace) .mobilePanelButton[aria-expanded="true"] { border-color: var(--action-bg); background: var(--action-bg); color: var(--action-text); filter: brightness(1.05); }
+  .roomWorkspace:not(.directWorkspace) .onlineCount { color: var(--action-text); }
   .roomWorkspace .roomHeader { min-height: 64px; padding: 10px 16px; }
   .roomWorkspace .roomTitle { font-size: 21px; line-height: 1.2; overflow-wrap: anywhere; }
   .roomWorkspace .roomSubtitle { font-size: 12px; margin-top: 3px; }
   .roomWorkspace .conversationBody { gap: 8px; padding: 10px 12px 0; }
   .roomWorkspace .profileButton { min-height: 76px; }
   .roomWorkspace .participantsOpen { grid-column: auto; grid-row: auto; }
+}
+
+@media (max-width: 540px) {
+  .roomWorkspace:not(.directWorkspace) { grid-template-rows: auto minmax(0, 1fr); }
+  .roomWorkspace:not(.directWorkspace) .topbar { padding: 7px 10px; }
+  .roomWorkspace:not(.directWorkspace) .topbarControls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; align-items: stretch; }
+  .roomWorkspace:not(.directWorkspace) .topbarControls > .mobilePanelButton { width: 100%; justify-content: center; }
+  .roomWorkspace:not(.directWorkspace) .topbarControls > :last-child { grid-column: 1 / -1; }
+  .roomWorkspace:not(.directWorkspace) .topbarControls.hasMobileStatus > :last-child { grid-column: 2 / -1; }
 }
