@@ -265,7 +265,10 @@ export const ChatPage = () => {
           onEditDraftChange={setEditDraft}
           onSaveEdit={handleSaveEdit}
           onDeleteMessage={handleDeleteMessage}
-          onReplyMessage={handleReplyMessage}
+          onReplyMessage={(message) => {
+            handleReplyMessage(message);
+            inputRef.current?.focus();
+          }}
         />
 
         <ChatPresenceBar

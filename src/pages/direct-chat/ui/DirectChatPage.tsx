@@ -188,7 +188,10 @@ export const DirectChatPage = () => {
           onEditDraftChange={setEditDraft}
           onSaveEdit={handleSaveEdit}
           onDeleteMessage={handleDeleteMessage}
-          onReplyMessage={setReplyTarget}
+          onReplyMessage={(message) => {
+            setReplyTarget(message);
+            inputRef.current?.focus();
+          }}
         />
 
         <ChatInput

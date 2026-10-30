@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useMemo, useRef, useState } from "react";
 import type { User } from "firebase/auth";
 import { Timestamp } from "firebase/firestore";
 import type { Message } from "@/entities/message/model/types";
@@ -79,6 +79,8 @@ export const ChatPreviewPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [messageText, setMessageText] = useState("");
   const [messages, setMessages] = useState(previewMessages);
+  const [replyTarget, setReplyTarget] = useState<Message | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [nickname, setNickname] = useState("Nova");
   const [avatarId, setAvatarId] = useState<AvatarId>(DEFAULT_AVATAR_ID);
@@ -93,8 +95,15 @@ export const ChatPreviewPage = () => {
     event?.preventDefault();
     const text = messageText.trim();
     if (!text) return;
-    setMessages((current) => [...current, createMessage(`m${current.length + 1}`, nickname, previewUser.uid, text, 26)]);
+    setMessages((current) => [...current, createMessage(`m${current.length + 1}`, nickname, previewUser.uid, text, 26, replyTarget ? {
+      id: replyTarget.id,
+      text: replyTarget.text,
+      user: replyTarget.user,
+      userName: replyTarget.userName,
+      avatarId: replyTarget.avatarId,
+    } : null)]);
     setMessageText("");
+    setReplyTarget(null);
   };
 
   return (
@@ -148,7 +157,10 @@ export const ChatPreviewPage = () => {
           onEditDraftChange={() => undefined}
           onSaveEdit={() => undefined}
           onDeleteMessage={() => undefined}
-          onReplyMessage={() => undefined}
+          onReplyMessage={(message) => {
+            setReplyTarget(message);
+            inputRef.current?.focus();
+          }}
         />
         <ChatPresenceBar
           onlineUsers={previewMembers}
@@ -160,9 +172,10 @@ export const ChatPreviewPage = () => {
         <ChatInput
           input={messageText}
           sending={false}
-          replyTarget={null}
+          replyTarget={replyTarget}
+          inputRef={inputRef}
           onChange={setMessageText}
-          onCancelReply={() => undefined}
+          onCancelReply={() => setReplyTarget(null)}
           onSubmit={handleSend}
         />
       </ChatWorkspace>
