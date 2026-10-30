@@ -193,28 +193,19 @@ export const ChatMessages = ({
                 </span>
                 {msg.editedAt && <span className={s.editedTag}>{t("chatEdited")}</span>}
                 <div className={s.messageActions}>
-                  <button type="button" disabled={isProcessing} onClick={() => onReplyMessage(msg)}>
+                  <button className={s.messageDesktopReply} type="button" disabled={isProcessing} onClick={() => onReplyMessage(msg)}>
                     {t("chatReply")}
                   </button>
-                  {(isOwn || canModerate) && (
-                    <>
-                      {isOwn && (
-                        <button className={s.messageDesktopAction} type="button" disabled={isProcessing} onClick={() => onStartEdit(msg)}>
-                          {t("chatEdit")}
-                        </button>
-                      )}
-                      <button className={s.messageDesktopAction} type="button" disabled={isProcessing} onClick={() => onDeleteMessage(msg)}>
-                        {canDeleteMessage && !isOwn ? t("chatModerateDelete") : t("commonDelete")}
-                      </button>
-                      <details className={s.messageMenu}>
-                        <summary aria-label={t("chatMessageActions")}>···</summary>
-                        <div className={s.messageMenuItems}>
-                          {isOwn && <button type="button" disabled={isProcessing} onClick={() => onStartEdit(msg)}>{t("chatEdit")}</button>}
-                          <button type="button" disabled={isProcessing} onClick={() => onDeleteMessage(msg)}>{canDeleteMessage && !isOwn ? t("chatModerateDelete") : t("commonDelete")}</button>
-                        </div>
-                      </details>
-                    </>
-                  )}
+                  {isOwn && <button className={s.messageDesktopAction} type="button" disabled={isProcessing} onClick={() => onStartEdit(msg)}>{t("chatEdit")}</button>}
+                  {canDeleteMessage && <button className={s.messageDesktopAction} type="button" disabled={isProcessing} onClick={() => onDeleteMessage(msg)}>{canDeleteMessage && !isOwn ? t("chatModerateDelete") : t("commonDelete")}</button>}
+                  <details className={s.messageMenu}>
+                    <summary aria-label={t("chatMessageActions")}>···</summary>
+                    <div className={s.messageMenuItems}>
+                      <button className={s.messageMobileReply} type="button" disabled={isProcessing} onClick={() => onReplyMessage(msg)}>{t("chatReply")}</button>
+                      {isOwn && <button type="button" disabled={isProcessing} onClick={() => onStartEdit(msg)}>{t("chatEdit")}</button>}
+                      {canDeleteMessage && <button type="button" disabled={isProcessing} onClick={() => onDeleteMessage(msg)}>{canDeleteMessage && !isOwn ? t("chatModerateDelete") : t("commonDelete")}</button>}
+                    </div>
+                  </details>
                 </div>
               </div>
             )}
