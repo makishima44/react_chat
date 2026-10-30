@@ -77,6 +77,7 @@ const previewUser = {
 export const ChatPreviewPage = () => {
   const [selectedRoom, setSelectedRoom] = useState(previewRooms[0]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [messageText, setMessageText] = useState("");
   const [messages, setMessages] = useState(previewMessages);
   const [replyTarget, setReplyTarget] = useState<Message | null>(null);
@@ -118,6 +119,22 @@ export const ChatPreviewPage = () => {
         currentUserId={previewUser.uid}
         currentUserName={nickname}
         currentUserAvatar={avatarId}
+        mobileSearchControl={
+          <button
+            type="button"
+            className={`${s.iconButton} ${s.mobileSearchButton}`}
+            aria-label="Поиск"
+            aria-expanded={mobileSearchOpen}
+            aria-controls="room-message-search"
+            onClick={() => setMobileSearchOpen((open) => !open)}
+          >
+            <svg className={s.icon} viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10.8" cy="10.8" r="6.3" fill="none" stroke="currentColor" strokeWidth="2" />
+              <path d="m15.5 15.5 4.2 4.2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+            <span>Поиск</span>
+          </button>
+        }
         headerControls={
           <ChatHeaderControls
             workspace
@@ -138,6 +155,8 @@ export const ChatPreviewPage = () => {
           hasActiveSearch={Boolean(searchQuery)}
           onChange={setSearchQuery}
           onClear={() => setSearchQuery("")}
+          mobileOpen={mobileSearchOpen}
+          onMobileClose={() => setMobileSearchOpen(false)}
         />
         <ChatMessages
           messages={filteredMessages}

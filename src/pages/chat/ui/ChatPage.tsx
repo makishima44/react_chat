@@ -38,6 +38,7 @@ import { AccessRoomModal } from "@/pages/rooms/ui/components/AccessRoomModal";
 
 export const ChatPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [streamError, setStreamError] = useState("");
   const navigate = useNavigate();
   const { roomId } = useParams();
@@ -223,6 +224,35 @@ export const ChatPage = () => {
         currentUserId={currentUserId}
         currentUserName={currentUserName}
         currentUserAvatar={avatarId}
+        mobileStatusControl={notificationPermission === "default" ? (
+          <button
+            type="button"
+            className={`${s.iconButton} ${s.mobileNotificationButton}`}
+            aria-label={t("chatEnableMentionAlerts")}
+            title={t("chatEnableMentionAlerts")}
+            onClick={requestNotificationPermission}
+          >
+            <svg className={s.icon} viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        ) : undefined}
+        mobileSearchControl={
+          <button
+            type="button"
+            className={`${s.iconButton} ${s.mobileSearchButton}`}
+            aria-label={t("commonSearch")}
+            aria-expanded={mobileSearchOpen}
+            aria-controls="room-message-search"
+            onClick={() => setMobileSearchOpen((open) => !open)}
+          >
+            <svg className={s.icon} viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10.8" cy="10.8" r="6.3" fill="none" stroke="currentColor" strokeWidth="2" />
+              <path d="m15.5 15.5 4.2 4.2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+            <span>{t("commonSearch")}</span>
+          </button>
+        }
         headerControls={
           <ChatHeaderControls
             onOpenSettings={openSettings}
@@ -245,6 +275,8 @@ export const ChatPage = () => {
           hasActiveSearch={Boolean(normalizedSearchQuery)}
           onChange={setSearchQuery}
           onClear={() => setSearchQuery("")}
+          mobileOpen={mobileSearchOpen}
+          onMobileClose={() => setMobileSearchOpen(false)}
         />
 
         <ChatMessages

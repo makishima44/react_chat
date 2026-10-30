@@ -43,6 +43,9 @@
   height: 18px;
 }
 
+.mobileSearchButton,
+.mobileNotificationButton { display: none; }
+
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -1377,6 +1380,15 @@
 .messageMobileReply { display: none; }
 
 @media (max-width: 760px) {
+  .mobileSearchButton,
+  .mobileNotificationButton { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; }
+  .mobileSearchButton { width: auto; min-width: 58px; gap: 3px; padding: 0 6px; font-size: 11px; }
+  .mobileSearchButton .icon { width: 16px; height: 16px; }
+  .mobileNotificationButton { width: 34px; min-width: 34px; height: 36px; padding: 0; }
+  .roomPage .roomHeader { display: none; }
+  .roomPage .roomRoleBar,
+  .roomPage .presenceBar { display: none; }
+  .roomPage .searchBar[data-mobile-open="false"] { display: none; }
   .roomPage .headerControls[data-workspace-controls="true"] { gap: 6px; }
   .roomPage .headerControls[data-workspace-controls="true"] > button { height: 40px; min-height: 40px; padding: 0 10px; font-size: 12px; letter-spacing: normal; border-radius: 10px; }
   .roomPage .headerControls .iconButton { width: 40px; min-width: 40px; padding: 0; }

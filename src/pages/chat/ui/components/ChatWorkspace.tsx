@@ -24,6 +24,8 @@ type ChatWorkspaceProps = {
   currentUserName: string;
   currentUserAvatar: AvatarId;
   headerControls: ReactNode;
+  mobileSearchControl?: ReactNode;
+  mobileStatusControl?: ReactNode;
   children: ReactNode;
   onOpenRoom: (room: Room) => void;
   onNavigate: (path: string) => void;
@@ -51,6 +53,8 @@ export const ChatWorkspace = ({
   currentUserName,
   currentUserAvatar,
   headerControls,
+  mobileSearchControl,
+  mobileStatusControl,
   children,
   onOpenRoom,
   onNavigate,
@@ -107,6 +111,8 @@ export const ChatWorkspace = ({
             {t("chatPeopleShort")}
             <span className={s.onlineCount}>{onlineUsers.length}</span>
           </button>}
+          {conversationType === "room" && mobileSearchControl}
+          {conversationType === "room" && mobileStatusControl}
           {headerControls}
         </div>
       </header>

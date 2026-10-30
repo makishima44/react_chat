@@ -697,10 +697,11 @@
 }
 
 @media (max-width: 760px) {
+  .roomWorkspace .conversation > .roomHeader { display: none; }
   .roomWorkspace { grid-template-rows: 52px minmax(0, 1fr); }
   .roomWorkspace .topbar { padding: 4px 12px; justify-content: stretch; }
-  .roomWorkspace .topbarControls { width: 100%; gap: 8px; justify-content: space-between; }
-  .roomWorkspace .mobilePanelButton { min-height: 40px; padding: 0 12px; border-radius: 10px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .roomWorkspace .topbarControls { width: 100%; gap: 5px; justify-content: space-between; }
+  .roomWorkspace .mobilePanelButton { min-height: 40px; padding: 0 9px; border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; }
   .roomWorkspace .roomHeader { min-height: 64px; padding: 10px 16px; }
   .roomWorkspace .roomTitle { font-size: 21px; line-height: 1.2; overflow-wrap: anywhere; }
   .roomWorkspace .roomSubtitle { font-size: 12px; margin-top: 3px; }
