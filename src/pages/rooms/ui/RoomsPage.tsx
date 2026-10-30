@@ -7,7 +7,7 @@ import { roomCategoryIcons } from "@/entities/room/model/categoryIcons";
 import { auth } from "@/shared/api/firebase/firebaseConfig";
 import { ChatSettingsModal } from "@/pages/chat/ui/components/ChatSettingsModal";
 import { Avatar } from "@/shared/ui/avatar/Avatar";
-import roomIllustration from "@/shared/assets/after-hours-cat.png";
+import roomIllustration from "@/shared/assets/room-hero-pixel.png";
 import { useAppPreferences } from "@/shared/model/preferences";
 import { useRoomsQuery } from "../model/useRoomsQuery";
 import { useUserSettings } from "../model/useUserSettings";
