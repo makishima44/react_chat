@@ -60,7 +60,6 @@ export const RoomsPage = () => {
     const term = search.trim().toLocaleLowerCase();
     return rooms
       .filter((room) => view !== "mine" || !!room.members?.[currentUserId] || room.createdBy === currentUserId)
-      .filter((room) => view !== "activity" || !!room.unreadCount)
       .filter(
         (room) => filter === "all" || (room.category ?? "general") === filter,
       )

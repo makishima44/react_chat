@@ -38,7 +38,7 @@ export const RoomsSidebar = ({
   const { t } = useAppPreferences();
   const { search } = useLocation();
   const view = new URLSearchParams(search).get("view");
-  const activeNav = activeSection === "direct-messages" ? "direct-messages" : view === "mine" || view === "activity" ? view : "rooms";
+  const activeNav = activeSection === "direct-messages" ? "direct-messages" : view === "mine" ? "mine" : "rooms";
   const [profileOpen, setProfileOpen] = useState(false);
   const myRooms = rooms.filter((room) => room.members?.[currentUserId] || room.createdBy === currentUserId);
 
@@ -58,9 +58,6 @@ export const RoomsSidebar = ({
         </button>
         <button className={`${s.navItem} ${activeNav === "direct-messages" ? s.navActive : ""}`} aria-current={activeNav === "direct-messages" ? "page" : undefined} type="button" onClick={() => onNavigate("/dm")}>
           <span className={s.navGlyph} aria-hidden="true">♧</span><span className={s.navText}>{t("directMessagesTitle")}</span><span className={s.mobileNavText}>{t("mobileMessages")}</span>
-        </button>
-        <button className={`${s.navItem} ${activeNav === "activity" ? s.navActive : ""}`} aria-current={activeNav === "activity" ? "page" : undefined} type="button" onClick={() => onNavigate("/rooms?view=activity")}>
-          <span className={s.navGlyph} aria-hidden="true">◷</span><span className={s.navText}>{t("roomsActivity")}</span><span className={s.mobileNavText}>{t("mobileActivity")}</span>
         </button>
       </nav>
 
