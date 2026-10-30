@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import type { DirectChat } from "@/entities/direct-chat/model/types";
 import type { Room } from "@/entities/room/model/types";
@@ -35,6 +36,9 @@ export const RoomsSidebar = ({
   onLogout,
 }: RoomsSidebarProps) => {
   const { t } = useAppPreferences();
+  const { search } = useLocation();
+  const view = new URLSearchParams(search).get("view");
+  const activeNav = activeSection === "direct-messages" ? "direct-messages" : view === "mine" || view === "activity" ? view : "rooms";
   const [profileOpen, setProfileOpen] = useState(false);
   const myRooms = rooms.filter((room) => room.members?.[currentUserId] || room.createdBy === currentUserId);
 
@@ -46,17 +50,17 @@ export const RoomsSidebar = ({
       </button>
 
       <nav className={s.primaryNav} aria-label={t("roomsNavigationLabel")}>
-        <button className={`${s.navItem} ${activeSection === "rooms" ? s.navActive : ""}`} type="button" onClick={() => onNavigate("/rooms")}>
-          <span className={s.navGlyph} aria-hidden="true">⌂</span>{t("roomsFindNav")}
+        <button className={`${s.navItem} ${activeNav === "rooms" ? s.navActive : ""}`} aria-current={activeNav === "rooms" ? "page" : undefined} type="button" onClick={() => onNavigate("/rooms")}>
+          <span className={s.navGlyph} aria-hidden="true">⌂</span><span className={s.navText}>{t("roomsFindNav")}</span><span className={s.mobileNavText}>{t("mobileRooms")}</span>
         </button>
-        <button className={s.navItem} type="button" onClick={() => onNavigate("/rooms?view=mine")}>
-          <span className={s.navGlyph} aria-hidden="true">▤</span>{t("roomsMyRooms")}
+        <button className={`${s.navItem} ${activeNav === "mine" ? s.navActive : ""}`} aria-current={activeNav === "mine" ? "page" : undefined} type="button" onClick={() => onNavigate("/rooms?view=mine")}>
+          <span className={s.navGlyph} aria-hidden="true">▤</span><span className={s.navText}>{t("roomsMyRooms")}</span><span className={s.mobileNavText}>{t("mobileMyRooms")}</span>
         </button>
-        <button className={`${s.navItem} ${activeSection === "direct-messages" ? s.navActive : ""}`} type="button" onClick={() => onNavigate("/dm")}>
-          <span className={s.navGlyph} aria-hidden="true">♧</span>{t("directMessagesTitle")}
+        <button className={`${s.navItem} ${activeNav === "direct-messages" ? s.navActive : ""}`} aria-current={activeNav === "direct-messages" ? "page" : undefined} type="button" onClick={() => onNavigate("/dm")}>
+          <span className={s.navGlyph} aria-hidden="true">♧</span><span className={s.navText}>{t("directMessagesTitle")}</span><span className={s.mobileNavText}>{t("mobileMessages")}</span>
         </button>
-        <button className={s.navItem} type="button" onClick={() => onNavigate("/rooms?view=activity")}>
-          <span className={s.navGlyph} aria-hidden="true">♧</span>{t("roomsActivity")}
+        <button className={`${s.navItem} ${activeNav === "activity" ? s.navActive : ""}`} aria-current={activeNav === "activity" ? "page" : undefined} type="button" onClick={() => onNavigate("/rooms?view=activity")}>
+          <span className={s.navGlyph} aria-hidden="true">◷</span><span className={s.navText}>{t("roomsActivity")}</span><span className={s.mobileNavText}>{t("mobileActivity")}</span>
         </button>
       </nav>
 

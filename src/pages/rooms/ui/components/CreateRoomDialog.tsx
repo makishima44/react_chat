@@ -55,7 +55,7 @@ export const CreateRoomDialog = ({
             type="button"
             className={s.closeButton}
             onClick={onClose}
-            aria-label={t("settingsClose")}
+            aria-label={t("commonCancel")}
           >
             ×
           </button>

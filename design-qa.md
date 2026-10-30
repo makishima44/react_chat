@@ -1,24 +1,33 @@
-# Design QA
+# Мобильный интерфейс After Hours
 
-final result: blocked
+final result: passed
 
-## Target and implementation
+Проверка ограничена интерфейсом списка комнат, переписки и создания комнаты. Исходные снимки пользователя показывают проблемы до изменения и используются для сравнения удобства, а не как макет для копирования.
 
-- Selected reference: variant 1, Amber room directory, at `C:\Users\user\.codex\generated_images\01a17e06-e86f-7c02-8132-854e2a5da2ba\exec-85305512-252d-47dd-80be-7777444331cc.png` (1440 × 1024).
-- Local preview: `http://localhost:3001/_dev/rooms-preview`.
-- Desktop capture was inspected inline. The shell now fills the available viewport and follows the selected layout: left navigation/profile menu, room discovery header, search/sort, category filters, room rows, and modal creation.
-- Interactions observed: open/close room creation dialog, category dropdown presence, profile appearance menu, Purple theme switch, live room list, and empty state after Firestore results settled.
-- No room was created, deleted, or otherwise modified during preview.
+## Исходные проблемы и исправления
 
-## Responsive and theme review
+- Большое приветствие, узкий поиск и пустое место перед списком: мобильное приветствие занимает две строки, иллюстрация скрыта, поле поиска имеет высоту 48 px.
+- Нижние вкладки без подписей: добавлены короткие подписи RU/EN и корректное выделение текущего раздела.
+- Служебные блоки вытесняли переписку: компактная шапка, роль и поиск; длинные имена ограничены шириной сообщения.
+- Три ярких действия под каждым сообщением: быстрый ответ сохранён, редактирование и удаление доступны через меню с областью нажатия 44 px.
+- Ответ перекрывал ввод: отдельная цитата над полем, отправка и отмена расположены независимо.
+- Форма создания имела низкий контраст: поверхности и текст используют текущую тему, поля имеют размер текста 16 px и высоту 48 px.
 
-- Amber and Purple both rendered in the browser; Purple changes accent surfaces and retains the same neutral dark structure.
-- Tablet breakpoint at 850 px collapses the left rail to icon navigation; phone breakpoint at 600 px moves navigation to a fixed bottom bar and stacks the toolbar and creation action.
-- Matrix splash, scanline overlay, terminal font, and dashed terminal frame were removed from the app shell/shared frame.
-- Legacy rooms without a category display as General. Search, category filtering, and sorting use the already-live Firestore room snapshot, so they require no new composite index.
+## Визуальная проверка в браузере
 
-## Verification and limitation
+- 393 × 852: список комнат, RU/EN, светлая тема; заголовок, поиск, фильтры, строка комнаты и нижняя навигация без переполнения страницы.
+- 393 × 852: переписка, меню действий, выбор собственного сообщения для ответа и ввод текста. Цитата и поле ввода не пересекаются.
+- 320 × 568: переписка в тёмной теме, все кнопки шапки помещаются.
+- 393 × 480: уменьшенная высота, поле ответа и отправка видимы; прокручивается история сообщений.
+- 393 × 852: форма создания комнаты в тёмной теме, поля и кнопки помещаются в окно.
+- Десктопный предпросмотр переписки после сброса мобильной ширины: боковые панели и обычные действия сообщений сохраняются.
 
-- `npm run build`: passed. Vite reports the existing application bundle exceeds 500 kB.
-- `npm run lint`: passed with two existing warnings in `src/shared/model/preferences.tsx` and `src/widgets/pwa-install/model/usePwaInstall.ts`.
-- Desktop and dialog screenshots were inspected inline. The available browser capture API does not expose a viewport setter or a project-file screenshot export, so I could not capture phone/tablet states or save normalized comparison screenshots against the 1440 × 1024 reference. I therefore cannot claim a complete multi-device visual QA pass.
+Проверены шрифт и размеры текста, отступы, переносы, цвета в обеих темах, сохранение существующих изображений и локализация. Новая графика и зависимости не добавлялись.
+
+## Ограничения
+
+Экранная клавиатура физического телефона не проверялась: уменьшение высоты окна проверяет компоновку, но не заменяет проверку на устройстве. Запись и удаление реальных данных Firebase не выполнялись. Системная установка PWA не проверялась. Мобильные изменения компоновки ограничены media queries.
+
+## Проверки кода
+
+`npm run lint`, `npm run build`, `git diff --check`. В lint остаётся существующее предупреждение react-refresh в preferences.tsx.

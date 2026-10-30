@@ -199,13 +199,20 @@ export const ChatMessages = ({
                   {(isOwn || canModerate) && (
                     <>
                       {isOwn && (
-                        <button type="button" disabled={isProcessing} onClick={() => onStartEdit(msg)}>
+                        <button className={s.messageDesktopAction} type="button" disabled={isProcessing} onClick={() => onStartEdit(msg)}>
                           {t("chatEdit")}
                         </button>
                       )}
-                      <button type="button" disabled={isProcessing} onClick={() => onDeleteMessage(msg)}>
+                      <button className={s.messageDesktopAction} type="button" disabled={isProcessing} onClick={() => onDeleteMessage(msg)}>
                         {canDeleteMessage && !isOwn ? t("chatModerateDelete") : t("commonDelete")}
                       </button>
+                      <details className={s.messageMenu}>
+                        <summary aria-label={t("chatMessageActions")}>···</summary>
+                        <div className={s.messageMenuItems}>
+                          {isOwn && <button type="button" disabled={isProcessing} onClick={() => onStartEdit(msg)}>{t("chatEdit")}</button>}
+                          <button type="button" disabled={isProcessing} onClick={() => onDeleteMessage(msg)}>{canDeleteMessage && !isOwn ? t("chatModerateDelete") : t("commonDelete")}</button>
+                        </div>
+                      </details>
                     </>
                   )}
                 </div>

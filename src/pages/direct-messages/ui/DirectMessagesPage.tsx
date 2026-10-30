@@ -115,7 +115,7 @@ export const DirectMessagesPage = () => {
       <section className={shell.main}>
         <header className={shell.topbar}>
           <span>{t("directMessagesBreadcrumb")}</span>
-          <button type="button" className={shell.mobileProfile} onClick={settings.openSettings}>
+          <button type="button" className={shell.mobileProfile} onClick={settings.openSettings} aria-label={t("chatOpenSettingsAria")}>
             <Avatar avatarId={settings.avatarId} size="small" />
           </button>
         </header>

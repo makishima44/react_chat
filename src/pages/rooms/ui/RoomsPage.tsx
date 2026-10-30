@@ -109,10 +109,11 @@ export const RoomsPage = () => {
       />
       <section className={s.main}>
         <header className={s.topbar}>
-          <span>{t("roomsBreadcrumb")}</span>
+          <span className={s.mobileBrand}>After Hours</span>
           <button
             type="button"
             className={s.mobileProfile}
+            aria-label={t("chatOpenSettingsAria")}
             onClick={settings.openSettings}
           >
             <Avatar avatarId={settings.avatarId} size="small" />

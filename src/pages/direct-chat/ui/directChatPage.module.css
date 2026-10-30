@@ -207,7 +207,8 @@
 :global(:root[data-theme="dark"]) .directConversation .searchLabel,
 :global(:root[data-theme="dark"]) .directConversation .searchCount { color: #c4b4ca; }
 @media (max-width: 760px) {
-  .directConversation .searchBar { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .directConversation .searchBar { min-height: 44px; padding: 8px 12px; border-width: 1px; grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .directConversation .searchLabel { display: none; }
   .directConversation .searchMeta { justify-content: space-between; }
-  .directConversation .searchInput { font-size: 15px; }
+  .directConversation .searchInput { min-height: 24px; font-size: 16px; }
 }

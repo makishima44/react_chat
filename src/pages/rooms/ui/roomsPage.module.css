@@ -1082,3 +1082,56 @@
 :global(:root[data-theme="dark"]) .deleteDialog.deleteDialog { background: #301f38; border-color: #60486a; color: #faf5ee; }
 :global(:root[data-theme="dark"]) .deleteDialog :global(h2),
 :global(:root[data-theme="dark"]) .deleteDialog :global(p) { color: #faf5ee; }
+
+.mobileNavText { display: none; }
+
+@media (max-width: 600px) {
+  .shell { min-height: var(--app-height); }
+  .main { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+  .topbar { height: 60px; padding: 0 20px; border-bottom: 1px solid #e8e0dc; }
+  .mobileBrand { color: var(--text); font-size: 19px; font-weight: 900; letter-spacing: -.04em; }
+  .mobileProfile { display: grid; place-items: center; width: 44px; height: 44px; }
+  .content { padding: 24px 20px; }
+  .welcome { display: block; min-height: 0; margin: 0 0 24px; }
+  .welcome > div { max-width: none; }
+  .welcome h1 { max-width: 330px; font-size: 32px; line-height: 1.08; letter-spacing: -.04em; }
+  .welcome p:last-child { margin-top: 12px; font-size: 14px; line-height: 1.5; }
+  .welcomeIllustration { display: none; }
+  .toolbar { gap: 12px; margin-bottom: 20px; }
+  .search { flex: 0 0 auto; height: 48px; min-height: 48px; gap: 16px; padding: 0 16px; border-width: 1px; }
+  .searchGlyph { width: 17px; height: 17px; border-width: 2px; }
+  .searchGlyph::after { width: 7px; height: 2px; right: -5px; bottom: -3px; }
+  .search input { font-size: 16px; }
+  .primaryButton { min-height: 48px; font-size: 16px; }
+  .primaryButton span { font-size: 28px; }
+  .filters { gap: 8px; margin: 0 -20px 20px; padding: 0 20px 4px; scrollbar-width: none; }
+  .filters::-webkit-scrollbar { display: none; }
+  .filterButton, .filterActive { flex: 0 0 auto; height: 44px; padding: 0 14px; font-size: 14px; border-width: 1px; }
+  .filterIcon { font-size: 18px; }
+  .listHeader { padding-bottom: 10px; color: var(--text-dim); font-size: 13px; font-weight: 700; }
+  .roomRow { min-height: 100px; padding: 16px 0; }
+  .roomOpen { grid-template-columns: 52px minmax(0, 1fr); gap: 12px; padding-right: 24px; }
+  .roomAvatar { width: 52px; height: 52px; border-radius: 12px; }
+  .roomAvatarGlyph { font-size: 30px; }
+  .roomInfo strong { font-size: 18px; line-height: 1.25; overflow-wrap: anywhere; }
+  .roomInfo .roomDescription { font-size: 13px; line-height: 1.4; }
+  .roomTags { margin-top: 6px; }
+  .rowMenu { bottom: auto; top: 12px; right: -8px; width: 40px; height: 44px; }
+  .sidebar { height: auto; min-height: 68px; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); }
+  .primaryNav { gap: 4px; }
+  .navItem, .navActive { flex: 1; width: auto; min-width: 0; height: 56px; gap: 3px; align-content: center; border-radius: 12px; }
+  .navText { display: none; }
+  .mobileNavText { display: block; color: inherit; font-size: 10px; font-weight: 700; line-height: 1.2; }
+  .navGlyph { font-size: 22px; line-height: 1; }
+  .topbar > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .overlay { padding: 12px; }
+  .modal { padding: 20px; max-height: calc(var(--app-height) - 24px); gap: 16px; background: var(--panel); border-color: rgba(var(--text-rgb), .15); color: var(--text); }
+  .modalHeading h2 { color: var(--text); font-size: 22px; }
+  .modalHeading p, .field { color: var(--text-dim); font-size: 13px; }
+  .closeButton { flex: 0 0 40px; min-height: 40px; color: var(--text); }
+  .field input, .field textarea, .field select { min-height: 48px; padding: 10px 12px; border-color: rgba(var(--text-rgb), .2); background: rgb(var(--surface-rgb)); color: var(--text); font-size: 16px; }
+  .field input::placeholder, .field textarea::placeholder { color: var(--text-dim); }
+  .modalActions { display: grid; grid-template-columns: 1fr 1fr; }
+  .modalActions .primaryButton, .cancelButton { min-height: 48px; padding: 0 8px; font-size: 14px; border-radius: 11px; }
+  .cancelButton { color: var(--text); border-color: rgba(var(--text-rgb), .2); }
+}
