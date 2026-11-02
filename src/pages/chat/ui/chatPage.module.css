@@ -1301,6 +1301,10 @@
 .roomPage .searchLabel { color: #6e628c; font-size: 14px; font-weight: 800; letter-spacing: .08em; }
 .roomPage .roomRoleValue { color: #483274; background: #eee3fc; border: 0; }
 .roomPage .roomRoleCapability { color: #6e628c; }
+.roomPage .roomRoleCompact .roomRoleBar { width: fit-content; gap: 7px; padding: 0; border: 0; background: transparent; font-size: 11px; }
+.roomPage .roomRoleCompact .roomRoleLabel { color: #6e628c; font-size: 10px; letter-spacing: .03em; text-transform: none; }
+.roomPage .roomRoleCompact .roomRoleValue { padding: 1px 8px; border-color: #d4c9e7; background: #f5efff; color: #483274; font-weight: 700; }
+.roomPage .roomRoleCompact .roomRoleCapability { color: #92702c; font-size: 10px; }
 .roomPage .searchBar { min-height: 54px; padding: 9px 16px; }
 .roomPage .searchBar:not([data-active="true"]) .searchMeta { display: none; }
 .roomPage .searchInput { color: #1b0c2c; font-size: 18px; }
@@ -1316,8 +1320,8 @@
 .roomPage .messageTime { color: #6e628c; font-size: 13px; }
 .roomPage .messageBody,
 .roomPage .text { color: #1b0c2c; font-size: 18px; line-height: 1.45; }
-.roomPage .messageBody { width: min(88%, 760px); justify-self: start; padding: 8px 12px; background: #f5efff; border: 1px solid #ded5ed; border-radius: 9px; }
-.roomPage .messageOwn .messageBody { justify-self: end; }
+.roomPage .messageBody { width: min(88%, 760px); justify-self: start; padding: 8px 12px; background: #fff0d6; border: 1px solid #ecd7b1; border-radius: 9px; }
+.roomPage .messageOwn .messageBody { justify-self: end; background: #e7f2ff; border-color: #cbdff8; }
 .roomPage .mention,
 .roomPage .mentionCurrentUser,
 .roomPage .replyPreviewAuthor,
@@ -1345,6 +1349,11 @@
 :global(:root[data-theme="dark"]) .roomPage .messageBody,
 :global(:root[data-theme="dark"]) .roomPage .replyPreview,
 :global(:root[data-theme="dark"]) .roomPage .replyComposer { background: #35233e; border-color: #60486a; }
+:global(:root[data-theme="dark"]) .roomPage .messageBody { background: #3b2b41; border-color: #624866; }
+:global(:root[data-theme="dark"]) .roomPage .messageOwn .messageBody { background: #263a53; border-color: #496889; }
+:global(:root[data-theme="dark"]) .roomPage .roomRoleCompact .roomRoleLabel { color: #c4b4ca; }
+:global(:root[data-theme="dark"]) .roomPage .roomRoleCompact .roomRoleValue { background: #35233e; border-color: #60486a; color: #e4d4ff; }
+:global(:root[data-theme="dark"]) .roomPage .roomRoleCompact .roomRoleCapability { color: #f1cf77; }
 :global(:root[data-theme="dark"]) .roomPage .message { border-color: #493451; }
 :global(:root[data-theme="dark"]) .roomPage .messageTime,
 :global(:root[data-theme="dark"]) .roomPage .presenceBar,
@@ -1380,6 +1389,29 @@
 .messageMenu { display: none; }
 .messageMobileReply { display: none; }
 
+.roomPage .mobileSearchButton {
+  display: inline-flex;
+  width: auto;
+  min-width: 58px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid #d4c9e7;
+  border-radius: 9px;
+  background: #f5efff;
+  color: #483274;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.roomPage .mobileSearchButton:hover,
+.roomPage .mobileSearchButton[aria-expanded="true"] { border-color: #bda9d8; background: #eee3fc; }
+.roomPage .mobileSearchButton .icon { width: 17px; height: 17px; }
+.roomPage .searchBar[data-mobile-open="false"] { display: none; }
+
 @media (max-width: 760px) {
   .mobileSearchButton,
   .mobileNotificationButton { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; }
@@ -1389,7 +1421,6 @@
   .roomPage .roomHeader { display: none; }
   .roomPage .roomRoleBar,
   .roomPage .presenceBar { display: none; }
-  .roomPage .searchBar[data-mobile-open="false"] { display: none; }
   .roomPage .headerControls[data-workspace-controls="true"] { gap: 6px; }
   .roomPage .headerControls[data-workspace-controls="true"] > button { height: 40px; min-height: 40px; padding: 0 10px; font-size: 12px; letter-spacing: normal; border-radius: 10px; }
   .roomPage .mobileSearchButton,

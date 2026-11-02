@@ -26,6 +26,7 @@ type ChatWorkspaceProps = {
   headerControls: ReactNode;
   mobileSearchControl?: ReactNode;
   mobileStatusControl?: ReactNode;
+  roomRoleControl?: ReactNode;
   children: ReactNode;
   onOpenRoom: (room: Room) => void;
   onNavigate: (path: string) => void;
@@ -55,6 +56,7 @@ export const ChatWorkspace = ({
   headerControls,
   mobileSearchControl,
   mobileStatusControl,
+  roomRoleControl,
   children,
   onOpenRoom,
   onNavigate,
@@ -192,6 +194,7 @@ export const ChatWorkspace = ({
             <div className={s.roomTitleCopy}>
               <h1 className={s.roomTitle}>{conversationType === "direct" ? peerName || t("commonAnonymous") : roomName || t("chatTitle")}</h1>
               <p className={s.roomSubtitle}>{conversationType === "direct" ? t("directChatSubtitleFallback") : t("chatRoomSubtitle")}</p>
+              {conversationType === "room" && roomRoleControl}
             </div>
           </div>
           {conversationType === "room" && <div className={s.roomHeaderStatus}>

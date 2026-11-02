@@ -142,6 +142,11 @@ export const ChatPreviewPage = () => {
             <span>Поиск</span>
           </button>
         }
+        roomRoleControl={
+          <div className={s.roomRoleCompact}>
+            <RoomRoleBar currentRoomRole="member" canModerateCurrentRoom={false} />
+          </div>
+        }
         headerControls={
           <ChatHeaderControls
             workspace
@@ -155,7 +160,6 @@ export const ChatPreviewPage = () => {
         onNavigate={() => undefined}
         onOpenSettings={() => setSettingsOpen(true)}
       >
-        <RoomRoleBar currentRoomRole="member" canModerateCurrentRoom={false} />
         <ChatSearchBar
           searchQuery={searchQuery}
           resultCount={filteredMessages.length}

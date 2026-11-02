@@ -255,6 +255,11 @@ export const ChatPage = () => {
             <span>{t("commonSearch")}</span>
           </button>
         }
+        roomRoleControl={
+          <div className={s.roomRoleCompact}>
+            <RoomRoleBar currentRoomRole={currentRoomRole} canModerateCurrentRoom={canModerateCurrentRoom} />
+          </div>
+        }
         headerControls={
           <ChatHeaderControls
             onOpenSettings={openSettings}
@@ -269,8 +274,6 @@ export const ChatPage = () => {
         onNavigate={navigate}
         onOpenSettings={openSettings}
       >
-        <RoomRoleBar currentRoomRole={currentRoomRole} canModerateCurrentRoom={canModerateCurrentRoom} />
-
         <ChatSearchBar
           searchQuery={searchQuery}
           resultCount={filteredMessages.length}
