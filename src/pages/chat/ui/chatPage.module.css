@@ -1316,7 +1316,8 @@
 .roomPage .messageTime { color: #6e628c; font-size: 13px; }
 .roomPage .messageBody,
 .roomPage .text { color: #1b0c2c; font-size: 18px; line-height: 1.45; }
-.roomPage .messageOwn .messageBody { background: #f5efff; border-color: #ded5ed; }
+.roomPage .messageBody { width: min(88%, 760px); justify-self: start; padding: 8px 12px; background: #f5efff; border: 1px solid #ded5ed; border-radius: 9px; }
+.roomPage .messageOwn .messageBody { justify-self: end; }
 .roomPage .mention,
 .roomPage .mentionCurrentUser,
 .roomPage .replyPreviewAuthor,
@@ -1341,7 +1342,7 @@
 :global(:root[data-theme="dark"]) .roomPage .text,
 :global(:root[data-theme="dark"]) .roomPage .searchInput,
 :global(:root[data-theme="dark"]) .roomPage .inputArea input { color: #faf5ee; }
-:global(:root[data-theme="dark"]) .roomPage .messageOwn .messageBody,
+:global(:root[data-theme="dark"]) .roomPage .messageBody,
 :global(:root[data-theme="dark"]) .roomPage .replyPreview,
 :global(:root[data-theme="dark"]) .roomPage .replyComposer { background: #35233e; border-color: #60486a; }
 :global(:root[data-theme="dark"]) .roomPage .message { border-color: #493451; }
@@ -1422,7 +1423,8 @@
   .roomPage .messageBody > .replyPreview { grid-column: 1 / -1; }
   .roomPage .messageBody > .text,
   .roomPage .messageBody > .editedTag { grid-column: 1; }
-  .messageOwn .messageBody { width: min(92%, 600px); padding: 7px 9px; border-radius: 12px 4px 12px 12px; }
+  .roomPage .messageBody { width: min(92%, 600px); padding: 7px 9px; border-radius: 12px 12px 12px 4px; }
+  .roomPage .messageOwn .messageBody { border-radius: 12px 4px 12px 12px; }
   .messageActions { grid-column: 2; grid-row: 2 / span 2; gap: 0; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
   .messageActions .messageDesktopReply,
   .messageActions .messageDesktopAction { display: none; }
