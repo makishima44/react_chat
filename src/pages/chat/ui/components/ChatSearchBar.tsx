@@ -22,7 +22,10 @@ export const ChatSearchBar = ({ searchQuery, resultCount, hasActiveSearch, onCha
 
   return (
     <div className={s.searchBar} id="room-message-search" data-active={hasActiveSearch} data-mobile-open={mobileOpen}>
-      <span className={s.searchLabel}>{t("commonSearch")}</span>
+      <svg className={s.searchGlyph} viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="10.8" cy="10.8" r="6.3" fill="none" stroke="currentColor" strokeWidth="2" />
+        <path d="m15.5 15.5 4.2 4.2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
       <input
         ref={inputRef}
         type="text"

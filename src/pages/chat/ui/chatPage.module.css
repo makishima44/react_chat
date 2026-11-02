@@ -286,6 +286,13 @@
   outline: none;
 }
 
+.searchGlyph {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: #6e628c;
+}
+
 .searchMeta {
   display: inline-flex;
   align-items: center;
@@ -1332,6 +1339,7 @@
 .roomPage .replyComposerText { color: #6e628c; }
 .roomPage .inputArea { min-height: 64px; padding: 8px 12px; }
 .roomPage .inputArea input { color: #1b0c2c; font-size: 18px; }
+.roomPage .searchInput:focus-visible { outline: none; box-shadow: none; }
 .roomPage .inputArea > button { min-height: 42px; padding-inline: 18px; background: #ffc329; border-color: #ffc329; border-radius: 9px; color: #1b0c2c; font-size: 16px; font-weight: 800; }
 .roomPage .headerControls[data-workspace-controls="true"] > button { color: #483274; background: #f5efff; border-color: #d4c9e7; font-size: 13px; }
 .roomPage .headerControls[data-workspace-controls="true"] > button:hover { background: #eee3fc; }
@@ -1391,8 +1399,8 @@
 
 .roomPage .mobileSearchButton {
   display: inline-flex;
-  width: auto;
-  min-width: 58px;
+  width: 40px;
+  min-width: 40px;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
@@ -1410,7 +1418,35 @@
 .roomPage .mobileSearchButton:hover,
 .roomPage .mobileSearchButton[aria-expanded="true"] { border-color: #bda9d8; background: #eee3fc; }
 .roomPage .mobileSearchButton .icon { width: 17px; height: 17px; }
+.roomPage .mobileSearchButton > span { display: none; }
 .roomPage .searchBar[data-mobile-open="false"] { display: none; }
+
+@media (min-width: 761px) {
+  .roomPage .inputArea input:focus-visible { outline: none; box-shadow: none; }
+
+  .roomPage .inputArea:focus-within,
+  .roomPage .searchBar:focus-within {
+    border-color: #aa8bc9;
+    box-shadow: 0 0 0 3px rgba(104, 64, 149, .12);
+  }
+
+  .roomPage .messages {
+    scrollbar-width: thin;
+    scrollbar-color: #c9bad9 transparent;
+  }
+
+  .roomPage .messages::-webkit-scrollbar { width: 7px; }
+  .roomPage .messages::-webkit-scrollbar-track { background: transparent; }
+  .roomPage .messages::-webkit-scrollbar-thumb { min-height: 32px; border: 2px solid #fffdf8; border-radius: 8px; background: #c9bad9; }
+  .roomPage .messages::-webkit-scrollbar-thumb:hover { background: #a995c1; }
+
+  :global(:root[data-theme="dark"]) .roomPage .messages { scrollbar-color: #60486a transparent; }
+  :global(:root[data-theme="dark"]) .roomPage .messages::-webkit-scrollbar-thumb { border-color: #211329; background: #60486a; }
+  :global(:root[data-theme="dark"]) .roomPage .messages::-webkit-scrollbar-thumb:hover { background: #80658c; }
+  :global(:root[data-theme="dark"]) .roomPage .mobileSearchButton { border-color: #60486a; background: #35233e; color: #e4d4ff; }
+  :global(:root[data-theme="dark"]) .roomPage .mobileSearchButton:hover,
+  :global(:root[data-theme="dark"]) .roomPage .mobileSearchButton[aria-expanded="true"] { background: #493451; }
+}
 
 @media (max-width: 760px) {
   .mobileSearchButton,
@@ -1435,8 +1471,9 @@
   .roomPage .roomRoleBar { min-height: 0; gap: 6px; padding: 0 2px; border: 0; background: transparent; font-size: 11px; }
   .roomPage .roomRoleLabel { font-size: 10px; letter-spacing: .04em; }
   .roomPage .roomRoleCapability { display: none; }
-  .roomPage .searchBar { min-height: 44px; padding: 8px 12px; grid-template-columns: minmax(0, 1fr); gap: 4px; border-width: 1px; }
+  .roomPage .searchBar { min-height: 44px; padding: 8px 12px; grid-template-columns: auto minmax(0, 1fr); gap: 4px 8px; border-width: 1px; }
   .roomPage .searchLabel { display: none; }
+  .roomPage .searchMeta { grid-column: 1 / -1; }
   .roomPage .searchInput { font-size: 16px; min-height: 24px; }
   .roomPage .searchCount { font-size: 12px; }
   .roomPage .searchMeta { justify-content: space-between; }

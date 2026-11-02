@@ -130,7 +130,8 @@ export const ChatPreviewPage = () => {
           <button
             type="button"
             className={`${s.iconButton} ${s.mobileSearchButton}`}
-            aria-label="Поиск"
+            aria-label="Поиск сообщений"
+            title="Поиск сообщений"
             aria-expanded={mobileSearchOpen}
             aria-controls="room-message-search"
             onClick={() => setMobileSearchOpen((open) => !open)}
